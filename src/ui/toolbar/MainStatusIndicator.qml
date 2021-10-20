@@ -223,6 +223,37 @@ RowLayout {
         }
     }
 
+    Item {
+        Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * ScreenTools.largeFontPointRatio * 1.5
+        height:                 1
+    }
+
+    QGCColoredImage {
+        id:         videoSourceIcon
+        width:      ScreenTools.defaultFontPixelWidth * 2
+        height:     ScreenTools.defaultFontPixelHeight * 0.75
+        fillMode:   Image.PreserveAspectFit
+        mipmap:     true
+        color:      qgcPal.text
+        source:     "/qmlimages/camera.svg"
+        visible:    videoSourceMenu.visible
+    }
+
+    Item {
+        Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth / 2
+        height:                 1
+        visible:                videoSourceMenu.visible
+    }
+
+    VideoSourceMenu {
+        id:                     videoSourceMenu
+        Layout.preferredHeight: _root.height
+        verticalAlignment:      Text.AlignVCenter
+        font.pointSize:         ScreenTools.defaultFontPointSize
+        mouseAreaLeftMargin:    -(videoSourceMenu.x - videoSourceIcon.x)
+        visible:                _activeVehicle
+    }
+
     Component {
         id: vtolTransitionComponent
 
