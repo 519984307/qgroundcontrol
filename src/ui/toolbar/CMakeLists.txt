@@ -17,4 +17,5 @@ add_custom_target(UiToolbarQml
 		SignalStrength.qml
 		TelemetryRSSIIndicator.qml
 		VTOLModeIndicator.qml
+		VideoSourceIndicator.qml
 )

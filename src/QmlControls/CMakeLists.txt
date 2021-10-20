@@ -125,6 +125,7 @@ add_custom_target(QmlControlsQml
 		SliderSwitch.qml
 		SubMenuButton.qml
 		ToolStrip.qml
+		VideoSourceMenu.qml
 		VehicleRotationCal.qml
 		VehicleSummaryRow.qml
 )

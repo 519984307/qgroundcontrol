@@ -23,7 +23,7 @@ import QGroundControl.SettingsManager       1.0
 // Label control whichs pop up a flight mode change menu when clicked
 QGCLabel {
     id:     _root
-    text:   QGroundControl.settingsManager.videoSettings.udpPort.rawValue
+    text:   _root.get_stream_name(QGroundControl.settingsManager.videoSettings.udpPort.rawValue)
 
     property var    currentVehicle:         QGroundControl.multiVehicleManager.activeVehicle
     property real   mouseAreaLeftMargin:    0
@@ -37,17 +37,35 @@ QGCLabel {
 
         MenuItem {
             enabled: true
-            onTriggered: QGroundControl.settingsManager.videoSettings.udpPort.value = text
+            onTriggered: QGroundControl.settingsManager.videoSettings.udpPort.value = _root.get_port(text)
         }
     }
 
     property var flightModesMenuItems: []
-    property var ports: [5600, 5601, 5602, 5604]
+    property var ports: [5601, 5602]
+    property var stream_names: ["Regular image (5601)", "Debug image (5602)"]
+
+    function get_stream_name(port) {
+        var i = 0;
+        for (i = 0; i<ports.length; i++)
+        {
+            if(parseInt(port)==ports[i]) return stream_names[i];
+        }
+        return qsTr(`Custom image (${port})`)
+    }
+
+    function get_port(stream_name) {
+        var i = 0;
+        for (i = 0; i<ports.length;i++){
+            if(stream_name==stream_names[i]) return ports[i];
+        }
+        return 5601; // Default port (regular image)
+    }
 
     function updateFlightModesMenu() {
         console.log(QGroundControl.settingsManager.videoSettings.udpPort.rawValue)
         // console.log(VideoSettings.udp264VideoSource)
-        if (currentVehicle && currentVehicle.flightModeSetAvailable) {
+        if (currentVehicle) {
             var i;
             // Remove old menu items
             for (i = 0; i < flightModesMenuItems.length; i++) {
@@ -57,7 +75,7 @@ QGCLabel {
             // Add new items
             
             for (i = 0; i < ports.length; i++) {
-                var menuItem = flightModeMenuItemComponent.createObject(null, { "text": ports[i] })
+                var menuItem = flightModeMenuItemComponent.createObject(null, { "text": stream_names[i]})
                 flightModesMenuItems.push(menuItem)
                 flightModesMenu.insertItem(i, menuItem)
             }
