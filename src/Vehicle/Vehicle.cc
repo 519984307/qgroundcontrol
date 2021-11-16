@@ -1016,7 +1016,7 @@ void Vehicle::_handleAttitudeWorker(double rollRadians, double pitchRadians, dou
 
     // double new_roll, new_pitch, new_yaw;
     //bool vtolInFwdFlight = extendedState.vtol_state == MAV_VTOL_STATE_FW;
-    if(_vtolInFwdFlight){
+    if(_vtolInFwdFlight && _settingsManager->flyViewSettings()->fwdTelemetryFix()->rawValue().toBool()){
         roll = QGC::limitAngleToPMPIf(yawRadians);
         pitch = QGC::limitAngleToPMPIf(-pitchRadians);
         yaw = QGC::limitAngleToPMPIf(-rollRadians);

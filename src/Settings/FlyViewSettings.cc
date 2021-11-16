@@ -17,12 +17,15 @@ DECLARE_SETTINGGROUP(FlyView, "FlyView")
     qmlRegisterUncreatableType<FlyViewSettings>("QGroundControl.SettingsManager", 1, 0, "FlyViewSettings", "Reference only"); \
 }
 
+// TODO: Add a fact here to adapt the instrument panel to the hotfix (we need to add it in JSON, CC, and HEADER files)
+
 DECLARE_SETTINGSFACT(FlyViewSettings, guidedMinimumAltitude)
 DECLARE_SETTINGSFACT(FlyViewSettings, guidedMaximumAltitude)
 DECLARE_SETTINGSFACT(FlyViewSettings, showLogReplayStatusBar)
 DECLARE_SETTINGSFACT(FlyViewSettings, alternateInstrumentPanel)
 DECLARE_SETTINGSFACT(FlyViewSettings, showAdditionalIndicatorsCompass)
 DECLARE_SETTINGSFACT(FlyViewSettings, lockNoseUpCompass)
+DECLARE_SETTINGSFACT(FlyViewSettings, fwdTelemetryFix)
 DECLARE_SETTINGSFACT(FlyViewSettings, maxGoToLocationDistance)
 DECLARE_SETTINGSFACT(FlyViewSettings, keepMapCenteredOnVehicle)
 DECLARE_SETTINGSFACT(FlyViewSettings, showSimpleCameraControl)

@@ -30,6 +30,12 @@
     "default":     false
 },
 {
+    "name":             "fwdTelemetryFix",
+    "shortDesc": "Use the temporary telemetry fix for FW mode",
+    "type":             "bool",
+    "default":     true
+},
+{
     "name":             "showAdditionalIndicatorsCompass",
     "shortDesc": "Show additional heading indicators on Compass",
     "type":             "bool",

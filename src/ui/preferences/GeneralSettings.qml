@@ -158,6 +158,16 @@ Rectangle {
                             }
 
                             FactCheckBox {
+                                text:       qsTr("Use the FWD Telemetry fix")
+                                visible:    true
+                                fact:       _fwdTelemetryFix
+
+                                property Fact _fwdTelemetryFix: QGroundControl.settingsManager.flyViewSettings.fwdTelemetryFix
+                            }
+
+                            
+
+                            FactCheckBox {
                                 text:       qsTr("Show additional heading indicators on Compass")
                                 visible:    _showAdditionalIndicatorsCompass.visible
                                 fact:       _showAdditionalIndicatorsCompass
