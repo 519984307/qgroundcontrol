@@ -1014,9 +1014,20 @@ void Vehicle::_handleAttitudeWorker(double rollRadians, double pitchRadians, dou
 {
     double roll, pitch, yaw;
 
-    roll = QGC::limitAngleToPMPIf(rollRadians);
-    pitch = QGC::limitAngleToPMPIf(pitchRadians);
-    yaw = QGC::limitAngleToPMPIf(yawRadians);
+    // double new_roll, new_pitch, new_yaw;
+    //bool vtolInFwdFlight = extendedState.vtol_state == MAV_VTOL_STATE_FW;
+    if(_vtolInFwdFlight){
+        roll = QGC::limitAngleToPMPIf(yawRadians);
+        pitch = QGC::limitAngleToPMPIf(-pitchRadians);
+        yaw = QGC::limitAngleToPMPIf(-rollRadians);
+    }
+    else
+    {
+        roll = QGC::limitAngleToPMPIf(rollRadians);
+        pitch = QGC::limitAngleToPMPIf(pitchRadians);
+        yaw = QGC::limitAngleToPMPIf(yawRadians);
+    }
+    
 
     roll = qRadiansToDegrees(roll);
     pitch = qRadiansToDegrees(pitch);
@@ -1027,6 +1038,9 @@ void Vehicle::_handleAttitudeWorker(double rollRadians, double pitchRadians, dou
     }
     // truncate to integer so widget never displays 360
     yaw = trunc(yaw);
+
+
+    // TODO: Read a settings fact that toggles the modification
 
     _rollFact.setRawValue(roll);
     _pitchFact.setRawValue(pitch);
