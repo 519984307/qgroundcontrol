@@ -1055,6 +1055,7 @@
         <value code="10">Takeoff</value>
         <value code="11">Land</value>
         <value code="12">Follow Me</value>
+        <value code="13">Precision Land</value>
       </values>
     </parameter>
     <parameter name="COM_FLTMODE2" default="-1" type="INT32">
@@ -1074,6 +1075,7 @@
         <value code="10">Takeoff</value>
         <value code="11">Land</value>
         <value code="12">Follow Me</value>
+        <value code="13">Precision Land</value>
       </values>
     </parameter>
     <parameter name="COM_FLTMODE3" default="-1" type="INT32">
@@ -1093,6 +1095,7 @@
         <value code="10">Takeoff</value>
         <value code="11">Land</value>
         <value code="12">Follow Me</value>
+        <value code="13">Precision Land</value>
       </values>
     </parameter>
     <parameter name="COM_FLTMODE4" default="-1" type="INT32">
@@ -1112,6 +1115,7 @@
         <value code="10">Takeoff</value>
         <value code="11">Land</value>
         <value code="12">Follow Me</value>
+        <value code="13">Precision Land</value>
       </values>
     </parameter>
     <parameter name="COM_FLTMODE5" default="-1" type="INT32">
@@ -1131,6 +1135,7 @@
         <value code="10">Takeoff</value>
         <value code="11">Land</value>
         <value code="12">Follow Me</value>
+        <value code="13">Precision Land</value>
       </values>
     </parameter>
     <parameter name="COM_FLTMODE6" default="-1" type="INT32">
@@ -1150,6 +1155,7 @@
         <value code="10">Takeoff</value>
         <value code="11">Land</value>
         <value code="12">Follow Me</value>
+        <value code="13">Precision Land</value>
       </values>
     </parameter>
     <parameter name="COM_FLT_PROFILE" default="0" type="INT32">
