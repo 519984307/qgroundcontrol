@@ -42,8 +42,8 @@ QGCLabel {
     }
 
     property var flightModesMenuItems: []
-    property var ports: [5601, 5602]
-    property var stream_names: ["Regular image (5601)", "Debug image (5602)"]
+    property var ports: [5601, 5602, 5605]
+    property var stream_names: ["MC Regular image (5601)", "MC Debug image (5602)", "FW camera (5605)"]
 
     function get_stream_name(port) {
         var i = 0;
