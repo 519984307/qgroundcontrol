@@ -254,6 +254,40 @@ RowLayout {
         visible:                _activeVehicle
     }
 
+
+    // Start ROS Menu
+
+    Item {
+        Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * ScreenTools.largeFontPointRatio * 1.5
+        height:                 1
+    }
+
+    QGCColoredImage {
+        id:         rosIcon
+        width:      ScreenTools.defaultFontPixelWidth * 2
+        height:     ScreenTools.defaultFontPixelHeight * 0.75
+        fillMode:   Image.PreserveAspectFit
+        mipmap:     true
+        color:      qgcPal.text
+        source:     "/qmlimages/Hamburger.svg"
+        visible:    !_activeVehicle
+    }
+
+    Item {
+        Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth / 2
+        height:                 1
+        visible:                !_activeVehicle
+    }
+
+    StartROSMenu {
+        id:                     rosMenu
+        Layout.preferredHeight: _root.height
+        verticalAlignment:      Text.AlignVCenter
+        font.pointSize:         ScreenTools.defaultFontPointSize
+        mouseAreaLeftMargin:    -(rosMenu.x - rosIcon.x)
+        visible:                !_activeVehicle
+    }
+
     Component {
         id: vtolTransitionComponent
 

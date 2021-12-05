@@ -102,6 +102,7 @@
 #include "QGCMAVLink.h"
 #include "VehicleLinkManager.h"
 #include "Autotune.h"
+#include "StartROSMenuController.h"
 
 #if defined(QGC_ENABLE_PAIRING)
 #include "PairingManager.h"
@@ -511,6 +512,10 @@ void QGCApplication::_initCommon()
     qmlRegisterType<SyslinkComponentController>     (kQGCControllers,                       1, 0, "SyslinkComponentController");
     qmlRegisterType<EditPositionDialogController>   (kQGCControllers,                       1, 0, "EditPositionDialogController");
     qmlRegisterType<RCToParamDialogController>      (kQGCControllers,                       1, 0, "RCToParamDialogController");
+
+    // Controller for the start ROS button
+    qmlRegisterType<StartROSMenuController>         (kQGCControllers,                          1, 0, "StartROSMenuController");
+
 
     qmlRegisterType<TerrainProfile>                 ("QGroundControl.Controls",             1, 0, "TerrainProfile");
     qmlRegisterType<ToolStripAction>                ("QGroundControl.Controls",             1, 0, "ToolStripAction");

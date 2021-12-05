@@ -30,4 +30,18 @@ public:
     DEFINE_SETTINGFACT(keepMapCenteredOnVehicle)
     DEFINE_SETTINGFACT(showSimpleCameraControl)
     DEFINE_SETTINGFACT(showObstacleDistanceOverlay)
+
+    // Start ROS settings
+    DEFINE_SETTINGFACT(Mark11IP)
+
+    DEFINE_SETTINGFACT(Mark12IP)
+
+    DEFINE_SETTINGFACT(Mark13IP)
+
+    DEFINE_SETTINGFACT(Skeleton12IP)
+
+    DEFINE_SETTINGFACT(Skeleton13IP)
+
+    DEFINE_SETTINGFACT(JetsonUsername)
+
 };

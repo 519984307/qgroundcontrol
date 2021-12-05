@@ -30,3 +30,15 @@ DECLARE_SETTINGSFACT(FlyViewSettings, maxGoToLocationDistance)
 DECLARE_SETTINGSFACT(FlyViewSettings, keepMapCenteredOnVehicle)
 DECLARE_SETTINGSFACT(FlyViewSettings, showSimpleCameraControl)
 DECLARE_SETTINGSFACT(FlyViewSettings, showObstacleDistanceOverlay)
+
+// Start ROS settings
+DECLARE_SETTINGSFACT(FlyViewSettings, Mark11IP)
+DECLARE_SETTINGSFACT(FlyViewSettings, Mark12IP)
+DECLARE_SETTINGSFACT(FlyViewSettings, Mark13IP)
+DECLARE_SETTINGSFACT(FlyViewSettings, Skeleton12IP)
+DECLARE_SETTINGSFACT(FlyViewSettings, Skeleton13IP)
+DECLARE_SETTINGSFACT(FlyViewSettings, JetsonUsername)
+
+
+
+

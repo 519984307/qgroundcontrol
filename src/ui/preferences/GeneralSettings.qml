@@ -357,6 +357,91 @@ Rectangle {
                                     visible:    _showSaveVideoSettings && fact.visible
                                 }
                             }
+
+                            GridLayout {
+                                columns: 2
+
+                                QGCLabel {
+                                    text:               qsTr("Start ROS settings")
+                                    Layout.columnSpan:  2
+                                    Layout.alignment:   Qt.AlignHCenter
+                                }
+
+                                QGCLabel {
+                                    text:       qsTr("Jetson Username")
+                                    visible:    true
+                                }
+                                FactTextField {
+                                    id:                     jetsonusername
+                                    Layout.preferredWidth:  _comboFieldWidth
+                                    visible:                true
+                                    fact:                   _flyViewSettings.JetsonUsername
+                                }
+
+                                QGCLabel {
+                                    text:       qsTr("Mark 11 IP address")
+                                    visible:    true
+                                }
+                                FactTextField {
+                                    id:                     mark11ip
+                                    Layout.preferredWidth:  _comboFieldWidth
+                                    visible:                true
+                                    fact:                   _flyViewSettings.Mark11IP
+                                }
+
+                                
+
+
+                                QGCLabel {
+                                    text:       qsTr("Mark 12 IP address")
+                                    visible:    true
+                                }
+                                FactTextField {
+                                    id:                     mark12ip
+                                    Layout.preferredWidth:  _comboFieldWidth
+                                    visible:                true
+                                    fact:                   _flyViewSettings.Mark12IP
+                                }
+
+                                
+
+                                QGCLabel {
+                                    text:       qsTr("Mark 13 IP address")
+                                    visible:    true
+                                }
+                                FactTextField {
+                                    id:                     mark13ip
+                                    Layout.preferredWidth:  _comboFieldWidth
+                                    visible:                true
+                                    fact:                   _flyViewSettings.Mark13IP
+                                }
+
+                                QGCLabel {
+                                    text:       qsTr("Skeleton 12 IP address")
+                                    visible:    true
+                                }
+                                FactTextField {
+                                    id:                     skeleton12ip
+                                    Layout.preferredWidth:  _comboFieldWidth
+                                    visible:                true
+                                    fact:                   _flyViewSettings.Skeleton12IP
+                                }
+
+                                QGCLabel {
+                                    text:       qsTr("Skeleton 13 IP address")
+                                    visible:    true
+                                }
+                                FactTextField {
+                                    id:                     skeleton13ip
+                                    Layout.preferredWidth:  _comboFieldWidth
+                                    visible:                true
+                                    fact:                   _flyViewSettings.Skeleton13IP
+                                }
+
+                                
+
+                                
+                            }
                         }
                     }
 

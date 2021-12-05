@@ -72,6 +72,42 @@
     "units":            "m",
     "default":     1000,
     "min":              1
+},
+{
+    "name":             "JetsonUsername",
+    "shortDesc": "Account username for the Jetson",
+    "type":             "string",
+    "default":     "jetsonnx"
+},
+{
+    "name":             "Mark11IP",
+    "shortDesc": "IP Address of the Mark 11 glider",
+    "type":             "string",
+    "default":     ""
+},
+{
+    "name":             "Mark12IP",
+    "shortDesc": "IP Address of the Mark 12 glider",
+    "type":             "string",
+    "default":     ""
+},
+{
+    "name":             "Mark13IP",
+    "shortDesc": "IP Address of the Mark 13 glider",
+    "type":             "string",
+    "default":     ""
+},
+{
+    "name":             "Skeleton12IP",
+    "shortDesc": "IP Address of the Skeleton 12 glider",
+    "type":             "string",
+    "default":     ""
+},
+{
+    "name":             "Skeleton13IP",
+    "shortDesc": "IP Address of the Skeleton 13 glider",
+    "type":             "string",
+    "default":     ""
 }
 ]
 }
