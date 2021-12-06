@@ -132,6 +132,7 @@ add_custom_target(QmlControlsQml
 		VideoSourceMenu.qml
 		VehicleRotationCal.qml
 		VehicleSummaryRow.qml
+		LandingStationIndicator.qml
 )
 
 target_link_libraries(QmlControls

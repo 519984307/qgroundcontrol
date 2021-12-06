@@ -136,6 +136,12 @@
     "shortDesc": "Throttle %",
     "type":             "uint16",
     "units":            "%"
+},
+{
+    "name":             "landingStationConnected",
+    "shortDesc": "Landing Station Connected",
+    "type":             "bool",
+    "default":          false
 }
 ]
 }

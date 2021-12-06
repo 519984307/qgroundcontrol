@@ -254,6 +254,22 @@ RowLayout {
         visible:                _activeVehicle
     }
 
+    // Landing Station Indicator
+    Item {
+        id:                     landingStationIndicatorItem
+        Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth / 2
+        height:                 1
+        visible:                landingStationIndicator.visible
+    }
+
+    LandingStationIndicator {
+        id:                     landingStationIndicator
+        Layout.preferredHeight: _root.height
+        verticalAlignment:      Text.AlignVCenter
+        font.pointSize:         ScreenTools.defaultFontPointSize
+        mouseAreaLeftMargin:    -(landingStationIndicator.x - landingStationIndicatorItem.x)
+        visible:                _activeVehicle
+    }
 
     // Start ROS Menu
 

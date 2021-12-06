@@ -94,6 +94,7 @@ const char* Vehicle::_headingToHomeFactName =       "headingToHome";
 const char* Vehicle::_distanceToGCSFactName =       "distanceToGCS";
 const char* Vehicle::_hobbsFactName =               "hobbs";
 const char* Vehicle::_throttlePctFactName =         "throttlePct";
+const char* Vehicle::_landingStationConnectedFactName = "landingStationConnected";
 
 const char* Vehicle::_gpsFactGroupName =                "gps";
 const char* Vehicle::_gps2FactGroupName =               "gps2";
@@ -154,6 +155,7 @@ Vehicle::Vehicle(LinkInterface*             link,
     , _distanceToGCSFact            (0, _distanceToGCSFactName,     FactMetaData::valueTypeDouble)
     , _hobbsFact                    (0, _hobbsFactName,             FactMetaData::valueTypeString)
     , _throttlePctFact              (0, _throttlePctFactName,       FactMetaData::valueTypeUint16)
+    , _landingStationConnectedFact  (0, _landingStationConnectedFactName, FactMetaData::valueTypeBool)
     , _gpsFactGroup                 (this)
     , _gps2FactGroup                (this)
     , _windFactGroup                (this)
@@ -307,6 +309,7 @@ Vehicle::Vehicle(MAV_AUTOPILOT              firmwareType,
     , _distanceToGCSFact                (0, _distanceToGCSFactName,     FactMetaData::valueTypeDouble)
     , _hobbsFact                        (0, _hobbsFactName,             FactMetaData::valueTypeString)
     , _throttlePctFact                  (0, _throttlePctFactName,       FactMetaData::valueTypeUint16)
+    , _landingStationConnectedFact      (0, _landingStationConnectedFactName, FactMetaData::valueTypeBool)
     , _gpsFactGroup                     (this)
     , _gps2FactGroup                    (this)
     , _windFactGroup                    (this)
@@ -428,6 +431,7 @@ void Vehicle::_commonInit()
     _addFact(&_headingToHomeFact,       _headingToHomeFactName);
     _addFact(&_distanceToGCSFact,       _distanceToGCSFactName);
     _addFact(&_throttlePctFact,         _throttlePctFactName);
+    _addFact(&_landingStationConnectedFact, _landingStationConnectedFactName);
 
     _hobbsFact.setRawValue(QVariant(QString("0000:00:00")));
     _addFact(&_hobbsFact,               _hobbsFactName);
@@ -587,6 +591,7 @@ void Vehicle::resetCounters()
     _heardFrom          = false;
 }
 
+// TODO: Seems that this is the function that handles the incoming Mavlink messages
 void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t message)
 {
     // If the link is already running at Mavlink V2 set our max proto version to it.
@@ -750,6 +755,8 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
     case MAVLINK_MSG_ID_OBSTACLE_DISTANCE:
         _handleObstacleDistance(message);
         break;
+    case MAVLINK_MSG_ID_NAMED_VALUE_FLOAT:
+        _handleNamedValueFloat(message);
 
     case MAVLINK_MSG_ID_EVENT:
     case MAVLINK_MSG_ID_CURRENT_EVENT_SEQUENCE:
@@ -1095,6 +1102,23 @@ void Vehicle::_handleAttitudeQuaternion(mavlink_message_t& message)
     rollRate()->setRawValue(qRadiansToDegrees(rates[0]));
     pitchRate()->setRawValue(qRadiansToDegrees(rates[1]));
     yawRate()->setRawValue(qRadiansToDegrees(rates[2]));
+}
+
+void Vehicle::_handleNamedValueFloat(mavlink_message_t& message)
+{
+    // only accept the attitude message from the vehicle's flight controller
+    if (message.sysid != _id || message.compid != _compID) {
+        return;
+    }
+
+    mavlink_named_value_float_t content;
+    mavlink_msg_named_value_float_decode(&message, &content);
+
+    // _handleAttitudeWorker(attitude.roll, attitude.pitch, attitude.yaw);
+    std::string name_str = content.name;
+    if(name_str != "lan_con") return;
+    if(content.value == 1) landingStationConnected()->setRawValue(tr("true"));
+    else landingStationConnected()->setRawValue(tr("false"));
 }
 
 void Vehicle::_handleGpsRawInt(mavlink_message_t& message)
