@@ -255,11 +255,28 @@ RowLayout {
     }
 
     // Landing Station Indicator
+
+    Item {
+        Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * ScreenTools.largeFontPointRatio * 1.5
+        height:                 1
+    }
+
+    QGCColoredImage {
+        id:         landingStationIcon
+        width:      ScreenTools.defaultFontPixelWidth * 2
+        height:     ScreenTools.defaultFontPixelHeight * 0.75
+        fillMode:   Image.PreserveAspectFit
+        mipmap:     true
+        color:      qgcPal.text
+        source:     landingStationIndicator.currentVehicle.landingStationConnected.value ? "/qmlimages/GreenCheckmark.svg" : "/qmlimages/CircleX.svg"
+        visible:    landingStationIndicator.visible
+    }
+
+
     Item {
         id:                     landingStationIndicatorItem
         Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth / 2
         height:                 1
-        visible:                landingStationIndicator.visible
     }
 
     LandingStationIndicator {
@@ -267,7 +284,7 @@ RowLayout {
         Layout.preferredHeight: _root.height
         verticalAlignment:      Text.AlignVCenter
         font.pointSize:         ScreenTools.defaultFontPointSize
-        mouseAreaLeftMargin:    -(landingStationIndicator.x - landingStationIndicatorItem.x)
+        mouseAreaLeftMargin:    -(landingStationIndicator.x - landingStationIcon.x)
         visible:                _activeVehicle
     }
 

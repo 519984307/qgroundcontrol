@@ -14,11 +14,28 @@ import QGroundControl               1.0
 import QGroundControl.Controls      1.0
 import QGroundControl.ScreenTools   1.0
 
-// Label control whichs pop up a flight mode change menu when clicked
+// Label control that shows the connection status to the Landing Station
 QGCLabel {
     id:     _root
-    text:   currentVehicle.landingStationConnected ? qsTr("LS disconnected", "Landing Station not connected") : qsTr("LS connected", "Connected to Landing Station")
+    text:   updateText()
 
+    function updateText()
+    {
+        /*console.log(currentVehicle.landingStationConnected.value)
+        console.log(currentVehicle.landingStationConnected.rawValue)*/
+        return currentVehicle.landingStationConnected.value ?  qsTr("LS connected", "Connected to Landing Station") : qsTr("LS disconnected", "Landing Station not connected");
+    }
     property var    currentVehicle:         QGroundControl.multiVehicleManager.activeVehicle
-    property real   mouseAreaLeftMargin:    0
+    
+
+    /*Item {
+       Timer {
+               interval: 100; running: true; repeat: true
+               onTriggered: _root.text = updateText();
+             }
+    }*/
+
+    property real mouseAreaLeftMargin:    0 
 }
+
+

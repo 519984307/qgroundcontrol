@@ -1106,7 +1106,7 @@ void Vehicle::_handleAttitudeQuaternion(mavlink_message_t& message)
 
 void Vehicle::_handleNamedValueFloat(mavlink_message_t& message)
 {
-    // only accept the attitude message from the vehicle's flight controller
+    // only accept the message from the vehicle's flight controller
     if (message.sysid != _id || message.compid != _compID) {
         return;
     }
@@ -1117,7 +1117,10 @@ void Vehicle::_handleNamedValueFloat(mavlink_message_t& message)
     // _handleAttitudeWorker(attitude.roll, attitude.pitch, attitude.yaw);
     std::string name_str = content.name;
     if(name_str != "lan_con") return;
-    if(content.value == 1) landingStationConnected()->setRawValue(tr("true"));
+    if(content.value == 1)
+    {
+        landingStationConnected()->setRawValue(tr("true"));
+    }
     else landingStationConnected()->setRawValue(tr("false"));
 }
 
