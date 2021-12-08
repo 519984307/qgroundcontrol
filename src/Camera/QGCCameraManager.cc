@@ -8,6 +8,8 @@
 #include "QGCApplication.h"
 #include "QGCCameraManager.h"
 #include "JoystickManager.h"
+#include "SettingsManager.h"
+#include<iostream>
 
 QGC_LOGGING_CATEGORY(CameraManagerLog, "CameraManagerLog")
 
@@ -42,8 +44,14 @@ QGCCameraManager::~QGCCameraManager()
 void
 QGCCameraManager::setCurrentCamera(int sel)
 {
-    if(sel != _currentCamera && sel >= 0 && sel < _cameras.count()) {
+    int ports[] = {5601, 5602, 5605};
+    sel %= 3;
+    std::cout<<"GOT CAMERA CHANGE SIGNAL\n";
+    // TODO: we can override this to change the settings fact directly
+    if(sel >= 0 && sel < 3) {
+        std::cout<<"Changing cam to "<< ports[sel] << "\n";
         _currentCamera = sel;
+        qgcApp()->toolbox()->settingsManager()->videoSettings()->udpPort()->setRawValue(ports[sel]);
         emit currentCameraChanged();
         emit streamChanged();
     }
@@ -495,12 +503,14 @@ QGCCameraManager::_stopZoom()
 void
 QGCCameraManager::_stepCamera(int direction)
 {
-    if(_lastCameraChange.elapsed() > 1000) {
+    std::cout<<"STEP CAM with currentCam:" << _currentCamera <<"\n";
+    if(_lastCameraChange.elapsed() > 50) {
         _lastCameraChange.start();
         qCDebug(CameraManagerLog) << "Step Camera" << direction;
+        std::cout<<"STEP CAM ...\n";
         int c = _currentCamera + direction;
-        if(c < 0) c = _cameras.count() - 1;
-        if(c >= _cameras.count()) c = 0;
+        if(c < 0) c = 2;
+        // if(c >= _cameras.count()) c = 0;
         setCurrentCamera(c);
     }
 }
