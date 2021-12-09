@@ -33,7 +33,7 @@ SettingsManager::SettingsManager(QGCApplication* app, QGCToolbox* toolbox)
     , _apmMavlinkStreamRateSettings (nullptr)
 #endif
 {
-
+    
 }
 
 void SettingsManager::setToolbox(QGCToolbox *toolbox)
@@ -60,4 +60,6 @@ void SettingsManager::setToolbox(QGCToolbox *toolbox)
 #if defined(QGC_AIRMAP_ENABLED)
     _airMapSettings =               new AirMapSettings          (this);
 #endif
+    // Always set low-latency on
+    _videoSettings->lowLatencyMode()->setRawValue(true);
 }

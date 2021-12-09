@@ -345,7 +345,7 @@ Rectangle {
 
                                 Item { width: 1; height: 1}
                                 FactCheckBox {
-                                    text:       qsTr("Low Latency Mode")
+                                    text:       qsTr("Low Latency Mode (Disable at your own risk!)")
                                     fact:       _videoSettings.lowLatencyMode
                                     visible:    !_videoAutoStreamConfig && _isGst && fact.visible
                                 }
