@@ -75,7 +75,7 @@ class RosSSHThread : public QThread
             Keeping the code since it might be used in the future.
         */
         myProcess->closeWriteChannel();
-        myProcess->waitForReadyRead(5000);
+        myProcess->waitForReadyRead(20000);
         std::string stdout_str = myProcess->readAll().toStdString();
         std::string password_prompt_regex = _cmd + "'s password:";
         std::cout<<"Got the following STDOUT : " << stdout_str;
