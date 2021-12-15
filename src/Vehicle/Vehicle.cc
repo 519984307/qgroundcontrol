@@ -1389,7 +1389,9 @@ void Vehicle::_handleExtendedSysState(mavlink_message_t& message)
         if (vtolInFwdFlight != _vtolInFwdFlight) {
             _vtolInFwdFlight = vtolInFwdFlight;
 
-            // TODO: change video stream port here
+            // Change video stream port here
+            if(_vtolInFwdFlight) _settingsManager->videoSettings()->udpPort()->setRawValue(5605);
+            else _settingsManager->videoSettings()->udpPort()->setRawValue(5601);
 
             emit vtolInFwdFlightChanged(vtolInFwdFlight);
         }
