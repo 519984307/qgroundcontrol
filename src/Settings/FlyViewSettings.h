@@ -24,7 +24,13 @@ public:
     DEFINE_SETTINGFACT(showLogReplayStatusBar)
     DEFINE_SETTINGFACT(alternateInstrumentPanel)
     DEFINE_SETTINGFACT(showAdditionalIndicatorsCompass)
+
+
     DEFINE_SETTINGFACT(fwdTelemetryFix)
+    DEFINE_SETTINGFACT(TelemetryFixAMat)
+    DEFINE_SETTINGFACT(TelemetryFixBMat)
+
+
     DEFINE_SETTINGFACT(lockNoseUpCompass)
     DEFINE_SETTINGFACT(maxGoToLocationDistance)
     DEFINE_SETTINGFACT(keepMapCenteredOnVehicle)

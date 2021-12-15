@@ -25,7 +25,12 @@ DECLARE_SETTINGSFACT(FlyViewSettings, showLogReplayStatusBar)
 DECLARE_SETTINGSFACT(FlyViewSettings, alternateInstrumentPanel)
 DECLARE_SETTINGSFACT(FlyViewSettings, showAdditionalIndicatorsCompass)
 DECLARE_SETTINGSFACT(FlyViewSettings, lockNoseUpCompass)
+
 DECLARE_SETTINGSFACT(FlyViewSettings, fwdTelemetryFix)
+DECLARE_SETTINGSFACT(FlyViewSettings, TelemetryFixAMat)
+DECLARE_SETTINGSFACT(FlyViewSettings, TelemetryFixBMat)
+
+
 DECLARE_SETTINGSFACT(FlyViewSettings, maxGoToLocationDistance)
 DECLARE_SETTINGSFACT(FlyViewSettings, keepMapCenteredOnVehicle)
 DECLARE_SETTINGSFACT(FlyViewSettings, showSimpleCameraControl)

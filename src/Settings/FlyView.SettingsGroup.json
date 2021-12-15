@@ -108,6 +108,18 @@
     "shortDesc": "IP Address of the Skeleton 13 glider",
     "type":             "string",
     "default":     ""
+},
+{
+    "name":             "TelemetryFixAMat",
+    "shortDesc": "Matrix A of the attitude transformation",
+    "type":             "string",
+    "default":     "[[1,0,0],[0,1,0],[0,0,1]]"
+},
+{
+    "name":             "TelemetryFixBMat",
+    "shortDesc": "Matrix B of the attitude transformation",
+    "type":             "string",
+    "default":     ""
 }
 ]
 }

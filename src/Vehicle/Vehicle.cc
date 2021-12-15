@@ -1017,6 +1017,8 @@ void Vehicle::_handleNavControllerOutput(mavlink_message_t& message)
 #pragma warning(push, 0)
 #endif
 
+#include<sstream>
+
 void Vehicle::_handleAttitudeWorker(double rollRadians, double pitchRadians, double yawRadians)
 {
     double roll, pitch, yaw;
@@ -1024,9 +1026,18 @@ void Vehicle::_handleAttitudeWorker(double rollRadians, double pitchRadians, dou
     // double new_roll, new_pitch, new_yaw;
     //bool vtolInFwdFlight = extendedState.vtol_state == MAV_VTOL_STATE_FW;
     if(_vtolInFwdFlight && _settingsManager->flyViewSettings()->fwdTelemetryFix()->rawValue().toBool()){
-        roll = QGC::limitAngleToPMPIf(yawRadians - 3.14/4);
-        pitch = QGC::limitAngleToPMPIf(-pitchRadians - 3.14/2);
-        yaw = QGC::limitAngleToPMPIf(-rollRadians);
+        std::string mat = _settingsManager->flyViewSettings()->TelemetryFixAMat()->rawValue().toString().toStdString();
+        double r1, p1, y1, r2, p2, y2, r3, p3, y3;
+        char dummy;
+        std::stringstream s;
+        s << mat;
+        s >> dummy ;
+        s >> dummy >> r1 >> dummy >> p1 >> dummy >> y1 >> dummy >> dummy;
+        s >> dummy >> r2 >> dummy >> p2 >> dummy >> y2 >> dummy >> dummy;
+        s >> dummy >> r3 >> dummy >> p3 >> dummy >> y3 >> dummy >> dummy;
+        roll = QGC::limitAngleToPMPIf(r1*rollRadians + p1*pitchRadians + y1*yawRadians);
+        pitch = QGC::limitAngleToPMPIf(r2*rollRadians + p2*pitchRadians + y2*yawRadians);
+        yaw = QGC::limitAngleToPMPIf(r3*rollRadians + p3*pitchRadians + y3*yawRadians);
     }
     else
     {
@@ -1377,6 +1388,9 @@ void Vehicle::_handleExtendedSysState(mavlink_message_t& message)
         bool vtolInFwdFlight = extendedState.vtol_state == MAV_VTOL_STATE_FW;
         if (vtolInFwdFlight != _vtolInFwdFlight) {
             _vtolInFwdFlight = vtolInFwdFlight;
+
+            // TODO: change video stream port here
+
             emit vtolInFwdFlightChanged(vtolInFwdFlight);
         }
     }

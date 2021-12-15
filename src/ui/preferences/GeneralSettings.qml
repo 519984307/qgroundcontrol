@@ -165,6 +165,18 @@ Rectangle {
                                 property Fact _fwdTelemetryFix: QGroundControl.settingsManager.flyViewSettings.fwdTelemetryFix
                             }
 
+                            QGCLabel {
+                                    id:         transformationMatA
+                                    text:       qsTr("Transformation matrix")
+                                    visible:    QGroundControl.settingsManager.flyViewSettings.fwdTelemetryFix
+                                }
+                                FactTextField {
+                                    Layout.preferredWidth:  _comboFieldWidth
+                                    fact:                   _flyViewSettings.TelemetryFixAMat
+                                    visible:                QGroundControl.settingsManager.flyViewSettings.fwdTelemetryFix
+                                }
+                            
+
                             
 
                             FactCheckBox {
