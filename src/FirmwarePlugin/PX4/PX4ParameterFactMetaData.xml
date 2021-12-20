@@ -1133,6 +1133,13 @@ Set -1 to disable the check</short_desc>
       <short_desc>Allow arming without GPS</short_desc>
       <long_desc>The default allows to arm the vehicle without GPS signal.</long_desc>
     </parameter>
+    <parameter name="COM_BATT_THR" default="0.70" type="FLOAT">
+      <short_desc>Minimal battery level to allow arming represented in percentage</short_desc>
+      <long_desc>Minimal battery level to allow arming represented in percentage</long_desc>
+      <min>0.00</min>
+      <max>1.00</max>
+      <decimal>3</decimal>
+    </parameter>
     <parameter name="COM_CPU_MAX" default="90.0" type="FLOAT">
       <short_desc>Maximum allowed CPU load to still arm</short_desc>
       <long_desc>A negative value disables the check.</long_desc>
