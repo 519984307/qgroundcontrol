@@ -15,6 +15,8 @@
 #include <QDir>
 #include <QQuickWindow>
 
+#include<regex>
+
 #ifndef QGC_DISABLE_UVC
 #include <QCameraInfo>
 #endif
@@ -684,10 +686,28 @@ VideoManager::_updateSettings(unsigned id)
         }
     }
     QString source = _videoSettings->videoSource()->rawValue().toString();
+
+    std::string udpVideoIP = "0.0.0.0";
+    /*
+    - Settings fact to turn this on and off
+    - Store current glider IP when connecting to ROS
+    - Fetch it here 
+    - Check that the IP is correct
+
+    */
+
+    bool useUnicast = _toolbox->settingsManager()->flyViewSettings()->unicastVideoSink()->rawValue().toBool();
+    if(useUnicast)
+    {
+        std::string ip = _toolbox->settingsManager()->flyViewSettings()->lastROSIP()->rawValue().toString().toStdString();
+        std::string ip_regex = "(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])";
+        if(std::regex_match(ip, std::regex(ip_regex))) udpVideoIP = ip;
+    }
+
     if (source == VideoSettings::videoSourceUDPH264)
-        settingsChanged |= _updateVideoUri(0, QStringLiteral("udp://0.0.0.0:%1").arg(_videoSettings->udpPort()->rawValue().toInt()));
+        settingsChanged |= _updateVideoUri(0, QStringLiteral("udp://%1:%2").arg(udpVideoIP.c_str()).arg(_videoSettings->udpPort()->rawValue().toInt()));
     else if (source == VideoSettings::videoSourceUDPH265)
-        settingsChanged |= _updateVideoUri(0, QStringLiteral("udp265://0.0.0.0:%1").arg(_videoSettings->udpPort()->rawValue().toInt()));
+        settingsChanged |= _updateVideoUri(0, QStringLiteral("udp265://%1:%2").arg(udpVideoIP.c_str()).arg(_videoSettings->udpPort()->rawValue().toInt()));
     else if (source == VideoSettings::videoSourceMPEGTS)
         settingsChanged |= _updateVideoUri(0, QStringLiteral("mpegts://0.0.0.0:%1").arg(_videoSettings->udpPort()->rawValue().toInt()));
     else if (source == VideoSettings::videoSourceRTSP)

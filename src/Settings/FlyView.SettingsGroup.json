@@ -120,6 +120,18 @@
     "shortDesc": "Matrix B of the attitude transformation",
     "type":             "string",
     "default":     ""
+},
+{
+    "name":             "unicastVideoSink",
+    "shortDesc": "Use the IP of the last connected Jetson to receive video (disable when using simulation or not using the ROS button)",
+    "type":             "bool",
+    "default":     false
+},
+{
+    "name":             "LastROSIP",
+    "shortDesc": "IP of the last Jetson used with ROS button successfully",
+    "type":             "string",
+    "default":     ""
 }
 ]
 }

@@ -44,6 +44,9 @@ DECLARE_SETTINGSFACT(FlyViewSettings, Skeleton12IP)
 DECLARE_SETTINGSFACT(FlyViewSettings, Skeleton13IP)
 DECLARE_SETTINGSFACT(FlyViewSettings, JetsonUsername)
 
+DECLARE_SETTINGSFACT(FlyViewSettings, unicastVideoSink)
+DECLARE_SETTINGSFACT(FlyViewSettings, lastROSIP)
+
 
 
 

@@ -50,4 +50,8 @@ public:
 
     DEFINE_SETTINGFACT(JetsonUsername)
 
+    DEFINE_SETTINGFACT(unicastVideoSink)
+
+    DEFINE_SETTINGFACT(lastROSIP)
+
 };

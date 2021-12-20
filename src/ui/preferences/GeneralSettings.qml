@@ -203,6 +203,14 @@ Rectangle {
                                 property Fact _showDumbCameraControl: QGroundControl.settingsManager.flyViewSettings.showSimpleCameraControl
                             }
 
+                            FactCheckBox {
+                                text:       qsTr("Use Unicast Video Sink (disable for SIM)")
+                                visible:    true
+                                fact:       _unicast
+
+                                property Fact _unicast: QGroundControl.settingsManager.flyViewSettings.unicastVideoSink
+                            }
+
                             GridLayout {
                                 columns: 2
 

@@ -105,4 +105,8 @@ void StartROSMenuController::set_status(int val)
             tr("SSH to glider failed")
             );
     }
+    else if(status() == 0)
+    {
+        qgcApp()->toolbox()->settingsManager()->flyViewSettings()->lastROSIP()->setRawValue(QVariant(QString::fromStdString(_current_ip)));
+    }
 }
