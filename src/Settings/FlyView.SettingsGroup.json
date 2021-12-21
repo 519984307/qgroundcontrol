@@ -128,7 +128,7 @@
     "default":     false
 },
 {
-    "name":             "LastROSIP",
+    "name":             "lastROSIP",
     "shortDesc": "IP of the last Jetson used with ROS button successfully",
     "type":             "string",
     "default":     ""
