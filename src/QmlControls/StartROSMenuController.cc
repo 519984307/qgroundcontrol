@@ -99,7 +99,13 @@ void StartROSMenuController::set_status(int val)
     emit statusChanged(val);
     if(status()==2)
     {
-        std::string message = "Make sure that your network setup is correct, and that you have run the SSH setup commands for this glider.\n\nIf you didn't run the SSH setup, do the following steps CAREFULLY:\n1- If you have never used SSH on this machine, run \"ssh-keygen -b 4096\" (should be executed only once, choose \"Cancel\" if the command asks you to overwrite an existing SSH key)\n2- Run \"ssh-copy-id "+_current_username+"@"+_current_ip+"\" to copy your SSH identity to the glider, you will be prompted to enter the glider's password.";
+        std::string setup_command = "ssh-copy-id "+_current_username+"@"+_current_ip;
+        std::string osType = proQSysInfo::productType().toStdString();
+        if(osType == "windows" || osType == "winrt")
+        {
+            setup_command = "type $env:USERPROFILE\.ssh\id_rsa.pub | ssh "+_current_username+"@"+_current_ip+" \"cat >> .ssh/authorized_keys\"";        
+        }
+        std::string message = "Make sure that your network setup is correct, and that you have run the SSH setup commands for this glider.\n\nIf you didn't run the SSH setup, do the following steps CAREFULLY:\n1- If you have never used SSH on this machine, run \"ssh-keygen -b 4096\" (should be executed only once, choose \"Cancel\" if the command asks you to overwrite an existing SSH key)\n2- Run \""+setup_command+"\" to copy your SSH identity to the glider, you will be prompted to enter the glider's password.";
         qgcApp()->showAppMessage(
             tr(message.c_str()),
             tr("SSH to glider failed")
