@@ -7,6 +7,7 @@
 #include <QQuickItem>
 #include <QCursor>
 #include "SettingsManager.h"
+#include <QSysInfo> 
 
 class StartROSMenuController : public QObject
 {
@@ -52,6 +53,12 @@ class RosSSHThread : public QThread
 {
     Q_OBJECT
     void run() override {
+        std::string osType = proQSysInfo::productType().toStdString();
+        std::cout<<osType<<"\n";
+        if(osType == "windows" || osType == "winrt")
+        {
+            std::cout<<"Windows confirmed\n";
+        }
         int result;
         QString program = tr("ssh");
         QStringList arguments;
