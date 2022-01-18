@@ -53,7 +53,7 @@ class RosSSHThread : public QThread
 {
     Q_OBJECT
     void run() override {
-        std::string osType = proQSysInfo::productType().toStdString();
+        std::string osType = QSysInfo::productType().toStdString();
         std::cout<<osType<<"\n";
         if(osType == "windows" || osType == "winrt")
         {
