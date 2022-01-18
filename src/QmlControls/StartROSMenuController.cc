@@ -100,7 +100,7 @@ void StartROSMenuController::set_status(int val)
     if(status()==2)
     {
         std::string setup_command = "ssh-copy-id "+_current_username+"@"+_current_ip;
-        std::string osType = proQSysInfo::productType().toStdString();
+        std::string osType = QSysInfo::productType().toStdString();
         if(osType == "windows" || osType == "winrt")
         {
             setup_command = "type $env:USERPROFILE\.ssh\id_rsa.pub | ssh "+_current_username+"@"+_current_ip+" \"cat >> .ssh/authorized_keys\"";        
