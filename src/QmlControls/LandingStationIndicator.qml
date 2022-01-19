@@ -23,6 +23,7 @@ QGCLabel {
     {
         /*console.log(currentVehicle.landingStationConnected.value)
         console.log(currentVehicle.landingStationConnected.rawValue)*/
+        if(!currentVehicle) return "No Vehicle";
         return currentVehicle.landingStationConnected.value ?  qsTr("LS connected", "Connected to Landing Station") : qsTr("LS disconnected", "Landing Station not connected");
     }
     property var    currentVehicle:         QGroundControl.multiVehicleManager.activeVehicle
