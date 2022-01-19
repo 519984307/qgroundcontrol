@@ -142,6 +142,11 @@
     "shortDesc": "Landing Station Connected",
     "type":             "bool",
     "default":          false
+},
+{
+    "name":             "videoFPS",
+    "shortDesc": "FPS of the current video stream",
+    "type":             "uint16"
 }
 ]
 }

@@ -95,6 +95,7 @@ const char* Vehicle::_distanceToGCSFactName =       "distanceToGCS";
 const char* Vehicle::_hobbsFactName =               "hobbs";
 const char* Vehicle::_throttlePctFactName =         "throttlePct";
 const char* Vehicle::_landingStationConnectedFactName = "landingStationConnected";
+const char* Vehicle::_videoFPSFactName =            "videoFPS";
 
 const char* Vehicle::_gpsFactGroupName =                "gps";
 const char* Vehicle::_gps2FactGroupName =               "gps2";
@@ -156,6 +157,7 @@ Vehicle::Vehicle(LinkInterface*             link,
     , _hobbsFact                    (0, _hobbsFactName,             FactMetaData::valueTypeString)
     , _throttlePctFact              (0, _throttlePctFactName,       FactMetaData::valueTypeUint16)
     , _landingStationConnectedFact  (0, _landingStationConnectedFactName, FactMetaData::valueTypeBool)
+    , _videoFPSFact                 (0, _videoFPSFactName,          FactMetaData::valueTypeUint16)
     , _gpsFactGroup                 (this)
     , _gps2FactGroup                (this)
     , _windFactGroup                (this)
@@ -310,6 +312,8 @@ Vehicle::Vehicle(MAV_AUTOPILOT              firmwareType,
     , _hobbsFact                        (0, _hobbsFactName,             FactMetaData::valueTypeString)
     , _throttlePctFact                  (0, _throttlePctFactName,       FactMetaData::valueTypeUint16)
     , _landingStationConnectedFact      (0, _landingStationConnectedFactName, FactMetaData::valueTypeBool)
+    , _videoFPSFact                     (0, _videoFPSFactName,          FactMetaData::valueTypeUint16)
+
     , _gpsFactGroup                     (this)
     , _gps2FactGroup                    (this)
     , _windFactGroup                    (this)
@@ -432,6 +436,7 @@ void Vehicle::_commonInit()
     _addFact(&_distanceToGCSFact,       _distanceToGCSFactName);
     _addFact(&_throttlePctFact,         _throttlePctFactName);
     _addFact(&_landingStationConnectedFact, _landingStationConnectedFactName);
+    _addFact(&_videoFPSFact,            _videoFPSFactName);
 
     _hobbsFact.setRawValue(QVariant(QString("0000:00:00")));
     _addFact(&_hobbsFact,               _hobbsFactName);

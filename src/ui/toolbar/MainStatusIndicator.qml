@@ -267,7 +267,7 @@ RowLayout {
         height:     ScreenTools.defaultFontPixelHeight * 0.75
         fillMode:   Image.PreserveAspectFit
         mipmap:     true
-        color:      Qt.rgba(0,0,0,1)
+        color:      _activeVehicle ? (landingStationIndicator.currentVehicle.landingStationConnected.value? Qt.rgba(0,1,0,1):Qt.rgba(1,0,0,1)): Qt.rgba(1,1,1,1)
         source:     _activeVehicle ? (landingStationIndicator.currentVehicle.landingStationConnected.value ? "/qmlimages/GreenCheckmark.svg" : "/qmlimages/CircleX.svg") : ""
         visible:    landingStationIndicator.visible
     }
@@ -286,12 +286,14 @@ RowLayout {
         font.pointSize:         ScreenTools.defaultFontPointSize
         mouseAreaLeftMargin:    -(landingStationIndicator.x - landingStationIcon.x)
         visible:                _activeVehicle
+        color:      _activeVehicle ? (landingStationIndicator.currentVehicle.landingStationConnected.value? Qt.rgba(1,1,1,1):Qt.rgba(1,0,0,1)): Qt.rgba(1,1,1,1)
+
     }
 
     // Video FPS indicator
     Item {
         id:                     videoFPSItem
-        Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth / 2
+        Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth
         height:                 1
     }
 
@@ -301,7 +303,7 @@ RowLayout {
         verticalAlignment:      Text.AlignVCenter
         font.pointSize:         ScreenTools.defaultFontPointSize
         visible:                _activeVehicle
-        text:                   _activeVehicle ? _activeVehicle.videoFPS.value : 0
+        text:                   "" + (_activeVehicle ? _activeVehicle.videoFPS.value : 0) + "FPS"
     }
 
     // Start ROS Menu
