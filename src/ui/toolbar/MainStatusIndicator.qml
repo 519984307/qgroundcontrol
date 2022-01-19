@@ -267,8 +267,8 @@ RowLayout {
         height:     ScreenTools.defaultFontPixelHeight * 0.75
         fillMode:   Image.PreserveAspectFit
         mipmap:     true
-        color:      qgcPal.text
-        source:     landingStationIndicator.currentVehicle.landingStationConnected.value ? "/qmlimages/GreenCheckmark.svg" : "/qmlimages/CircleX.svg"
+        color:      Qt.rgba(0,0,0,1)
+        source:     _activeVehicle ? (landingStationIndicator.currentVehicle.landingStationConnected.value ? "/qmlimages/GreenCheckmark.svg" : "/qmlimages/CircleX.svg") : ""
         visible:    landingStationIndicator.visible
     }
 
@@ -286,6 +286,22 @@ RowLayout {
         font.pointSize:         ScreenTools.defaultFontPointSize
         mouseAreaLeftMargin:    -(landingStationIndicator.x - landingStationIcon.x)
         visible:                _activeVehicle
+    }
+
+    // Video FPS indicator
+    Item {
+        id:                     videoFPSItem
+        Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth / 2
+        height:                 1
+    }
+
+    QGCLabel {
+        id:                     videoFPS
+        Layout.preferredHeight: _root.height
+        verticalAlignment:      Text.AlignVCenter
+        font.pointSize:         ScreenTools.defaultFontPointSize
+        visible:                _activeVehicle
+        text:                   _activeVehicle ? _activeVehicle.videoFPS.value : 0
     }
 
     // Start ROS Menu

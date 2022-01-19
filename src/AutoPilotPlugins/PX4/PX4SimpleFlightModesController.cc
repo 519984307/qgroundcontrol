@@ -171,5 +171,7 @@ void PX4SimpleFlightModesController::_rcChannelsChanged(int channelCount, int pw
         _activeFlightMode++;
     }
 
+    // TODO: If the channel is equal to the next cam channel, change channel instead of flight mode and return
+
     emit activeFlightModeChanged(_activeFlightMode);
 }
