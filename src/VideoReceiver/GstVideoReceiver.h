@@ -23,6 +23,8 @@
 #include <QQueue>
 #include <QQuickItem>
 
+#include <deque>
+
 #include "VideoReceiver.h"
 
 #include <gst/gst.h>
@@ -146,6 +148,9 @@ protected:
 
     qint64              _lastSourceFrameTime;
     qint64              _lastVideoFrameTime;
+    qint64              _lastVideoFrameTimeMSecs;
+    std::deque<qint64>  _frames;
+
     bool                _resetVideoSink;
     gulong              _videoSinkProbeId;
 

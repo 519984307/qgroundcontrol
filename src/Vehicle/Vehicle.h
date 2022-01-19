@@ -301,6 +301,8 @@ public:
     Q_PROPERTY(Fact* hobbs              READ hobbs              CONSTANT)
     Q_PROPERTY(Fact* throttlePct        READ throttlePct        CONSTANT)
     Q_PROPERTY(Fact* landingStationConnected READ landingStationConnected CONSTANT)
+    Q_PROPERTY(Fact* videoFPS           READ videoFPS           CONSTANT)
+
 
     Q_PROPERTY(FactGroup*           gps             READ gpsFactGroup               CONSTANT)
     Q_PROPERTY(FactGroup*           gps2            READ gps2FactGroup              CONSTANT)
@@ -643,6 +645,8 @@ public:
     Fact* hobbs                             () { return &_hobbsFact; }
     Fact* throttlePct                       () { return &_throttlePctFact; }
     Fact* landingStationConnected           () { return &_landingStationConnectedFact; }
+    Fact* videoFPS                          () { return &_videoFPSFact; }
+
 
     FactGroup* gpsFactGroup                 () { return &_gpsFactGroup; }
     FactGroup* gps2FactGroup                () { return &_gps2FactGroup; }
@@ -1299,6 +1303,7 @@ private:
     Fact _hobbsFact;
     Fact _throttlePctFact;
     Fact _landingStationConnectedFact;
+    Fact _videoFPSFact;
 
     VehicleGPSFactGroup             _gpsFactGroup;
     VehicleGPS2FactGroup            _gps2FactGroup;
@@ -1350,6 +1355,7 @@ private:
     static const char* _hobbsFactName;
     static const char* _throttlePctFactName;
     static const char* _landingStationConnectedFactName;
+    static const char* _videoFPSFactName;
 
     static const char* _gpsFactGroupName;
     static const char* _gps2FactGroupName;

@@ -16,10 +16,34 @@
 
 #include "GstVideoReceiver.h"
 
+#include "QGCToolbox.h"
+#include "QGCCorePlugin.h"
+#include "QGCOptions.h"
+#include "MultiVehicleManager.h"
+#include "Settings/SettingsManager.h"
+#include "Vehicle.h"
+
+#include "ScreenToolsController.h"
+/*
+#include "VideoManager.h"
+#include "QGCToolbox.h"
+#include "QGCCorePlugin.h"
+#include "QGCOptions.h"
+#include "MultiVehicleManager.h"
+#include "Settings/SettingsManager.h"
+#include "Vehicle.h"
+#include "QGCCameraManager.h"*/
+
 #include <QDebug>
 #include <QUrl>
 #include <QDateTime>
 #include <QSysInfo>
+/*#include <QQmlContext>
+#include <QQmlEngine>
+#include <QSettings>
+#include <QUrl>
+#include <QDir>
+#include <QQuickWindow>*/
 
 QGC_LOGGING_CATEGORY(VideoReceiverLog, "VideoReceiverLog")
 
@@ -50,12 +74,15 @@ GstVideoReceiver::GstVideoReceiver(QObject* parent)
     , _pipeline(nullptr)
     , _lastSourceFrameTime(0)
     , _lastVideoFrameTime(0)
+    , _lastVideoFrameTimeMSecs(0)
+    , _frames(0)
     , _resetVideoSink(true)
     , _videoSinkProbeId(0)
     , _udpReconnect_us(5000000)
     , _signalDepth(0)
     , _endOfStream(false)
 {
+    // qCWarning(VideoReceiverLog) << "Initialized GST VIDEO RECEIVER!!";
     _slotHandler.start();
     connect(&_watchdogTimer, &QTimer::timeout, this, &GstVideoReceiver::_watchdog);
     _watchdogTimer.start(1000);
@@ -63,6 +90,9 @@ GstVideoReceiver::GstVideoReceiver(QObject* parent)
 
 GstVideoReceiver::~GstVideoReceiver(void)
 {
+    // qCWarning(VideoReceiverLog) << "Destroying GST VIDEO RECEIVER";
+    if(qgcApp()->toolbox()->multiVehicleManager()->activeVehicle())
+        qgcApp()->toolbox()->multiVehicleManager()->activeVehicle()->videoFPS()->setRawValue(0);
     _slotHandler.shutdown();
 }
 
@@ -273,6 +303,7 @@ GstVideoReceiver::start(const QString& uri, unsigned timeout, int buffer)
 void
 GstVideoReceiver::stop(void)
 {
+
     if (_needDispatch()) {
         _slotHandler.dispatch([this]() {
             stop();
@@ -359,6 +390,9 @@ GstVideoReceiver::stop(void)
     }
 
     qCDebug(VideoReceiverLog) << "Stopped" << _uri;
+    if(qgcApp()->toolbox()->multiVehicleManager()->activeVehicle())
+        qgcApp()->toolbox()->multiVehicleManager()->activeVehicle()->videoFPS()->setRawValue(0);
+
 
     _dispatchSignal([this](){
         emit onStopComplete(STATUS_OK);
@@ -1128,6 +1162,18 @@ void
 GstVideoReceiver::_noteVideoSinkFrame(void)
 {
     _lastVideoFrameTime = QDateTime::currentSecsSinceEpoch();
+    _lastVideoFrameTimeMSecs = QDateTime::currentMSecsSinceEpoch();
+
+    _frames.push_back(_lastVideoFrameTimeMSecs);
+    while(!_frames.empty() && _frames[0] < _lastVideoFrameTimeMSecs-1000) _frames.pop_front();
+
+    // Set settings fact to the length of the vector
+    if(qgcApp()->toolbox()->multiVehicleManager()->activeVehicle() != nullptr)
+    {
+        // qCWarning(VideoReceiverLog) << "Setting the FPS fact!!";
+        qgcApp()->toolbox()->multiVehicleManager()->activeVehicle()->videoFPS()->setRawValue((int)_frames.size());
+    }
+    
     if (!_decoding) {
         _decoding = true;
         qCDebug(VideoReceiverLog) << "Decoding started";
