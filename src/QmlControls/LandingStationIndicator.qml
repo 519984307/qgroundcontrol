@@ -21,10 +21,26 @@ QGCLabel {
 
     function updateText()
     {
-        /*console.log(currentVehicle.landingStationConnected.value)
-        console.log(currentVehicle.landingStationConnected.rawValue)*/
+        
         if(!currentVehicle) return "No Vehicle";
-        return currentVehicle.landingStationConnected.value ?  qsTr("LS connected", "Connected to Landing Station") : qsTr("LS disconnected", "Landing Station not connected");
+
+        // Case when we are connected
+        if(currentVehicle.landingStationConnected.value) return qsTr("LS connected", "Connected to Landing Station");
+
+        // Get the current distance info when we are disconnected
+        var dist_info = "";
+        const d = new Date();
+        let time = d.getTime()/1000;
+        console.log(currentVehicle.landingStationDistanceLastTime.value);
+        console.log(currentVehicle.landingStationDistance.value);
+        console.log(time);
+
+        if(time - currentVehicle.landingStationDistanceLastTime.value < 3)
+        {
+            dist_info = " (" + Math.round(currentVehicle.landingStationDistance.value * 100) / 100 + "m)";
+        }
+
+        return qsTr("LS disconnected" + dist_info, "Landing Station not connected");
     }
     property var    currentVehicle:         QGroundControl.multiVehicleManager.activeVehicle
     
