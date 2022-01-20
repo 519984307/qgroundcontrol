@@ -95,6 +95,10 @@ const char* Vehicle::_distanceToGCSFactName =       "distanceToGCS";
 const char* Vehicle::_hobbsFactName =               "hobbs";
 const char* Vehicle::_throttlePctFactName =         "throttlePct";
 const char* Vehicle::_landingStationConnectedFactName = "landingStationConnected";
+const char* Vehicle::_landingStationDistanceFactName = "landingStationDistance";
+const char* Vehicle::_landingStationDistanceLastTimeFactName = "landingStationDistanceLastTime";
+
+
 const char* Vehicle::_videoFPSFactName =            "videoFPS";
 
 const char* Vehicle::_gpsFactGroupName =                "gps";
@@ -157,6 +161,9 @@ Vehicle::Vehicle(LinkInterface*             link,
     , _hobbsFact                    (0, _hobbsFactName,             FactMetaData::valueTypeString)
     , _throttlePctFact              (0, _throttlePctFactName,       FactMetaData::valueTypeUint16)
     , _landingStationConnectedFact  (0, _landingStationConnectedFactName, FactMetaData::valueTypeBool)
+    , _landingStationDistanceFact  (0, _landingStationDistanceFactName, FactMetaData::valueTypeDouble)
+    , _landingStationDistanceLastTimeFact  (0, _landingStationDistanceLastTimeFactName, FactMetaData::valueTypeUint64)
+
     , _videoFPSFact                 (0, _videoFPSFactName,          FactMetaData::valueTypeUint16)
     , _gpsFactGroup                 (this)
     , _gps2FactGroup                (this)
@@ -312,6 +319,9 @@ Vehicle::Vehicle(MAV_AUTOPILOT              firmwareType,
     , _hobbsFact                        (0, _hobbsFactName,             FactMetaData::valueTypeString)
     , _throttlePctFact                  (0, _throttlePctFactName,       FactMetaData::valueTypeUint16)
     , _landingStationConnectedFact      (0, _landingStationConnectedFactName, FactMetaData::valueTypeBool)
+    , _landingStationDistanceFact  (0, _landingStationDistanceFactName, FactMetaData::valueTypeDouble)
+    , _landingStationDistanceLastTimeFact  (0, _landingStationDistanceLastTimeFactName, FactMetaData::valueTypeUint64)
+
     , _videoFPSFact                     (0, _videoFPSFactName,          FactMetaData::valueTypeUint16)
 
     , _gpsFactGroup                     (this)
@@ -436,6 +446,9 @@ void Vehicle::_commonInit()
     _addFact(&_distanceToGCSFact,       _distanceToGCSFactName);
     _addFact(&_throttlePctFact,         _throttlePctFactName);
     _addFact(&_landingStationConnectedFact, _landingStationConnectedFactName);
+    _addFact(&_landingStationDistanceFact, _landingStationDistanceFactName);
+    _addFact(&_landingStationDistanceLastTimeFact, _landingStationDistanceLastTimeFactName);
+
     _addFact(&_videoFPSFact,            _videoFPSFactName);
 
     _hobbsFact.setRawValue(QVariant(QString("0000:00:00")));
@@ -1132,7 +1145,22 @@ void Vehicle::_handleNamedValueFloat(mavlink_message_t& message)
 
     // _handleAttitudeWorker(attitude.roll, attitude.pitch, attitude.yaw);
     std::string name_str = content.name;
+
+    // handle the distance message
+    if(name_str == "dis_ls")
+    {
+        landingStationDistance()->setRawValue(content.value);
+        landingStationDistanceLastTime()->setRawValue((long long) QDateTime::currentSecsSinceEpoch());
+        return;
+    }
+
     if(name_str != "lan_con") return;
+
+    // Set the last time we have seen the distance message to 0 if the value is too old
+    if(QDateTime::currentSecsSinceEpoch() - landingStationDistanceLastTime()->rawValue().toInt() > 3)
+    {
+        landingStationDistanceLastTime()->setRawValue(0);
+    }
     if(content.value == 1)
     {
         landingStationConnected()->setRawValue(tr("true"));

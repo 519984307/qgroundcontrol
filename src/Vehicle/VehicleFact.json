@@ -147,6 +147,17 @@
     "name":             "videoFPS",
     "shortDesc": "FPS of the current video stream",
     "type":             "uint16"
+},
+{
+    "name":             "landingStationDistance",
+    "shortDesc": "Current Distance in Meters to the Landing Station",
+    "type":             "double"
+},
+{
+    "name":             "landingStationDistanceLastTime",
+    "shortDesc": "Timestamp of the last LS distance info",
+    "type":             "uint64",
+    "default":          0
 }
 ]
 }
