@@ -45,12 +45,13 @@ QGCLabel {
     property var    currentVehicle:         QGroundControl.multiVehicleManager.activeVehicle
     
 
-    /*Item {
+    // Continuously checks if the LS Distance info is outdated
+    Item {
        Timer {
-               interval: 100; running: true; repeat: true
+               interval: 2000; running: true; repeat: true
                onTriggered: _root.text = updateText();
              }
-    }*/
+    }
 
     property real mouseAreaLeftMargin:    0 
 }
