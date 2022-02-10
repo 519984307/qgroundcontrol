@@ -55,6 +55,7 @@ public:
     DEFINE_SETTINGFACT(lastROSIP)
 
     // Lanidng station control settings
+    DEFINE_SETTINGFACT(landingStationControlsVisible)
     DEFINE_SETTINGFACT(landingStationTimeout)
     DEFINE_SETTINGFACT(landingStationSpeed)
 };

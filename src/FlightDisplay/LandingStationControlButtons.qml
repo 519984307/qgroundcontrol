@@ -33,6 +33,8 @@ Rectangle {
 
     property var _flyViewSettings: QGroundControl.settingsManager.flyViewSettings
 
+    visible: _flyViewSettings.landingStationControlsVisible.value
+
 
     LandingStationControlButtonsController {
         id: landingStationController
