@@ -132,6 +132,23 @@
     "shortDesc": "IP of the last Jetson used with ROS button successfully",
     "type":             "string",
     "default":     ""
+},
+{
+    "name":             "landingStationTimeout",
+    "shortDesc": "How long the landing station belts keep moving after receiving the last message",
+    "units":            "s",
+    "type":             "float",
+    "default":          2.0,
+    "min":              0
+},
+{
+    "name":             "landingStationSpeed",
+    "shortDesc": "How fast the landing station belts move",    
+    "type":             "uint32",
+    "units":            "%",
+    "min":              0,
+    "max":              100,
+    "default":          100
 }
 ]
 }

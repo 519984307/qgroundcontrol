@@ -42,6 +42,7 @@ add_custom_target(FligthDisplayQml
 		RoverChecklist.qml
 		SubChecklist.qml
 		TelemetryValuesBar.qml
+		LandingStationControlButtons.qml
 		TerrainProgress.qml
 		VehicleWarnings.qml
 		VirtualJoystick.qml

@@ -215,6 +215,13 @@ Item {
         }
     }
 
+    LandingStationControlButtons {
+        id:                 landingStationControls
+        anchors.margins:    _toolsMargin
+        anchors.top: parent.top
+        anchors.left: mapScale.right
+    }
+
     //-- Virtual Joystick
     Loader {
         id:                         virtualJoystickMultiTouch

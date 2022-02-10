@@ -656,6 +656,7 @@ HEADERS += \
     src/QmlControls/HorizontalFactValueGrid.h \
     src/QmlControls/InstrumentValueData.h \
     src/QmlControls/FactValueGrid.h \
+    src/QmlControls/LandingStationControlButtonsController.h \
     src/QmlControls/ParameterEditorController.h \
     src/QmlControls/QGCFileDialogController.h \
     src/QmlControls/QGCImageProvider.h \
@@ -897,6 +898,7 @@ SOURCES += \
     src/QmlControls/HorizontalFactValueGrid.cc \
     src/QmlControls/InstrumentValueData.cc \
     src/QmlControls/FactValueGrid.cc \
+    src/QmlControls/LandingStationControlButtonsController.cc \
     src/QmlControls/ParameterEditorController.cc \
     src/QmlControls/QGCFileDialogController.cc \
     src/QmlControls/QGCImageProvider.cc \

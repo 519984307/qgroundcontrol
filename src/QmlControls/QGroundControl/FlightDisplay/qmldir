@@ -32,6 +32,7 @@ ProximityRadarValues            1.0 ProximityRadarValues.qml
 ProximityRadarVideoView         1.0 ProximityRadarVideoView.qml
 TerrainProgress                 1.0 TerrainProgress.qml
 TelemetryValuesBar              1.0 TelemetryValuesBar.qml
+LandingStationControlButtons    1.0 LandingStationControlButtons.qml
 VehicleWarnings                 1.0 VehicleWarnings.qml
 ObstacleDistanceOverlay         1.0 ObstacleDistanceOverlay.qml
 ObstacleDistanceOverlayMap      1.0 ObstacleDistanceOverlayMap.qml
