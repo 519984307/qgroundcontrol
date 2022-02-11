@@ -20,16 +20,16 @@ import QGroundControl.Palette       1.0
 
 Rectangle {
     id:                 landingStationControls
-    height:             buttonsAndStuff.height + ScreenTools.defaultFontPixelWidth * 3
-    width:              buttonsAndStuff.width + ScreenTools.defaultFontPixelHeight * 2
+    height:             buttonsAndStuff.height + ScreenTools.defaultFontPixelHeight
+    width:              buttonsAndStuff.width + ScreenTools.defaultFontPixelWidth * 2
     radius:             ScreenTools.defaultFontPixelHeight / 2
     color:              qgcPal.window
     border.color:       qgcPal.text
 
     DeadMouseArea { anchors.fill: parent }
 
-    property int _buttonWidth: ScreenTools.defaultFontPixelHeight * 4;
-    property int _textWidth: ScreenTools.defaultFontPixelHeight * 4;
+    property int _buttonWidth: ScreenTools.defaultFontPixelWidth * 12;
+    property int _textWidth: ScreenTools.defaultFontPixelWidth * 12;
 
     property var _flyViewSettings: QGroundControl.settingsManager.flyViewSettings
 
@@ -60,25 +60,30 @@ Rectangle {
             fact: _flyViewSettings.landingStationSpeed
             onEditingFinished: landingStationController.setSpeed(fact.value)
         }
-        Item {
-            Layout.fillWidth: true
+        QGCButton {
+            Layout.alignment: Qt.AlignHCenter
+            text: "Deliver"
             Layout.preferredWidth: _buttonWidth
+            onClicked: landingStationController.delivery()
         }
 
-        Item {
-            Layout.fillWidth: true
+        QGCButton {
+            Layout.alignment: Qt.AlignHCenter
+            text: "Hook Close"
             Layout.preferredWidth: _buttonWidth
+            onClicked: landingStationController.hookClose()
         }
         QGCButton {
             Layout.alignment: Qt.AlignHCenter
-            id: upButton
             text: "Up"
             Layout.preferredWidth: _buttonWidth
             onClicked: landingStationController.beltUp()
         }
-        Item {
-            Layout.fillWidth: true
+        QGCButton {
+            Layout.alignment: Qt.AlignHCenter
+            text: "Hook Open"
             Layout.preferredWidth: _buttonWidth
+            onClicked: landingStationController.hookOpen()
         }
 
         QGCButton {

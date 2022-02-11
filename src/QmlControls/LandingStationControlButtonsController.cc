@@ -40,6 +40,22 @@ LandingStationControlButtonsController::setSpeed(int speed)
 }
 
 void
+LandingStationControlButtonsController::hookOpen(void)
+{
+    _sendHookCommand(1);
+}
+void
+LandingStationControlButtonsController::hookClose(void)
+{
+    _sendHookCommand(2);
+}
+void
+LandingStationControlButtonsController::delivery(void)
+{
+    _sendDeliveryCommand(0);
+}
+
+void
 LandingStationControlButtonsController::beltStop(void)
 {
     _sendBeltCommand(0);
@@ -83,6 +99,16 @@ void
 LandingStationControlButtonsController::_sendSpeedCommand(int value)
 {
     _sendNamedValueFloat("lan_spd", static_cast<float>(value)/100);
+}
+void
+LandingStationControlButtonsController::_sendDeliveryCommand(int value)
+{
+    _sendNamedValueFloat("delivery", value);
+}
+void
+LandingStationControlButtonsController::_sendHookCommand(int value)
+{
+    _sendNamedValueFloat("hook_msg", value);
 }
 void
 LandingStationControlButtonsController::_sendBeltCommand(int value)
