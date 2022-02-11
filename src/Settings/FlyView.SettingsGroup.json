@@ -144,6 +144,7 @@
     "shortDesc": "How long the landing station belts keep moving after receiving the last message",
     "units":            "s",
     "type":             "float",
+    "decimalPlaces":    1,
     "default":          2.0,
     "min":              0
 },
