@@ -120,7 +120,7 @@ AnalyzePage {
                 spacing:            _margin
                 Layout.alignment:   Qt.AlignTop | Qt.AlignLeft
                 QGCButton {
-                    enabled:    !logController.requestingList && !logController.downloadingLogs
+                    enabled:    !logController.requestingList && !logController.downloadingLogs && !logController.transferingLogs
                     text:       qsTr("Refresh")
                     width:      _butttonWidth
                     onClicked: {
@@ -132,7 +132,25 @@ AnalyzePage {
                     }
                 }
                 QGCButton {
-                    enabled:    !logController.requestingList && !logController.downloadingLogs && tableView.selection.count > 0
+                    enabled:    !logController.requestingList && !logController.transferingLogs && !logController.downloadingLogs
+                    text:       qsTr("Sharepoint")
+                    width:      _butttonWidth
+                    onClicked: {
+                        //-- Clear selection
+                        for(var i = 0; i < logController.model.count; i++) {
+                            var o = logController.model.get(i)
+                            if (o) o.selected = false
+                        }
+                        //-- Flag selected log files
+                        tableView.selection.forEach(function(rowIndex){
+                            var o = logController.model.get(rowIndex)
+                            if (o) o.selected = true
+                        })
+                        logController.transfer()
+                    }
+                }
+                QGCButton {
+                    enabled:    !logController.requestingList && !logController.downloadingLogs && tableView.selection.count > 0 && !logController.transferingLogs
                     text:       qsTr("Download")
                     width:      _butttonWidth
                     onClicked: {
@@ -166,7 +184,7 @@ AnalyzePage {
                     }
                 }
                 QGCButton {
-                    enabled:    !logController.requestingList && !logController.downloadingLogs && logController.model.count > 0
+                    enabled:    !logController.requestingList && !logController.downloadingLogs && logController.model.count > 0 && !logController.transferingLogs
                     text:       qsTr("Erase All")
                     width:      _butttonWidth
                     onClicked:  mainWindow.showComponentDialog(
@@ -188,7 +206,7 @@ AnalyzePage {
                 QGCButton {
                     text:       qsTr("Cancel")
                     width:      _butttonWidth
-                    enabled:    logController.requestingList || logController.downloadingLogs
+                    enabled:    logController.requestingList || logController.downloadingLogs || logController.transferingLogs
                     onClicked:  logController.cancel()
                 }
             }

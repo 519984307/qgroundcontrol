@@ -160,6 +160,14 @@ void UAS::receiveMessage(mavlink_message_t message)
         }
             break;
 
+        case MAVLINK_MSG_ID_NAMED_VALUE_FLOAT:
+        {
+            mavlink_named_value_float_t named_value_float;
+            mavlink_msg_named_value_float_decode(&message, &named_value_float);
+            emit namedValueFloat(this, named_value_float.time_boot_ms, named_value_float.name, named_value_float.value);
+        }
+            break;
+
         default:
             break;
         }
