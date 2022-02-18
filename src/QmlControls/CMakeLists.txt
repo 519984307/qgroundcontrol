@@ -38,6 +38,8 @@ add_library(QmlControls
 	ToolStripActionList.h
 	StartROSMenuController.h
 	StartROSMenuController.cc
+	LandingStationControlButtonsController.h
+	LandingStationControlButtonsController.cc
 )
 
 add_custom_target(QmlControlsQml

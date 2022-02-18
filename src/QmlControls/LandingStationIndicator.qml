@@ -19,6 +19,8 @@ QGCLabel {
     id:     _root
     text:   updateText()
 
+    property var _flyViewSettings: QGroundControl.settingsManager.flyViewSettings
+
     function updateText()
     {
         
@@ -54,6 +56,22 @@ QGCLabel {
     }
 
     property real mouseAreaLeftMargin:    0 
+
+    function setLandingStationControlVisibility()
+    {
+        if(currentVehicle && currentVehicle.landingStationConnected.value) {
+            // Only allow changing the visibility when we are connected
+            _flyViewSettings.landingStationControlsVisible.value = !_flyViewSettings.landingStationControlsVisible.value;
+        }
+    }
+
+    MouseArea {
+        id:                 mouseArea
+        visible:            currentVehicle && currentVehicle.flightModeSetAvailable
+        anchors.leftMargin: mouseAreaLeftMargin
+        anchors.fill:       parent
+        onClicked:          setLandingStationControlVisibility()
+    }
 }
 
 

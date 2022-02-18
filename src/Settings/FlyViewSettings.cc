@@ -47,6 +47,11 @@ DECLARE_SETTINGSFACT(FlyViewSettings, JetsonUsername)
 DECLARE_SETTINGSFACT(FlyViewSettings, unicastVideoSink)
 DECLARE_SETTINGSFACT(FlyViewSettings, lastROSIP)
 
+DECLARE_SETTINGSFACT(FlyViewSettings, landingStationControlsVisible)
+DECLARE_SETTINGSFACT(FlyViewSettings, landingStationTimeout)
+DECLARE_SETTINGSFACT(FlyViewSettings, landingStationSpeed)
+
+
 
 
 

@@ -103,6 +103,7 @@
 #include "VehicleLinkManager.h"
 #include "Autotune.h"
 #include "StartROSMenuController.h"
+#include "LandingStationControlButtonsController.h"
 
 #if defined(QGC_ENABLE_PAIRING)
 #include "PairingManager.h"
@@ -515,6 +516,7 @@ void QGCApplication::_initCommon()
 
     // Controller for the start ROS button
     qmlRegisterType<StartROSMenuController>         (kQGCControllers,                          1, 0, "StartROSMenuController");
+    qmlRegisterType<LandingStationControlButtonsController>(kQGCControllers,                   1, 0, "LandingStationControlButtonsController");
 
 
     qmlRegisterType<TerrainProfile>                 ("QGroundControl.Controls",             1, 0, "TerrainProfile");
