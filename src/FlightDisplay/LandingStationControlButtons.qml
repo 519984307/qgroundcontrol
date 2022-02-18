@@ -32,8 +32,10 @@ Rectangle {
     property int _textWidth: ScreenTools.defaultFontPixelWidth * 12;
 
     property var _flyViewSettings: QGroundControl.settingsManager.flyViewSettings
+    property var _currentVehicle:  QGroundControl.multiVehicleManager.activeVehicle
 
-    visible: _flyViewSettings.landingStationControlsVisible.value
+    // Only show if we are connected to a landing station
+    visible: _currentVehicle && _currentVehicle.landingStationConnected.value && _flyViewSettings.landingStationControlsVisible.value
 
 
     LandingStationControlButtonsController {
