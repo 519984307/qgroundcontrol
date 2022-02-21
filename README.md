@@ -23,3 +23,15 @@ Key Links:
 * [Discussion/Support](https://docs.qgroundcontrol.com/en/Support/Support.html)
 * [Contributing](https://dev.qgroundcontrol.com/en/contribute/)
 * [License](https://github.com/mavlink/qgroundcontrol/blob/master/COPYING.md)
+
+
+Setup automatic connection to Jetson:
+
+Set ip address in "Application Settings" within Qgroundcontrol
+
+Open Windows Terminal:
+
+ssh-keygen -b 4096
+
+type %userprofile%\\.ssh\\id_rsa.pub | ssh jetsonnx@10.244.104.114 "cat >> .ssh/authorized_keys"
+
