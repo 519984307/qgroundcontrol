@@ -70,6 +70,7 @@ class QGCLogEntry : public QObject {
     Q_PROPERTY(uint         size        READ size                           NOTIFY sizeChanged)
     Q_PROPERTY(QString      sizeStr     READ sizeStr                        NOTIFY sizeChanged)
     Q_PROPERTY(bool         received    READ received                       NOTIFY receivedChanged)
+    Q_PROPERTY(bool         transferred READ transferred                    NOTIFY transferredChanged)
     Q_PROPERTY(bool         selected    READ selected   WRITE setSelected   NOTIFY selectedChanged)
     Q_PROPERTY(QString      status      READ status                         NOTIFY statusChanged)
 
@@ -81,6 +82,7 @@ public:
     QString     sizeStr     () const;
     QDateTime   time        () const { return _logTimeUTC; }
     bool        received    () const { return _received; }
+    bool        transferred () const { return _transferred; }
     bool        selected    () const { return _selected; }
     QString     status      () const { return _status; }
 
@@ -88,6 +90,7 @@ public:
     void        setSize     (uint size_)        { _logSize = size_;     emit sizeChanged(); }
     void        setTime     (QDateTime date_)   { _logTimeUTC = date_;  emit timeChanged(); }
     void        setReceived (bool rec_)         { _received = rec_;     emit receivedChanged(); }
+    void        setTransferred(bool trs_)       { _transferred = trs_;  emit transferredChanged(); }
     void        setSelected (bool sel_)         { _selected = sel_;     emit selectedChanged(); }
     void        setStatus   (QString stat_)     { _status = stat_;      emit statusChanged(); }
 
@@ -96,6 +99,7 @@ signals:
     void        timeChanged     ();
     void        sizeChanged     ();
     void        receivedChanged ();
+    void        transferredChanged ();
     void        selectedChanged ();
     void        statusChanged   ();
 
@@ -104,6 +108,7 @@ private:
     uint        _logSize;
     QDateTime   _logTimeUTC;
     bool        _received;
+    bool        _transferred;
     bool        _selected;
     QString     _status;
 };
@@ -119,21 +124,26 @@ public:
     Q_PROPERTY(QGCLogModel* model           READ model              NOTIFY modelChanged)
     Q_PROPERTY(bool         requestingList  READ requestingList     NOTIFY requestingListChanged)
     Q_PROPERTY(bool         downloadingLogs READ downloadingLogs    NOTIFY downloadingLogsChanged)
+    Q_PROPERTY(bool         transferingLogs READ transferingLogs    NOTIFY transferingLogsChanged)
 
     QGCLogModel*    model                   () { return &_logEntriesModel; }
     bool            requestingList          () const{ return _requestingLogEntries; }
     bool            downloadingLogs         () const{ return _downloadingLogs; }
+    bool            transferingLogs         () const{ return _transferingLogs; }
 
+    Q_INVOKABLE void transfer               ();
     Q_INVOKABLE void refresh                ();
     Q_INVOKABLE void download               (QString path = QString());
     Q_INVOKABLE void eraseAll               ();
     Q_INVOKABLE void cancel                 ();
 
     void downloadToDirectory(const QString& dir);
+    void startLogTransfer();
 
 signals:
     void requestingListChanged  ();
     void downloadingLogsChanged ();
+    void transferingLogsChanged ();
     void modelChanged           ();
     void selectionChanged       ();
 
@@ -141,10 +151,12 @@ private slots:
     void _setActiveVehicle  (Vehicle* vehicle);
     void _logEntry          (UASInterface *uas, uint32_t time_utc, uint32_t size, uint16_t id, uint16_t num_logs, uint16_t last_log_num);
     void _logData           (UASInterface *uas, uint32_t ofs, uint16_t id, uint8_t count, const uint8_t *data);
+    void _namedValueFloat   (UASInterface* uas, uint32_t time_boot_ms, char* name, float value);
     void _processDownload   ();
 
 private:
     bool _entriesComplete   ();
+    bool _entriesTransferred();
     bool _chunkComplete     () const;
     bool _logComplete       () const;
     void _findMissingEntries();
@@ -154,7 +166,13 @@ private:
     void _findMissingData   ();
     void _requestLogList    (uint32_t start, uint32_t end);
     void _requestLogData    (uint16_t id, uint32_t offset, uint32_t count, int retryCount = 0);
+    void _sendLogTransferRequest(int id);
+    void _sendLogTransferCancel(void);
+    void _sendNamedValueFloat(const char * name, float value);
     bool _prepareLogDownload();
+    void _setSelectedStatus (QString status);
+    QGCLogEntry* _getEntryByLogID(uint16_t id);
+    void _setTransfering    (bool active);
     void _setDownloading    (bool active);
     void _setListing        (bool active);
     void _updateDataRate    ();
@@ -168,6 +186,8 @@ private:
     Vehicle*            _vehicle;
     bool                _requestingLogEntries;
     bool                _downloadingLogs;
+    bool                _transferingLogs;
+    bool                _completeTransfer;
     int                 _retries;
     int                 _apmOneBased;
     QString             _downloadPath;

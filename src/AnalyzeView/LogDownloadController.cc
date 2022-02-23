@@ -6,7 +6,7 @@
  * COPYING.md in the root of the source code directory.
  *
  ****************************************************************************/
-
+#include <cmath>
 
 #include "LogDownloadController.h"
 #include "MultiVehicleManager.h"
@@ -90,6 +90,7 @@ QGCLogEntry::QGCLogEntry(uint logId, const QDateTime& dateTime, uint logSize, bo
     , _logSize(logSize)
     , _logTimeUTC(dateTime)
     , _received(received)
+    , _transferred(false)
     , _selected(false)
 {
     _status = tr("Pending");
@@ -109,6 +110,8 @@ LogDownloadController::LogDownloadController(void)
     , _vehicle(nullptr)
     , _requestingLogEntries(false)
     , _downloadingLogs(false)
+    , _transferingLogs(false)
+    , _completeTransfer(false)
     , _retries(0)
     , _apmOneBased(0)
 {
@@ -122,9 +125,11 @@ LogDownloadController::LogDownloadController(void)
 void
 LogDownloadController::_processDownload()
 {
-    if(_requestingLogEntries) {
+    //-- make sure that we don't run anything here if we are in _transferingLogs
+    //-- requesting specific log entries or log data would mess up MAVSDK
+    if(_requestingLogEntries && !_transferingLogs) {
         _findMissingEntries();
-    } else if(_downloadingLogs) {
+    } else if(_downloadingLogs && !_transferingLogs) {
         _findMissingData();
     }
 }
@@ -137,6 +142,7 @@ LogDownloadController::_setActiveVehicle(Vehicle* vehicle)
         _logEntriesModel.clear();
         disconnect(_uas, &UASInterface::logEntry, this, &LogDownloadController::_logEntry);
         disconnect(_uas, &UASInterface::logData,  this, &LogDownloadController::_logData);
+        disconnect(_uas, &UASInterface::namedValueFloat, this, &LogDownloadController::_namedValueFloat);
         _uas = nullptr;
     }
     _vehicle = vehicle;
@@ -144,6 +150,7 @@ LogDownloadController::_setActiveVehicle(Vehicle* vehicle)
         _uas = vehicle->uas();
         connect(_uas, &UASInterface::logEntry, this, &LogDownloadController::_logEntry);
         connect(_uas, &UASInterface::logData,  this, &LogDownloadController::_logData);
+        connect(_uas, &UASInterface::namedValueFloat, this, &LogDownloadController::_namedValueFloat);
     }
 }
 
@@ -177,7 +184,12 @@ LogDownloadController::_logEntry(UASInterface* uas, uint32_t time_utc, uint32_t 
                 entry->setSize(size);
                 entry->setTime(QDateTime::fromTime_t(time_utc));
                 entry->setReceived(true);
-                entry->setStatus(tr("Available"));
+                if(_completeTransfer) {
+                    entry->setStatus(tr("Waiting"));
+                }
+                else {
+                    entry->setStatus(tr("Available"));
+                }
             } else {
                 qWarning() << "Received log entry for out-of-bound index:" << id;
             }
@@ -191,7 +203,7 @@ LogDownloadController::_logEntry(UASInterface* uas, uint32_t time_utc, uint32_t 
     //-- Do we have it all?
     if(_entriesComplete()) {
         _receivedAllEntries();
-    } else {
+    } else if(!_transferingLogs) {
         //-- Reset timer
         _timer.start(kTimeOutMilliseconds);
     }
@@ -207,6 +219,23 @@ LogDownloadController::_entriesComplete()
         QGCLogEntry* entry = _logEntriesModel[i];
         if(entry) {
             if(!entry->received()) {
+               return false;
+            }
+        }
+    }
+    return true;
+}
+
+//----------------------------------------------------------------------------------------
+bool
+LogDownloadController::_entriesTransferred()
+{
+    //-- Iterate entries and look for a gap
+    int num_logs = _logEntriesModel.count();
+    for(int i = 0; i < num_logs; i++) {
+        QGCLogEntry* entry = _logEntriesModel[i];
+        if(entry) {
+            if(!entry->transferred()) {
                return false;
             }
         }
@@ -270,8 +299,10 @@ LogDownloadController::_findMissingEntries()
         if(_retries++ > 2) {
             for(int i = 0; i < num_logs; i++) {
                 QGCLogEntry* entry = _logEntriesModel[i];
-                if(entry && !entry->received()) {
-                    entry->setStatus(tr("Error"));
+                if(entry) {
+                    if(!entry->received()) {
+                        entry->setStatus(tr("Error"));
+                    }
                 }
             }
             //-- Give up
@@ -293,8 +324,13 @@ LogDownloadController::_findMissingEntries()
     }
 }
 
+//----------------------------------------------------------------------------------------
 void LogDownloadController::_updateDataRate(void)
 {
+    if (!_downloadData) {
+        //-- Make sure we have download data to update
+        return;
+    }
     if (_downloadData->elapsed.elapsed() >= kGUIRateMilliseconds) {
         //-- Update download rate
         qreal rrate = _downloadData->rate_bytes / (_downloadData->elapsed.elapsed() / 1000.0);
@@ -310,14 +346,124 @@ void LogDownloadController::_updateDataRate(void)
     }
 }
 
+//----------------------------------------------------------------------------------------
+void LogDownloadController::_namedValueFloat(UASInterface* uas, uint32_t time_boot_ms, char* name, float value)
+{
+    if(!_uas || uas != _uas || !_transferingLogs || (std::string(name) != "log_cmp")) {
+        //-- we are only listening to "log_cmp" messages
+        return;
+    }
+
+    //-- float value is in format id.result (e.g. 5.3 -> id: 5, result 3)
+    int id = static_cast<int>(value);
+    int result = std::round(10*(value-id));
+
+    QGCLogEntry* entry = _getEntryByLogID(id);
+    if(!entry) {
+        //-- id was not found in our log list, can't do anything with this msg
+        qWarning() << "No entry found with id" << id;
+        return;
+    }
+
+    switch(result) {
+        case 0:
+            entry->setStatus("Transferred");
+            break;
+        case 1:
+            entry->setStatus("Failed");
+            break;
+        case 2:
+            entry->setStatus("Uploading");
+            break;
+        case 3:
+            entry->setStatus("Already exists");
+        default:
+            //-- Don't do anything if we don't recognize the result
+            break;
+    }
+
+    if (result != 2) //-- Don't move on if we are still uploading
+    {
+        entry->setSelected(false);
+        emit selectionChanged();
+        entry->setTransferred(true);
+        if(_downloadData && _downloadData->entry == entry) {
+            //-- if the current downloadData is for the entry we received the
+            //-- result for we can delete it since this download is complete now
+            delete _downloadData;
+            _downloadData = nullptr;
+        }
+
+        if(!_completeTransfer)
+        {
+            QGCLogEntry* next_entry = _getNextSelected();
+            if(next_entry) {
+                //-- if there is another selected entry, ask for its transfer
+                _downloadData = new LogDownloadData(next_entry);
+                _downloadData->elapsed.start();
+                //-- It's stupid and I don't like it but mavlink can't handle if
+                //-- we send back a NAMED_VALUE_FLOAT immediately so we wait 1s
+                while(_downloadData->elapsed.elapsed() < 1000) {
+                    continue;
+                }
+                //-- send request to transfer next file
+                _sendLogTransferRequest(next_entry->id());
+            }
+            else
+            {
+                //-- no more logs, we are done
+                _setTransfering(false);
+            }
+        } else if(_entriesTransferred()) //-- check if all entries were transferred
+        {
+            _setTransfering(false);
+        }
+    }
+}
 
 //----------------------------------------------------------------------------------------
 void
 LogDownloadController::_logData(UASInterface* uas, uint32_t ofs, uint16_t id, uint8_t count, const uint8_t* data)
 {
-    if(!_uas || uas != _uas || !_downloadData) {
+    if(!_uas || uas != _uas || (!_downloadData && !_transferingLogs)) {
         return;
     }
+
+    if(_transferingLogs) {
+        //-- if we are transfering logs, we don't care about data integrity and all the logic below,
+        //-- just use the incoming log data to update the status (transferred size and transfer rate)
+        if(_requestingLogEntries) {
+            //-- if its the first log data message, we can stop listening for log entries
+            _receivedAllEntries();
+        }
+        if(!_downloadData || _downloadData->ID != id) {
+            if (_downloadData) {
+                //-- _downloadData already exists meaning we transferred a log file before and
+                //-- switched to the next file now without getting a message
+                _downloadData->entry->setStatus(tr("Transferred"));
+                _downloadData->entry->setTransferred(true);
+                _downloadData->entry->setSelected(false);
+                emit selectionChanged();
+                delete _downloadData;
+                _downloadData = nullptr;
+            }
+            QGCLogEntry* entry = _getEntryByLogID(id);
+            if (!entry) {
+                qWarning() << "No entry found with id" << id;
+                //-- no entry with correct id found, ignoring
+                return;
+            }
+            _downloadData = new LogDownloadData(entry);
+            _downloadData->elapsed.start();
+        }
+        _downloadData->written += count;
+        _downloadData->rate_bytes += count;
+        _updateDataRate();
+        return;
+    }
+    //-- Everything below won't be executed if we are transfering logs
+    //----------------------------------------------------------------
+
     //-- APM "Fix"
     id -= _apmOneBased;
     if(_downloadData->ID != id) {
@@ -386,6 +532,21 @@ LogDownloadController::_logData(UASInterface* uas, uint32_t ofs, uint16_t id, ui
     }
 }
 
+//----------------------------------------------------------------------------------------
+QGCLogEntry*
+LogDownloadController::_getEntryByLogID(uint16_t id)
+{
+    int num_logs = _logEntriesModel.count();
+    for(int i = 0; i < num_logs; i++) { 
+        QGCLogEntry* entry = _logEntriesModel[i];
+        if(entry) {
+            if (entry->id() == id) {
+                return entry;
+            }
+        }
+    }
+    return nullptr;
+}
 
 //----------------------------------------------------------------------------------------
 bool
@@ -414,6 +575,7 @@ LogDownloadController::_receivedAllData()
     } else {
         _resetSelection();
         _setDownloading(false);
+        _setTransfering(false);
     }
 }
 
@@ -489,6 +651,132 @@ LogDownloadController::_requestLogData(uint16_t id, uint32_t offset, uint32_t co
 
 //----------------------------------------------------------------------------------------
 void
+LogDownloadController::transfer(void)
+{
+    startLogTransfer();
+}
+
+//----------------------------------------------------------------------------------------
+void
+LogDownloadController::startLogTransfer(void)
+{
+    if(_downloadingLogs) {
+        //-- make sure we are not in the progress of downloading logs
+        return;
+    }
+
+    //-- mark that we are in transfering mode
+    _setListing(false); //-- in case we are still waiting for log entries to arrive
+    _setTransfering(true);
+
+    //-- stop the timer since we don't need it for the log transfer
+    _timer.stop();
+
+    //-- check if we have any selected entries, in that case we only want to download those
+    bool selected_entries = false;
+    int num_logs = _logEntriesModel.count();
+    for(int i = 0; i < num_logs; i++) {
+        QGCLogEntry* entry = _logEntriesModel[i];
+        if(entry) {
+            if(entry->selected()) {
+                selected_entries = true;
+                break;
+            }
+        }
+    }
+
+    if(selected_entries) {
+        //-- if we have selected entries, mark them as waiting...
+        _setSelectedStatus("Waiting");
+
+        //-- ... and get the first one for transfering
+        QGCLogEntry* next_entry = _getNextSelected();
+
+        //-- create a new download data to track the download progress
+        delete _downloadData;
+        _downloadData = new LogDownloadData(next_entry);
+        _downloadData->elapsed.start();
+
+        //-- request the transfer of the first selected log file
+        _sendLogTransferRequest(next_entry->id());
+    }
+    else {
+        //-- no specific log files requested, transfer all available log files,
+        _completeTransfer = true;
+
+        //-- this will always first refresh the list of log files from the
+        //-- pixhawk so we can clear the list
+        if(_logEntriesModel.count()){
+            _logEntriesModel.clear();
+        }
+
+        //-- send the request for a complete transfer and wait for log entries
+        _sendLogTransferRequest(-1);
+        _setListing(true);
+    }
+}
+
+//----------------------------------------------------------------------------------------
+void
+LogDownloadController::_setSelectedStatus(QString status)
+{
+    int num_logs = _logEntriesModel.count();
+    for(int i = 0; i < num_logs; i++) {
+        QGCLogEntry* entry = _logEntriesModel[i];
+        if(entry) {
+            if(entry->selected()) {
+                entry->setStatus(status);
+            }
+        }
+    }
+}
+
+//----------------------------------------------------------------------------------------
+void
+LogDownloadController::_sendLogTransferRequest(int id)
+{
+    if (id == -1){
+        qCDebug(LogDownloadLog) << "Request log transfer of all available logs";
+    } else if (id >= 0) {
+        qCDebug(LogDownloadLog) << "Request log transfer of log with id: " << id;
+    }
+
+    _sendNamedValueFloat("log_trs", id);
+}
+
+//----------------------------------------------------------------------------------------
+void
+LogDownloadController::_sendLogTransferCancel(void)
+{
+    qCDebug(LogDownloadLog) << "Cancelling log transfer";
+    _sendNamedValueFloat("log_ccl", 0);
+}
+
+//----------------------------------------------------------------------------------------
+void
+LogDownloadController::_sendNamedValueFloat(const char * name, float value)
+{
+    if (_vehicle) {
+        WeakLinkInterfacePtr weakLink = _vehicle->vehicleLinkManager()->primaryLink();
+        if (!weakLink.expired()) {
+            SharedLinkInterfacePtr sharedLink = weakLink.lock();
+
+            mavlink_message_t msg;
+            mavlink_msg_named_value_float_pack_chan(
+                        qgcApp()->toolbox()->mavlinkProtocol()->getSystemId(),
+                        qgcApp()->toolbox()->mavlinkProtocol()->getComponentId(),
+                        sharedLink->mavlinkChannel(),
+                        &msg,
+                        0, // just send 0 as the timestamp because we don't really care atm.
+                        name,
+                        value);
+            _vehicle->sendMessageOnLinkThreadSafe(sharedLink.get(), msg);
+        }
+    }
+}
+
+//----------------------------------------------------------------------------------------
+void
 LogDownloadController::refresh(void)
 {
     _logEntriesModel.clear();
@@ -535,6 +823,7 @@ LogDownloadController::download(QString path)
     downloadToDirectory(dir);
 }
 
+//----------------------------------------------------------------------------------------
 void LogDownloadController::downloadToDirectory(const QString& dir)
 {
     //-- Stop listing just in case
@@ -548,21 +837,12 @@ void LogDownloadController::downloadToDirectory(const QString& dir)
         if(!_downloadPath.endsWith(QDir::separator()))
             _downloadPath += QDir::separator();
         //-- Iterate selected entries and shown them as waiting
-        int num_logs = _logEntriesModel.count();
-        for(int i = 0; i < num_logs; i++) {
-            QGCLogEntry* entry = _logEntriesModel[i];
-            if(entry) {
-                if(entry->selected()) {
-                   entry->setStatus(tr("Waiting"));
-                }
-            }
-        }
+        _setSelectedStatus(tr("Waiting"));
         //-- Start download process
         _setDownloading(true);
         _receivedAllData();
     }
 }
-
 
 //----------------------------------------------------------------------------------------
 QGCLogEntry*
@@ -663,6 +943,19 @@ LogDownloadController::_setDownloading(bool active)
 
 //----------------------------------------------------------------------------------------
 void
+LogDownloadController::_setTransfering(bool active)
+{
+    if (_transferingLogs != active) {
+        _transferingLogs = active;
+        _vehicle->vehicleLinkManager()->setCommunicationLostEnabled(!active);
+        emit transferingLogsChanged();
+    }
+    //-- if _completeTransfer was true and we are stopping, reset it
+    _completeTransfer = active && _completeTransfer;
+}
+
+//----------------------------------------------------------------------------------------
+void
 LogDownloadController::_setListing(bool active)
 {
     if (_requestingLogEntries != active) {
@@ -698,19 +991,26 @@ LogDownloadController::eraseAll(void)
 void
 LogDownloadController::cancel(void)
 {
+    qCDebug(LogDownloadLog) << _uas << _downloadData << _transferingLogs;
     if(_uas){
         _receivedAllEntries();
     }
     if(_downloadData) {
         _downloadData->entry->setStatus(tr("Canceled"));
-        if (_downloadData->file.exists()) {
-            _downloadData->file.remove();
+        if (!_transferingLogs){
+            if(_downloadData->file.exists()) {
+                _downloadData->file.remove();
+            }
         }
         delete _downloadData;
         _downloadData = 0;
     }
+    if(_transferingLogs) {
+        _sendLogTransferCancel();
+    }
     _resetSelection(true);
     _setDownloading(false);
+    _setTransfering(false);
 }
 
 //-----------------------------------------------------------------------------
