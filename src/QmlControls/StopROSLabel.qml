@@ -1,5 +1,6 @@
 import QtQuick                      2.12
 import QtQuick.Controls             2.12
+import QtQuick.Dialogs              1.3
 import QtQuick.Layouts              1.12
 
 import QGroundControl                       1.0
@@ -36,7 +37,7 @@ QGCLabel {
     }
 
     Component {
-        id: youSureButtons
+        id: stopRosButtons
 
         Rectangle {
             width:  childColumn.width   + ScreenTools.defaultFontPixelWidth  * 3
@@ -45,13 +46,14 @@ QGCLabel {
             color:  qgcPal.window
             border.color:   qgcPal.text
 
-            Column{
+            ColumnLayout{
                 id: childColumn
                 spacing:            ScreenTools.defaultFontPixelHeight * 0.5
                 Layout.alignment: Qt.AlignHCenter || Qt.AlignVCenter
                 anchors.centerIn: parent
 
                 QGCLabel {
+                    Layout.alignment: Qt.AlignHCenter
                     text: qsTr("This will interrupt the connection to the glider!\nAre you sure?")
                     horizontalAlignment: Text.AlignHCenter
                 }
@@ -77,6 +79,62 @@ QGCLabel {
                         onClicked: {rebootJetson(); mainWindow.hideIndicatorPopup()}
                     }
                 }
+
+                QGCLabel {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: qsTr("Shutting down the Jetson is permanent!\nAre you sure???")
+                    horizontalAlignment: Text.AlignHCenter
+                }
+
+                QGCButton {
+                        Layout.alignment: Qt.AlignHCenter
+                        Layout.preferredWidth: parent.width
+                        text: qsTr("Shutdown Jetson")
+                        onClicked: {mainWindow.hideIndicatorPopup(); mainWindow.showPopupDialogFromComponent(youReallySurePopup)}
+                }
+            }
+        }
+    }
+
+    Component {
+        id: youReallySurePopup
+
+        QGCPopupDialog {
+            id:         youSureDialog
+            width:      youSureColumn.width   + ScreenTools.defaultFontPixelWidth  * 3
+            height:     youSureColumn.height  + ScreenTools.defaultFontPixelHeight * 2
+            title:      qsTr("Shutdown Jetson?")
+            buttons:    StandardButton.Close
+
+            ColumnLayout {
+                id: youSureColumn
+                spacing: ScreenTools.defaultFontPixelHeight * 0.5
+                Layout.alignment: Qt.AlignHCenter || Qt.AlignVCenter
+                anchors.centerIn: parent
+
+                QGCLabel {
+                    Layout.alignment: Qt.AlignHCenter
+                    text: qsTr("Shutting down the Jetson means that someone will have to physically walk to the glider and start it up before you can fly again!\nAre you sure that's what you want to do?")
+                    horizontalAlignment: Text.AlignHCenter
+                }
+
+                Row {
+                    spacing:            ScreenTools.defaultFontPixelHeight * 0.5
+                    Layout.alignment:   Qt.AlignHCenter || Qt.AlignVCenter
+
+                    QGCButton {
+                        primary: true
+                        Layout.alignment: Qt.AlignRight
+                        text: qsTr("Cancel")
+                        onClicked: youSureDialog.hideDialog()
+                    }
+
+                    QGCButton {
+                        Layout.alignment: Qt.AlignLeft
+                        text: qsTr("Shutdown Jetson")
+                        onClicked: {shutdownJetson(); youSureDialog.hideDialog()}
+                    }
+                }
             }
         }
     }
@@ -87,7 +145,12 @@ QGCLabel {
         }
     }
     function rebootJetson() {
-        if (controller.startCommand(qsTr("screen -S ros2 -p 0 -X stuff '^C'; mkdir test; sleep 5; sudo reboot now")) == 0) {
+        if (controller.startCommand(qsTr("screen -S ros2 -p 0 -X stuff '^C'; sleep 5; sudo reboot now")) == 0) {
+            waitingForResult = true;
+        }
+    }
+    function shutdownJetson() {
+        if (controller.startCommand(qsTr("screen -S ros2 -p 0 -X stuff '^C'; sleep 5; sudo shutdown now")) == 0) {
             waitingForResult = true;
         }
     }
@@ -97,7 +160,7 @@ QGCLabel {
             // don't even think about stopping ROS while flying
             return;
         } else {
-            mainWindow.showIndicatorPopup(_root, youSureButtons);
+            mainWindow.showIndicatorPopup(_root, stopRosButtons);
         }
     }
 
