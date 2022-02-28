@@ -64,6 +64,20 @@ Rectangle {
 
     readonly property real _internalWidthRatio: 0.8
 
+    RosSSHController{
+        id: sshController
+    }
+    function shutdownJetson(text) {
+        sshController.newConnection(text);
+        sshController.startCommand(qsTr("screen -S ros2 -p 0 -X stuff '^C'; sleep 5; sudo shutdown now"));
+        sshController.resetConnection();
+    }
+    function rebootJetson(text) {
+        sshController.newConnection(text);
+        sshController.startCommand(qsTr("screen -S ros2 -p 0 -X stuff '^C'; sleep 5; sudo reboot now"));
+        sshController.resetConnection();
+    }
+
         QGCFlickable {
             clip:               true
             anchors.fill:       parent
@@ -379,11 +393,17 @@ Rectangle {
                             }
 
                             GridLayout {
-                                columns: 2
+                                // This enables "DON'T CARE" reboot and shutdown buttons. This buttons will
+                                // reboot/shutdown any jetson on the network, no matter if the glider is in
+                                // the air or not. There are also no checks done if this QGC is in any way
+                                // connected to the jetson it tries to shutdown. So be very carefull with
+                                // distributing QGC images compieled with this flag set to true
+                                readonly property var advancedControls: false
+                                columns: advancedControls ? 4 : 2
 
                                 QGCLabel {
                                     text:               qsTr("Start ROS settings")
-                                    Layout.columnSpan:  2
+                                    Layout.columnSpan:  parent.advancedControls ? 4 : 2
                                     Layout.alignment:   Qt.AlignHCenter
                                 }
 
@@ -397,6 +417,14 @@ Rectangle {
                                     visible:                true
                                     fact:                   _flyViewSettings.JetsonUsername
                                 }
+                                Item {
+                                    visible: parent.advancedControls
+                                    Layout.fillWidth: true
+                                }
+                                Item {
+                                    visible: parent.advancedControls
+                                    Layout.fillWidth: true
+                                }
 
                                 QGCLabel {
                                     text:       qsTr("Mark 11 IP address")
@@ -408,9 +436,16 @@ Rectangle {
                                     visible:                true
                                     fact:                   _flyViewSettings.Mark11IP
                                 }
-
-                                
-
+                                QGCButton {
+                                    visible: parent.advancedControls
+                                    text: qsTr("Reboot")
+                                    onClicked: rebootJetson("Mark11")
+                                }
+                                QGCButton {
+                                    visible: parent.advancedControls
+                                    text: qsTr("Shutdown")
+                                    onClicked: shutdownJetson("Mark11")
+                                }
 
                                 QGCLabel {
                                     text:       qsTr("Mark 12 IP address")
@@ -422,8 +457,16 @@ Rectangle {
                                     visible:                true
                                     fact:                   _flyViewSettings.Mark12IP
                                 }
-
-                                
+                                QGCButton {
+                                    visible: parent.advancedControls
+                                    text: qsTr("Reboot")
+                                    onClicked: rebootJetson("Mark12")
+                                }
+                                QGCButton {
+                                    visible: parent.advancedControls
+                                    text: qsTr("Shutdown")
+                                    onClicked: shutdownJetson("Mark12")
+                                }
 
                                 QGCLabel {
                                     text:       qsTr("Mark 13 IP address")
@@ -434,6 +477,16 @@ Rectangle {
                                     Layout.preferredWidth:  _comboFieldWidth
                                     visible:                true
                                     fact:                   _flyViewSettings.Mark13IP
+                                }
+                                QGCButton {
+                                    visible: parent.advancedControls
+                                    text: qsTr("Reboot")
+                                    onClicked: rebootJetson("Mark13")
+                                }
+                                QGCButton {
+                                    visible: parent.advancedControls
+                                    text: qsTr("Shutdown")
+                                    onClicked: shutdownJetson("Mark13")
                                 }
 
                                 QGCLabel {
@@ -446,6 +499,16 @@ Rectangle {
                                     visible:                true
                                     fact:                   _flyViewSettings.Skeleton12IP
                                 }
+                                QGCButton {
+                                    visible: parent.advancedControls
+                                    text: qsTr("Reboot")
+                                    onClicked: rebootJetson("Skeleton12")
+                                }
+                                QGCButton {
+                                    visible: parent.advancedControls
+                                    text: qsTr("Shutdown")
+                                    onClicked: shutdownJetson("Skeleton12")
+                                }
 
                                 QGCLabel {
                                     text:       qsTr("Skeleton 13 IP address")
@@ -457,10 +520,16 @@ Rectangle {
                                     visible:                true
                                     fact:                   _flyViewSettings.Skeleton13IP
                                 }
-
-                                
-
-                                
+                                QGCButton {
+                                    visible: parent.advancedControls
+                                    text: qsTr("Reboot")
+                                    onClicked: rebootJetson("Skeleton13")
+                                }
+                                QGCButton {
+                                    visible: parent.advancedControls
+                                    text: qsTr("Shutdown")
+                                    onClicked: shutdownJetson("Skeleton13")
+                                }
                             }
                         }
                     }
