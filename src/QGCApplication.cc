@@ -102,7 +102,8 @@
 #include "QGCMAVLink.h"
 #include "VehicleLinkManager.h"
 #include "Autotune.h"
-#include "StartROSMenuController.h"
+#include "RosSSHThread.h"
+#include "RosSSHController.h"
 #include "LandingStationControlButtonsController.h"
 
 #if defined(QGC_ENABLE_PAIRING)
@@ -515,7 +516,8 @@ void QGCApplication::_initCommon()
     qmlRegisterType<RCToParamDialogController>      (kQGCControllers,                       1, 0, "RCToParamDialogController");
 
     // Controller for the start ROS button
-    qmlRegisterType<StartROSMenuController>         (kQGCControllers,                          1, 0, "StartROSMenuController");
+    qmlRegisterType<RosSSHThread>                   (kQGCControllers,                          1, 0, "RosSSHThread");
+    qmlRegisterType<RosSSHController>               (kQGCControllers,                          1, 0, "RosSSHController");
     qmlRegisterType<LandingStationControlButtonsController>(kQGCControllers,                   1, 0, "LandingStationControlButtonsController");
 
 

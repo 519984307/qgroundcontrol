@@ -665,7 +665,8 @@ HEADERS += \
     src/QmlControls/QGCGeoBoundingCube.h \
     src/QmlControls/RCChannelMonitorController.h \
     src/QmlControls/RCToParamDialogController.h \
-    src/QmlControls/StartROSMenuController.h \
+    src/QmlControls/RosSSHThread.h \
+    src/QmlControls/RosSSHController.h \
     src/QmlControls/ScreenToolsController.h \
     src/QmlControls/TerrainProfile.h \
     src/QmlControls/ToolStripAction.h \
@@ -907,7 +908,8 @@ SOURCES += \
     src/QmlControls/QGCGeoBoundingCube.cc \
     src/QmlControls/RCChannelMonitorController.cc \
     src/QmlControls/RCToParamDialogController.cc \
-    src/QmlControls/StartROSMenuController.cc \
+    src/QmlControls/RosSSHThread.cc \
+    src/QmlControls/RosSSHController.cc \
     src/QmlControls/ScreenToolsController.cc \
     src/QmlControls/TerrainProfile.cc \
     src/QmlControls/ToolStripAction.cc \

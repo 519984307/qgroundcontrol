@@ -36,8 +36,10 @@ add_library(QmlControls
 	ToolStripAction.h
 	ToolStripActionList.cc
 	ToolStripActionList.h
-	StartROSMenuController.h
-	StartROSMenuController.cc
+	RosSSHThread.h
+	RosSSHThread.cc
+	RosSSHController.h
+	RosSSHController.cc
 	LandingStationControlButtonsController.h
 	LandingStationControlButtonsController.cc
 )
@@ -129,6 +131,7 @@ add_custom_target(QmlControlsQml
 		SectionHeader.qml
 		SliderSwitch.qml
 		StartROSMenu.qml
+		StopROSLabel.qml
 		SubMenuButton.qml
 		ToolStrip.qml
 		VideoSourceMenu.qml
