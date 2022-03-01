@@ -17,13 +17,15 @@ class RosSSHController : public QObject
 
 public:
     RosSSHController();
-    Q_INVOKABLE void newConnection(QString text);
+    Q_INVOKABLE void startROS(QString gliderName);
+    Q_INVOKABLE void newConnection(QString gliderName);
     Q_INVOKABLE void resetConnection();
     Q_INVOKABLE void setTimeout(int milliseconds);
     Q_INVOKABLE int startCommand(QString command);
     Q_INVOKABLE std::string readStdOut();
-
     Q_INVOKABLE int status() {return _status;}
+    Q_INVOKABLE void setStatus(int status);
+
     Q_PROPERTY(int status READ status WRITE setStatus NOTIFY statusChanged);
 
 signals:
@@ -42,7 +44,6 @@ private:
 
     const std::regex _ip_regex = std::regex("(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])");
 
-    void setStatus(int);
     void handleSSHResults(int result);
     void setConnection(std::string glider_name, std::string username, std::string ip);
     bool checkIp(std::string ip);

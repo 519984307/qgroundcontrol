@@ -393,11 +393,11 @@ Rectangle {
                             }
 
                             GridLayout {
-                                // This enables "DON'T CARE" reboot and shutdown buttons. This buttons will
+                                // This enables "DON'T CARE" reboot and shutdown buttons. These buttons will
                                 // reboot/shutdown any jetson on the network, no matter if the glider is in
                                 // the air or not. There are also no checks done if this QGC is in any way
                                 // connected to the jetson it tries to shutdown. So be very carefull with
-                                // distributing QGC images compieled with this flag set to true
+                                // distributing QGC images compiled with this flag set to true
                                 readonly property var advancedControls: false
                                 columns: advancedControls ? 4 : 2
 

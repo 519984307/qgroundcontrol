@@ -28,7 +28,7 @@ QGCLabel {
         function onStatusChanged(value) {
             // make sure we only react to results that we triggered ourselves
             if (waitingForResult && value == 0) {
-                // SSH was succesull, we can reset our connection
+                // SSH was succesful, we can reset our connection
                 controller.resetConnection();
                 waitingForResult = false;
             }

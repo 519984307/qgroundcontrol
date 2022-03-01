@@ -39,7 +39,7 @@ QGCLabel {
 
         MenuItem {
             enabled: true
-            onTriggered: {controller.newConnection(text); waitingForResult = true; flightModesMenu.dismiss()}
+            onTriggered: {controller.startROS(text); waitingForResult = true; flightModesMenu.dismiss()}
         }
     }
 
@@ -74,7 +74,6 @@ QGCLabel {
 
     function updateFlightModesMenu() {
         console.log(QGroundControl.settingsManager.videoSettings.udpPort.rawValue)
-        var state = controller.status;
         var i;
         // Remove old menu items
         for (i = 0; i < flightModesMenuItems.length; i++) {
@@ -82,7 +81,7 @@ QGCLabel {
         }
         flightModesMenuItems.length = 0
         // Add new items
-        if(state == 1) return;
+        if(sshStatus == 1) return;
         for (i = 0; i < ports.length; i++) {
             var menuItem = flightModeMenuItemComponent.createObject(null, { "text": stream_names[i]})
             flightModesMenuItems.push(menuItem)

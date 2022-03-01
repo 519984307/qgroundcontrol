@@ -13,15 +13,22 @@ RosSSHController::RosSSHController(void)
 }
 
 void
-RosSSHController::newConnection(QString text) {
-    qCDebug(RosSSHLogger)<<"Setting up new connection\n";
+RosSSHController::startROS(QString gliderName) {
+    newConnection(gliderName);
+    if (startCommand("") != 0) {
+        setStatus(2);
+    };
+}
+
+void
+RosSSHController::newConnection(QString gliderName) {
     std::string ip = "";
     SettingsManager* _settingsManager = qgcApp()->toolbox()->settingsManager();
 
     std::string username = _settingsManager->flyViewSettings()->JetsonUsername()->rawValue().toString().toStdString();
 
     // Get the IP from the settings
-    std::string glider_name = text.toStdString();
+    std::string glider_name = gliderName.toStdString();
     if(glider_name == "Mark11")
     {
         ip = _settingsManager->flyViewSettings()->Mark11IP()->rawValue().toString().toStdString();
@@ -44,15 +51,11 @@ RosSSHController::newConnection(QString text) {
     }
 
     setConnection(glider_name, username, ip);
-    if (startCommand("") != 0) {
-        setStatus(2);
-    };
 }
 
 void
 RosSSHController::setTimeout(int milliseconds)
 {
-    qCDebug(RosSSHLogger)<<"Setting timeout\n";
     _current_timeout_ms = milliseconds;
 }
 
@@ -89,7 +92,6 @@ RosSSHController::startCommand(QString command)
 std::string
 RosSSHController::readStdOut()
 {
-    qCDebug(RosSSHLogger)<<"Reading stdout";
     if (_ssh_thread)
     {
         return _ssh_thread->stdOut();
@@ -103,7 +105,6 @@ RosSSHController::readStdOut()
 void
 RosSSHController::setStatus(int status)
 {
-    qCDebug(RosSSHLogger)<<"Setting status to " << status;
     _status = status;
     emit statusChanged(_status);
     if (status != 1) {
@@ -119,7 +120,6 @@ RosSSHController::handleSSHResults(int result)
 
     if(result==2)
     {
-        setStatus(2);
         std::string setup_command = "ssh-copy-id "+_current_username+"@"+_current_ip;
         std::string osType = QSysInfo::productType().toStdString();
         if(osType == "windows" || osType == "winrt")
@@ -131,6 +131,9 @@ RosSSHController::handleSSHResults(int result)
                               "1- If you have never used SSH on this machine, run \"ssh-keygen -b 4096\" (should be executed only once, choose \"Cancel\" if the command asks you to overwrite an existing SSH key)\n" +
                               "2- Run \""+setup_command+"\" to copy your SSH identity to the glider, you will be prompted to enter the glider's password.\n\n" +
                               "Stdout of command was:\n" + _newest_stdout;
+
+        setStatus(2);
+
         qgcApp()->showAppMessage(
             tr(message.c_str()),
             tr("SSH to glider failed")
@@ -166,10 +169,10 @@ RosSSHController::setConnection(std::string glider_name, std::string username, s
 void
 RosSSHController::resetConnection()
 {
-    qCDebug(RosSSHLogger)<<"Resetting connection";
     _current_glider_name = "";
     _current_ip = "";
     _current_username = "";
+    setStatus(-1);
 }
 
 bool
