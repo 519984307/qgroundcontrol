@@ -149,11 +149,6 @@
       <output name="AUX1">feed-through of RC AUX1 channel</output>
       <output name="AUX2">feed-through of RC AUX2 channel</output>
     </airframe>
-    <airframe name="Hex X with control allocation" id="6003" maintainer="Silvan Fuhrer">
-      <class>Copter</class>
-      <maintainer>Silvan Fuhrer</maintainer>
-      <type>Hexarotor x</type>
-    </airframe>
   </airframe_group>
   <airframe_group name="Octo Coax Wide" image="OctoRotorXCoaxial">
     <airframe name="Steadidrone MAVRIK" id="12002" maintainer="Simon Wilks &lt;simon@uaventure.com&gt;">
@@ -397,9 +392,9 @@
       <output name="MAIN3">motor 3</output>
       <output name="MAIN4">motor 4</output>
     </airframe>
-    <airframe name="S500 with control allocation" id="4018" maintainer="Silvan Fuhrer">
+    <airframe name="Holybro X500 V2" id="4019" maintainer="Farhang Naderi &lt;farhang.nba@gmail.com&gt;">
       <class>Copter</class>
-      <maintainer>Silvan Fuhrer</maintainer>
+      <maintainer>Farhang Naderi &lt;farhang.nba@gmail.com&gt;</maintainer>
       <type>Quadrotor x</type>
     </airframe>
     <airframe name="3DR Solo" id="4030" maintainer="Andreas Antener &lt;andreas@uaventure.com&gt;">
@@ -796,6 +791,17 @@
       <output name="MAIN6">motor 6 CCW, bow port vertical, propeller CW</output>
       <output name="MAIN7">motor 7 CCW, stern starboard vertical, propeller CW</output>
       <output name="MAIN8">motor 8 CCW, stern port vertical, propeller CCW</output>
+    </airframe>
+  </airframe_group>
+  <airframe_group name="Simulation (VTOL)" image="AirframeUnknown">
+    <airframe name="SIH Tailsitter Duo" id="1102" maintainer="Romain Chiappinelli &lt;romain.chiap@gmail.com&gt;">
+      <class>VTOL</class>
+      <maintainer>Romain Chiappinelli &lt;romain.chiap@gmail.com&gt;</maintainer>
+      <type>Simulation</type>
+      <output name="MAIN1">motor right</output>
+      <output name="MAIN2">motor left</output>
+      <output name="MAIN5">elevon right</output>
+      <output name="MAIN6">elevon left</output>
     </airframe>
   </airframe_group>
   <airframe_group name="Standard VTOL" image="VTOLPlane">

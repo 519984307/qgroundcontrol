@@ -50,6 +50,7 @@
 #include "InitialConnectStateMachine.h"
 #include "VehicleBatteryFactGroup.h"
 #include "EventHandler.h"
+#include "Actuators/Actuators.h"
 #ifdef QT_DEBUG
 #include "MockLink.h"
 #endif
@@ -114,6 +115,7 @@ const char* Vehicle::_localPositionSetpointFactGroupName ="localPositionSetpoint
 const char* Vehicle::_escStatusFactGroupName =          "escStatus";
 const char* Vehicle::_estimatorStatusFactGroupName =    "estimatorStatus";
 const char* Vehicle::_terrainFactGroupName =            "terrain";
+const char* Vehicle::_hygrometerFactGroupName =         "hygrometer";
 
 // Standard connected vehicle
 Vehicle::Vehicle(LinkInterface*             link,
@@ -177,6 +179,7 @@ Vehicle::Vehicle(LinkInterface*             link,
     , _localPositionSetpointFactGroup(this)
     , _escStatusFactGroup           (this)
     , _estimatorStatusFactGroup     (this)
+    , _hygrometerFactGroup          (this)
     , _terrainFactGroup             (this)
     , _terrainProtocolHandler       (new TerrainProtocolHandler(this, &_terrainFactGroup, this))
 {
@@ -377,6 +380,7 @@ void Vehicle::_commonInit()
     connect(this, &Vehicle::hobbsMeterChanged,      this, &Vehicle::_updateHobbsMeter);
 
     connect(_toolbox->qgcPositionManager(), &QGCPositionManager::gcsPositionChanged, this, &Vehicle::_updateDistanceToGCS);
+    connect(_toolbox->qgcPositionManager(), &QGCPositionManager::gcsPositionChanged, this, &Vehicle::_updateHomepoint);
 
     _missionManager = new MissionManager(this);
     connect(_missionManager, &MissionManager::error,                    this, &Vehicle::_missionManagerError);
@@ -466,6 +470,7 @@ void Vehicle::_commonInit()
     _addFactGroup(&_localPositionSetpointFactGroup,_localPositionSetpointFactGroupName);
     _addFactGroup(&_escStatusFactGroup,         _escStatusFactGroupName);
     _addFactGroup(&_estimatorStatusFactGroup,   _estimatorStatusFactGroupName);
+    _addFactGroup(&_hygrometerFactGroup,        _hygrometerFactGroupName);
     _addFactGroup(&_terrainFactGroup,           _terrainFactGroupName);
 
     // Add firmware-specific fact groups, if provided
@@ -786,7 +791,12 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
     {
         mavlink_serial_control_t ser;
         mavlink_msg_serial_control_decode(&message, &ser);
-        emit mavlinkSerialControl(ser.device, ser.flags, ser.timeout, ser.baudrate, QByteArray(reinterpret_cast<const char*>(ser.data), ser.count));
+        if (static_cast<size_t>(ser.count) > sizeof(ser.data)) {
+            qWarning() << "Invalid count for SERIAL_CONTROL, discarding." << ser.count;
+        } else {
+            emit mavlinkSerialControl(ser.device, ser.flags, ser.timeout, ser.baudrate,
+                    QByteArray(reinterpret_cast<const char*>(ser.data), ser.count));
+        }
     }
         break;
 
@@ -1013,7 +1023,7 @@ void Vehicle::_handleNavControllerOutput(mavlink_message_t& message)
     mavlink_msg_nav_controller_output_decode(&message, &navControllerOutput);
 
     _altitudeTuningSetpointFact.setRawValue(_altitudeTuningFact.rawValue().toDouble() - navControllerOutput.alt_error);
-    _xTrackErrorFact.setRawValue(_altitudeTuningFact.rawValue().toDouble() - navControllerOutput.xtrack_error);
+    _xTrackErrorFact.setRawValue(navControllerOutput.xtrack_error);
     _airSpeedSetpointFact.setRawValue(_airSpeedFact.rawValue().toDouble() - navControllerOutput.aspd_error);
 }
 
@@ -1700,6 +1710,14 @@ EventHandler& Vehicle::_eventHandler(uint8_t compid)
 void Vehicle::setEventsMetadata(uint8_t compid, const QString& metadataJsonFileName, const QString& translationJsonFileName)
 {
     _eventHandler(compid).setMetadata(metadataJsonFileName, translationJsonFileName);
+}
+
+void Vehicle::setActuatorsMetadata(uint8_t compid, const QString& metadataJsonFileName, const QString& translationJsonFileName)
+{
+    if (!_actuators) {
+        _actuators = new Actuators(this, this);
+    }
+    _actuators->load(metadataJsonFileName);
 }
 
 void Vehicle::_handleHeartbeat(mavlink_message_t& message)
@@ -3378,6 +3396,9 @@ void Vehicle::startCalibration(Vehicle::CalibrationType calType)
             // Gyro cal for ArduCopter only
             param1 = 1;
         }
+    case CalibrationAPMAccelSimple:
+        param5 = 4;
+        break;
     }
 
     // We can't use sendMavCommand here since we have no idea how long it will be before the command returns a result. This in turn
@@ -3506,8 +3527,12 @@ void Vehicle::_handleMavlinkLoggingData(mavlink_message_t& message)
 {
     mavlink_logging_data_t log;
     mavlink_msg_logging_data_decode(&message, &log);
-    emit mavlinkLogData(this, log.target_system, log.target_component, log.sequence,
-                        log.first_message_offset, QByteArray((const char*)log.data, log.length), false);
+    if (static_cast<size_t>(log.length) > sizeof(log.data)) {
+        qWarning() << "Invalid length for LOGGING_DATA, discarding." << log.length;
+    } else {
+        emit mavlinkLogData(this, log.target_system, log.target_component, log.sequence,
+                            log.first_message_offset, QByteArray((const char*)log.data, log.length), false);
+    }
 }
 
 void Vehicle::_handleMavlinkLoggingDataAcked(mavlink_message_t& message)
@@ -3515,8 +3540,12 @@ void Vehicle::_handleMavlinkLoggingDataAcked(mavlink_message_t& message)
     mavlink_logging_data_acked_t log;
     mavlink_msg_logging_data_acked_decode(&message, &log);
     _ackMavlinkLogData(log.sequence);
-    emit mavlinkLogData(this, log.target_system, log.target_component, log.sequence,
-                        log.first_message_offset, QByteArray((const char*)log.data, log.length), true);
+    if (static_cast<size_t>(log.length) > sizeof(log.data)) {
+        qWarning() << "Invalid length for LOGGING_DATA_ACKED, discarding." << log.length;
+    } else {
+        emit mavlinkLogData(this, log.target_system, log.target_component, log.sequence,
+                            log.first_message_offset, QByteArray((const char*)log.data, log.length), false);
+    }
 }
 
 void Vehicle::setFirmwarePluginInstanceData(QObject* firmwarePluginInstanceData)
@@ -3646,7 +3675,7 @@ void Vehicle::_handleADSBVehicle(const mavlink_message_t& message)
 
     mavlink_msg_adsb_vehicle_decode(&message, &adsbVehicleMsg);
     if ((adsbVehicleMsg.flags & ADSB_FLAGS_VALID_COORDS) && adsbVehicleMsg.tslc <= maxTimeSinceLastSeen) {
-        ADSBVehicle::VehicleInfo_t vehicleInfo;
+        ADSBVehicle::ADSBVehicleInfo_t vehicleInfo;
 
         vehicleInfo.availableFlags = 0;
         vehicleInfo.icaoAddress = adsbVehicleMsg.ICAO_address;
@@ -3722,6 +3751,24 @@ void Vehicle::_updateDistanceToGCS()
         _distanceToGCSFact.setRawValue(coordinate().distanceTo(gcsPosition));
     } else {
         _distanceToGCSFact.setRawValue(qQNaN());
+    }
+}
+
+void Vehicle::_updateHomepoint()
+{
+    const bool setHomeCmdSupported = firmwarePlugin()->supportedMissionCommands(vehicleClass()).contains(MAV_CMD_DO_SET_HOME);
+    const bool updateHomeActivated = _toolbox->settingsManager()->flyViewSettings()->updateHomePosition()->rawValue().toBool();
+    if(setHomeCmdSupported && updateHomeActivated){
+        QGeoCoordinate gcsPosition = _toolbox->qgcPositionManager()->gcsPosition();
+        if (coordinate().isValid() && gcsPosition.isValid()) {
+            sendMavCommand(defaultComponentId(),
+                           MAV_CMD_DO_SET_HOME, false,
+                           0,
+                           0, 0, 0,
+                           static_cast<float>(gcsPosition.latitude()) ,
+                           static_cast<float>(gcsPosition.longitude()),
+                           static_cast<float>(gcsPosition.altitude()));
+        }
     }
 }
 

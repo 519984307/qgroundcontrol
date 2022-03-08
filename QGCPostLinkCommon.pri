@@ -73,6 +73,7 @@ WindowsBuild {
 
 LinuxBuild {
     QMAKE_POST_LINK += && mkdir -p $$DESTDIR/Qt/libs && mkdir -p $$DESTDIR/Qt/plugins
+    QMAKE_RPATHDIR += $ORIGIN/Qt/libs
 
     # QT_INSTALL_LIBS
     QT_LIB_LIST += \
@@ -107,6 +108,16 @@ LinuxBuild {
         libicui18n.so* \
         libQt5TextToSpeech.so.5
 
+    # Not all Qt libs are built in all systems. CI doesn't build Wayland, for example.
+    QT_LIB_OPTIONALS = \
+        libQt5WaylandClient.so.5 \
+        libQt5WaylandCompositor.so.5
+    for(QT_LIB, QT_LIB_OPTIONALS) {
+        exists("$$[QT_INSTALL_LIBS]/$$QT_LIB") {
+            QT_LIB_LIST += $$QT_LIB
+        }
+    }
+
     exists($$[QT_INSTALL_LIBS]/libicudata.so.56) {
         # Some Qt distributions link with *.so.56
         QT_LIB_LIST += \
@@ -119,9 +130,9 @@ LinuxBuild {
             libicui18n.so \
             libicuuc.so
     }
-
+    # Copy only if non-existing to avoid file timestamp updates
     for(QT_LIB, QT_LIB_LIST) {
-        QMAKE_POST_LINK += && $$QMAKE_COPY --dereference $$[QT_INSTALL_LIBS]/$$QT_LIB $$DESTDIR/Qt/libs/
+        QMAKE_POST_LINK += && $$QMAKE_COPY -n --dereference $$[QT_INSTALL_LIBS]/$$QT_LIB $$DESTDIR/Qt/libs/
     }
 
     # QT_INSTALL_PLUGINS
@@ -141,11 +152,11 @@ LinuxBuild {
     }
 
     for(QT_PLUGIN, QT_PLUGIN_LIST) {
-        QMAKE_POST_LINK += && $$QMAKE_COPY --dereference --recursive $$[QT_INSTALL_PLUGINS]/$$QT_PLUGIN $$DESTDIR/Qt/plugins/
+        QMAKE_POST_LINK += && $$QMAKE_COPY -n --dereference --recursive $$[QT_INSTALL_PLUGINS]/$$QT_PLUGIN $$DESTDIR/Qt/plugins/
     }
 
     # QT_INSTALL_QML
-    QMAKE_POST_LINK += && $$QMAKE_COPY --dereference --recursive $$[QT_INSTALL_QML] $$DESTDIR/Qt/
+    QMAKE_POST_LINK += && $$QMAKE_COPY -n --dereference --recursive $$[QT_INSTALL_QML] $$DESTDIR/Qt/
 
     # Airmap
     contains (DEFINES, QGC_AIRMAP_ENABLED) {
@@ -160,4 +171,9 @@ LinuxBuild {
     } else {
         include($$PWD/custom/custom_deploy.pri)
     }
+
+    QMAKE_POST_LINK += && SEARCHDIR="$$DESTDIR/Qt" RPATHDIR="$$DESTDIR/Qt/libs" "$$PWD/deploy/linux-fixup-rpaths.bash"
+
+    # https://doc.qt.io/qt-5/qt-conf.html
+    QMAKE_POST_LINK += && $$QMAKE_COPY "$$SOURCE_DIR/deploy/qt.conf" "$$DESTDIR"
 }

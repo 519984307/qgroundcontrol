@@ -37,6 +37,8 @@ public:
     DEFINE_SETTINGFACT(showSimpleCameraControl)
     DEFINE_SETTINGFACT(showObstacleDistanceOverlay)
 
+    DEFINE_SETTINGFACT(updateHomePosition)
+
     // Start ROS settings
     DEFINE_SETTINGFACT(Mark11IP)
 

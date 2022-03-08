@@ -36,6 +36,8 @@ DECLARE_SETTINGSFACT(FlyViewSettings, keepMapCenteredOnVehicle)
 DECLARE_SETTINGSFACT(FlyViewSettings, showSimpleCameraControl)
 DECLARE_SETTINGSFACT(FlyViewSettings, showObstacleDistanceOverlay)
 
+DECLARE_SETTINGSFACT(FlyViewSettings, updateHomePosition)
+
 // Start ROS settings
 DECLARE_SETTINGSFACT(FlyViewSettings, Mark11IP)
 DECLARE_SETTINGSFACT(FlyViewSettings, Mark12IP)
@@ -50,7 +52,6 @@ DECLARE_SETTINGSFACT(FlyViewSettings, lastROSIP)
 DECLARE_SETTINGSFACT(FlyViewSettings, landingStationControlsVisible)
 DECLARE_SETTINGSFACT(FlyViewSettings, landingStationTimeout)
 DECLARE_SETTINGSFACT(FlyViewSettings, landingStationSpeed)
-
 
 
 

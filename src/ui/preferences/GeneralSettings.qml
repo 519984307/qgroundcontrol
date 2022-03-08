@@ -218,10 +218,17 @@ Rectangle {
                             }
 
                             FactCheckBox {
+                                property Fact _unicast: QGroundControl.settingsManager.flyViewSettings.unicastVideoSink
+                                text:       qsTr("Update Home Position")
+                                fact:       _updateHomePosition
+                                visible:    _updateHomePosition.visible
+                                property Fact _updateHomePosition: QGroundControl.settingsManager.flyViewSettings.updateHomePosition
+                            }
+
+                            FactCheckBox {
                                 text:       qsTr("Use Unicast Video Sink (disable for SIM)")
                                 visible:    true
                                 fact:       _unicast
-
                                 property Fact _unicast: QGroundControl.settingsManager.flyViewSettings.unicastVideoSink
                             }
 
@@ -1207,7 +1214,7 @@ Rectangle {
                             FactTextField {
                                 fact:                   adsbGrid.adsbSettings.adsbServerHostAddress
                                 visible:                adsbGrid.adsbSettings.adsbServerHostAddress.visible
-                                Layout.preferredWidth:  _valueFieldWidth
+                                Layout.fillWidth:       true
                             }
 
                             QGCLabel {

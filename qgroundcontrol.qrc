@@ -67,6 +67,9 @@
         <file alias="MockLink.qml">src/ui/preferences/MockLink.qml</file>
         <file alias="MockLinkSettings.qml">src/ui/preferences/MockLinkSettings.qml</file>
         <file alias="MotorComponent.qml">src/AutoPilotPlugins/Common/MotorComponent.qml</file>
+        <file alias="ActuatorComponent.qml">src/AutoPilotPlugins/PX4/ActuatorComponent.qml</file>
+        <file alias="ActuatorFact.qml">src/AutoPilotPlugins/PX4/ActuatorFact.qml</file>
+        <file alias="ActuatorSlider.qml">src/AutoPilotPlugins/PX4/ActuatorSlider.qml</file>
         <file alias="OfflineMap.qml">src/QtLocationPlugin/QMLControl/OfflineMap.qml</file>
         <file alias="PlanToolBar.qml">src/PlanView/PlanToolBar.qml</file>
         <file alias="PlanToolBarIndicators.qml">src/PlanView/PlanToolBarIndicators.qml</file>
@@ -154,10 +157,10 @@
         <file alias="QGroundControl/Controls/QGCMouseArea.qml">src/QmlControls/QGCMouseArea.qml</file>
         <file alias="QGroundControl/Controls/QGCMovableItem.qml">src/QmlControls/QGCMovableItem.qml</file>
         <file alias="QGroundControl/Controls/QGCPopupDialog.qml">src/QmlControls/QGCPopupDialog.qml</file>
-        <file alias="QGroundControl/Controls/QGCPopupDialogContainer.qml">src/QmlControls/QGCPopupDialogContainer.qml</file>
         <file alias="QGroundControl/Controls/QGCPipOverlay.qml">src/QmlControls/QGCPipOverlay.qml</file>
         <file alias="QGroundControl/Controls/QGCPipState.qml">src/QmlControls/QGCPipState.qml</file>
         <file alias="QGroundControl/Controls/QGCRadioButton.qml">src/QmlControls/QGCRadioButton.qml</file>
+        <file alias="QGroundControl/Controls/QGCSimpleMessageDialog.qml">src/QmlControls/QGCSimpleMessageDialog.qml</file>
         <file alias="QGroundControl/Controls/QGCSlider.qml">src/QmlControls/QGCSlider.qml</file>
         <file alias="QGroundControl/Controls/QGCSwitch.qml">src/QmlControls/QGCSwitch.qml</file>
         <file alias="QGroundControl/Controls/QGCTabBar.qml">src/QmlControls/QGCTabBar.qml</file>
@@ -165,9 +168,6 @@
         <file alias="QGroundControl/Controls/QGCTextField.qml">src/QmlControls/QGCTextField.qml</file>
         <file alias="QGroundControl/Controls/QGCToolBarButton.qml">src/QmlControls/QGCToolBarButton.qml</file>
         <file alias="QGroundControl/Controls/QGCToolInsets.qml">src/QmlControls/QGCToolInsets.qml</file>
-        <file alias="QGroundControl/Controls/QGCViewDialog.qml">src/QmlControls/QGCViewDialog.qml</file>
-        <file alias="QGroundControl/Controls/QGCViewDialogContainer.qml">src/QmlControls/QGCViewDialogContainer.qml</file>
-        <file alias="QGroundControl/Controls/QGCViewMessage.qml">src/QmlControls/QGCViewMessage.qml</file>
         <file alias="QGroundControl/Controls/qmldir">src/QmlControls/QGroundControl/Controls/qmldir</file>
         <file alias="QGroundControl/Controls/RallyPointEditorHeader.qml">src/PlanView/RallyPointEditorHeader.qml</file>
         <file alias="QGroundControl/Controls/RallyPointItemEditor.qml">src/PlanView/RallyPointItemEditor.qml</file>
@@ -344,6 +344,7 @@
         <file alias="Vehicle/VehicleFact.json">src/Vehicle/VehicleFact.json</file>
         <file alias="Vehicle/VibrationFact.json">src/Vehicle/VibrationFact.json</file>
         <file alias="Vehicle/WindFact.json">src/Vehicle/WindFact.json</file>
+        <file alias="Vehicle/HygrometerFact.json">src/Vehicle/HygrometerFact.json</file>
         <file alias="Video.SettingsGroup.json">src/Settings/Video.SettingsGroup.json</file>
         <file alias="VTOLLandingPattern.FactMetaData.json">src/MissionManager/VTOLLandingPattern.FactMetaData.json</file>
     </qresource>

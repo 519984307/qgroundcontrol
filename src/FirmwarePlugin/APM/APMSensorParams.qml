@@ -94,4 +94,17 @@ Item {
     property var  rgCompassCalibrated:              [ compass1Calibrated, compass2Calibrated, compass3Calibrated ]
 
     property Fact declinationFact:                  factPanelController.getParameterFact(-1, "COMPASS_DEC")
+
+    property Fact ins1Id:                           factPanelController.getParameterFact(-1, "INS_ACC_ID")
+    property Fact ins2Id:                           factPanelController.getParameterFact(-1, "INS_ACC2_ID")
+    property Fact ins3Id:                           factPanelController.getParameterFact(-1, "INS_ACC3_ID")
+    property var  rgInsId:                          [ ins1Id, ins2Id, ins3Id ]
+
+    property bool baroIdAvailable:                  factPanelController.parameterExists(-1, "BARO1_DEVID")
+
+    property Fact baro1Id:                          baroIdAvailable ? factPanelController.getParameterFact(-1, "BARO1_DEVID") : _noFact
+    property Fact baro2Id:                          baroIdAvailable ? factPanelController.getParameterFact(-1, "BARO2_DEVID") : _noFact
+    property Fact baro3Id:                          baroIdAvailable ? factPanelController.getParameterFact(-1, "BARO3_DEVID") : _noFact
+    property var  rgBaroId:                         [ baro1Id, baro2Id, baro3Id ]
+
 }

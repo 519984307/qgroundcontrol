@@ -1117,7 +1117,7 @@ Set -1 to disable the check</short_desc>
       <max>180</max>
       <unit>deg</unit>
     </parameter>
-    <parameter name="COM_ARM_MAG_STR" default="1" type="INT32">
+    <parameter name="COM_ARM_MAG_STR" default="2" type="INT32">
       <short_desc>Enable mag strength preflight check</short_desc>
       <long_desc>Deny arming if the estimator detects a strong magnetic disturbance (check enabled by EKF2_MAG_CHECK)</long_desc>
     </parameter>
@@ -1138,6 +1138,14 @@ Set -1 to disable the check</short_desc>
       <long_desc>Minimal battery level to allow arming represented in percentage</long_desc>
       <min>0.00</min>
       <max>1.00</max>
+      <decimal>3</decimal>
+    </parameter>
+    <parameter name="COM_BAT_ACT_T" default="10.0" type="FLOAT">
+      <short_desc>Delay between battery state change and failsafe reaction</short_desc>
+      <long_desc>Battery state requires action -&gt; wait COM_BAT_ACT_T seconds in Hold mode for the user to realize and take a custom action -&gt; React with failsafe action COM_LOW_BAT_ACT A zero value disables the delay.</long_desc>
+      <min>0.0</min>
+      <max>25.0</max>
+      <unit>s</unit>
       <decimal>3</decimal>
     </parameter>
     <parameter name="COM_CPU_MAX" default="90.0" type="FLOAT">
@@ -1351,6 +1359,11 @@ Set -1 to disable the check</short_desc>
       <max>60</max>
       <unit>s</unit>
     </parameter>
+    <parameter name="COM_HOME_EN" default="1" type="INT32" boolean="true">
+      <short_desc>Home position enabled</short_desc>
+      <long_desc>Set home position automatically if possible.</long_desc>
+      <reboot_required>true</reboot_required>
+    </parameter>
     <parameter name="COM_HOME_H_T" default="5.0" type="FLOAT">
       <short_desc>Home set horizontal threshold</short_desc>
       <long_desc>The home position will be set if the estimated positioning accuracy is below the threshold.</long_desc>
@@ -1499,15 +1512,17 @@ See COM_OBL_ACT and COM_OBL_RC_ACT to configure action</short_desc>
       <max>1500</max>
       <unit>ms</unit>
     </parameter>
-    <parameter name="COM_RC_IN_MODE" default="0" type="INT32">
+    <parameter name="COM_RC_IN_MODE" default="3" type="INT32">
       <short_desc>RC control input mode</short_desc>
       <long_desc>The default value of 0 requires a valid RC transmitter setup. Setting this to 1 allows joystick control and disables RC input handling and the associated checks. A value of 2 will generate RC control data from manual input received via MAVLink instead of directly forwarding the manual input data.</long_desc>
       <min>0</min>
-      <max>2</max>
+      <max>4</max>
       <values>
         <value code="0">RC Transmitter</value>
         <value code="1">Joystick/No RC Checks</value>
         <value code="2">Virtual RC by Joystick</value>
+        <value code="3">RC or Joystick keep first</value>
+        <value code="4">Stick input disabled</value>
       </values>
     </parameter>
     <parameter name="COM_RC_LOSS_T" default="0.5" type="FLOAT">
@@ -1855,7 +1870,7 @@ Sets the number of standard deviations used by the innovation consistency test</
     </parameter>
     <parameter name="EKF2_GPS_CHECK" default="245" type="INT32">
       <short_desc>Integer bitmask controlling GPS checks</short_desc>
-      <long_desc>Set bits to 1 to enable checks. Checks enabled by the following bit positions 0 : Minimum required sat count set by EKF2_REQ_NSATS 1 : Minimum required PDOP set by EKF2_REQ_PDOP 2 : Maximum allowed horizontal position error set by EKF2_REQ_EPH 3 : Maximum allowed vertical position error set by EKF2_REQ_EPV 4 : Maximum allowed speed error set by EKF2_REQ_SACC 5 : Maximum allowed horizontal position rate set by EKF2_REQ_HDRIFT. This check will only run when the vehicle is on ground and stationary. Detecton of the stationary condition is controlled by the EKF2_MOVE_TEST parameter. 6 : Maximum allowed vertical position rate set by EKF2_REQ_VDRIFT. This check will only run when the vehicle is on ground and stationary. Detecton of the stationary condition is controlled by the EKF2_MOVE_TEST parameter. 7 : Maximum allowed horizontal speed set by EKF2_REQ_HDRIFT. This check will only run when the vehicle is on ground and stationary. Detecton of the stationary condition is controlled by the EKF2_MOVE_TEST parameter. 8 : Maximum allowed vertical velocity discrepancy set by EKF2_REQ_VDRIFT</long_desc>
+      <long_desc>Set bits to 1 to enable checks. Checks enabled by the following bit positions 0 : Minimum required sat count set by EKF2_REQ_NSATS 1 : Maximum allowed PDOP set by EKF2_REQ_PDOP 2 : Maximum allowed horizontal position error set by EKF2_REQ_EPH 3 : Maximum allowed vertical position error set by EKF2_REQ_EPV 4 : Maximum allowed speed error set by EKF2_REQ_SACC 5 : Maximum allowed horizontal position rate set by EKF2_REQ_HDRIFT. This check will only run when the vehicle is on ground and stationary. 6 : Maximum allowed vertical position rate set by EKF2_REQ_VDRIFT. This check will only run when the vehicle is on ground and stationary. 7 : Maximum allowed horizontal speed set by EKF2_REQ_HDRIFT. This check will only run when the vehicle is on ground and stationary. 8 : Maximum allowed vertical velocity discrepancy set by EKF2_REQ_VDRIFT</long_desc>
       <min>0</min>
       <max>511</max>
       <bitmask>
@@ -2083,7 +2098,7 @@ This parameter is used when the magnetometer fusion method is set automatically 
     </parameter>
     <parameter name="EKF2_MAG_TYPE" default="0" type="INT32">
       <short_desc>Type of magnetometer fusion</short_desc>
-      <long_desc>Integer controlling the type of magnetometer fusion used - magnetic heading or 3-component vector. The fuson of magnetomer data as a three component vector enables vehicle body fixed hard iron errors to be learned, but requires a stable earth field. If set to 'Automatic' magnetic heading fusion is used when on-ground and 3-axis magnetic field fusion in-flight with fallback to magnetic heading fusion if there is insufficient motion to make yaw or magnetic field states observable. If set to 'Magnetic heading' magnetic heading fusion is used at all times If set to '3-axis' 3-axis field fusion is used at all times. If set to 'VTOL custom' the behaviour is the same as 'Automatic', but if fusing airspeed, magnetometer fusion is only allowed to modify the magnetic field states. This can be used by VTOL platforms with large magnetic field disturbances to prevent incorrect bias states being learned during forward flight operation which can adversely affect estimation accuracy after transition to hovering flight. If set to 'MC custom' the behaviour is the same as 'Automatic, but if there are no earth frame position or velocity observations being used, the magnetometer will not be used. This enables vehicles to operate with no GPS in environments where the magnetic field cannot be used to provide a heading reference. Prior to flight, the yaw angle is assumed to be constant if movement tests controlled by the EKF2_MOVE_TEST parameter indicate that the vehicle is static. This allows the vehicle to be placed on the ground to learn the yaw gyro bias prior to flight. If set to 'None' the magnetometer will not be used under any circumstance. If no external source of yaw is available, it is possible to use post-takeoff horizontal movement combined with GPS velocity measurements to align the yaw angle with the timer required (depending on the amount of movement and GPS data quality). Other external sources of yaw may be used if selected via the EKF2_AID_MASK parameter.</long_desc>
+      <long_desc>Integer controlling the type of magnetometer fusion used - magnetic heading or 3-component vector. The fuson of magnetomer data as a three component vector enables vehicle body fixed hard iron errors to be learned, but requires a stable earth field. If set to 'Automatic' magnetic heading fusion is used when on-ground and 3-axis magnetic field fusion in-flight with fallback to magnetic heading fusion if there is insufficient motion to make yaw or magnetic field states observable. If set to 'Magnetic heading' magnetic heading fusion is used at all times If set to '3-axis' 3-axis field fusion is used at all times. If set to 'VTOL custom' the behaviour is the same as 'Automatic', but if fusing airspeed, magnetometer fusion is only allowed to modify the magnetic field states. This can be used by VTOL platforms with large magnetic field disturbances to prevent incorrect bias states being learned during forward flight operation which can adversely affect estimation accuracy after transition to hovering flight. If set to 'MC custom' the behaviour is the same as 'Automatic, but if there are no earth frame position or velocity observations being used, the magnetometer will not be used. This enables vehicles to operate with no GPS in environments where the magnetic field cannot be used to provide a heading reference. Prior to flight, the yaw angle is assumed to be constant if movement tests indicate that the vehicle is static. This allows the vehicle to be placed on the ground to learn the yaw gyro bias prior to flight. If set to 'None' the magnetometer will not be used under any circumstance. If no external source of yaw is available, it is possible to use post-takeoff horizontal movement combined with GPS velocity measurements to align the yaw angle with the timer required (depending on the amount of movement and GPS data quality). Other external sources of yaw may be used if selected via the EKF2_AID_MASK parameter.</long_desc>
       <reboot_required>true</reboot_required>
       <values>
         <value code="0">Automatic</value>
@@ -2112,17 +2127,10 @@ Baro and Magnetometer data will be averaged before downsampling, other data will
     </parameter>
     <parameter name="EKF2_MIN_RNG" default="0.1" type="FLOAT">
       <short_desc>Expected range finder reading when on ground</short_desc>
-      <long_desc>If the vehicle is on ground, is not moving as determined by the motion test controlled by EKF2_MOVE_TEST and the range finder is returning invalid or no data, then an assumed range value of EKF2_MIN_RNG will be used by the terrain estimator so that a terrain height estimate is avilable at the start of flight in situations where the range finder may be inside its minimum measurements distance when on ground.</long_desc>
+      <long_desc>If the vehicle is on ground, is not moving as determined by the motion test and the range finder is returning invalid or no data, then an assumed range value of EKF2_MIN_RNG will be used by the terrain estimator so that a terrain height estimate is avilable at the start of flight in situations where the range finder may be inside its minimum measurements distance when on ground.</long_desc>
       <min>0.01</min>
       <unit>m</unit>
       <decimal>2</decimal>
-    </parameter>
-    <parameter name="EKF2_MOVE_TEST" default="1.0" type="FLOAT">
-      <short_desc>Vehicle movement test threshold</short_desc>
-      <long_desc>Scales the threshold tests applied to IMU data used to determine if the vehicle is static or moving. See parameter descriptions for EKF2_GPS_CHECK and EKF2_MAG_TYPE for further information on the functionality affected by this parameter.</long_desc>
-      <min>0.1</min>
-      <max>10.0</max>
-      <decimal>1</decimal>
     </parameter>
     <parameter name="EKF2_MULTI_IMU" default="0" type="INT32">
       <short_desc>Multi-EKF IMUs</short_desc>
@@ -2238,6 +2246,13 @@ This is the ratio of static pressure error to dynamic pressure generated by a wi
       <min>-0.5</min>
       <max>0.5</max>
       <decimal>2</decimal>
+    </parameter>
+    <parameter name="EKF2_PREDICT_US" default="10000" type="INT32">
+      <short_desc>EKF prediction period</short_desc>
+      <long_desc>EKF prediction period in microseconds. This should ideally be an integer multiple of the IMU time delta. Actual filter update will be an integer multiple of IMU update.</long_desc>
+      <min>1000</min>
+      <max>20000</max>
+      <unit>us</unit>
     </parameter>
     <parameter name="EKF2_REQ_EPH" default="3.0" type="FLOAT">
       <short_desc>Required EPH to use GPS</short_desc>
@@ -2595,8 +2610,8 @@ This is the ratio of static pressure error to dynamic pressure generated by a wi
       <increment>0.01</increment>
     </parameter>
     <parameter name="FW_MAN_P_MAX" default="45.0" type="FLOAT">
-      <short_desc>Max manual pitch</short_desc>
-      <long_desc>Max pitch for manual control in attitude stabilized mode</long_desc>
+      <short_desc>Maximum manual pitch angle</short_desc>
+      <long_desc>Maximum manual pitch angle setpoint (positive &amp; negative) in manual attitude-only stabilized mode</long_desc>
       <min>0.0</min>
       <max>90.0</max>
       <unit>deg</unit>
@@ -2612,8 +2627,8 @@ This is the ratio of static pressure error to dynamic pressure generated by a wi
       <increment>0.01</increment>
     </parameter>
     <parameter name="FW_MAN_R_MAX" default="45.0" type="FLOAT">
-      <short_desc>Max manual roll</short_desc>
-      <long_desc>Max roll for manual control in attitude stabilized mode</long_desc>
+      <short_desc>Maximum manual roll angle</short_desc>
+      <long_desc>Maximum manual roll angle setpoint (positive &amp; negative) in manual attitude-only stabilized mode</long_desc>
       <min>0.0</min>
       <max>90.0</max>
       <unit>deg</unit>
@@ -2897,10 +2912,10 @@ This is the ratio of static pressure error to dynamic pressure generated by a wi
     </parameter>
     <parameter name="FW_L1_PERIOD" default="20.0" type="FLOAT">
       <short_desc>L1 period</short_desc>
-      <long_desc>This is the L1 distance and defines the tracking point ahead of the aircraft its following. A value of 18-25 meters works for most aircraft. Shorten slowly during tuning until response is sharp without oscillation.</long_desc>
-      <min>12.0</min>
+      <long_desc>Used to determine the L1 gain and controller time constant. This parameter is proportional to the L1 distance (which points ahead of the aircraft on the path it is following). A value of 18-25 seconds works for most aircraft. Shorten slowly during tuning until response is sharp without oscillation.</long_desc>
+      <min>7.0</min>
       <max>50.0</max>
-      <unit>m</unit>
+      <unit>s</unit>
       <decimal>1</decimal>
       <increment>0.5</increment>
     </parameter>
@@ -2996,19 +3011,19 @@ Set to 0 to disable heading hold</short_desc>
       <short_desc>Use terrain estimate during landing</short_desc>
       <long_desc>This is turned off by default and a waypoint or return altitude is normally used (or sea level for an arbitrary land position).</long_desc>
     </parameter>
-    <parameter name="FW_POSCTL_INV_ST" default="0" type="INT32">
-      <short_desc>RC stick mapping fixed-wing</short_desc>
-      <long_desc>Set RC/joystick configuration for fixed-wing position and altitude controlled flight.</long_desc>
+    <parameter name="FW_POS_STK_CONF" default="2" type="INT32">
+      <short_desc>RC stick configuraton fixed-wing</short_desc>
+      <long_desc>Set RC/joystick configuration for fixed-wing manual position and altitude controlled flight.</long_desc>
       <min>0</min>
-      <max>1</max>
-      <values>
-        <value code="0">Normal stick configuration (airspeed on throttle stick, altitude on pitch stick)</value>
-        <value code="1">Alternative stick configuration (altitude on throttle stick, airspeed on pitch stick)</value>
-      </values>
+      <max>3</max>
+      <bitmask>
+        <bit index="0">Alternative stick configuration (height rate on throttle stick, airspeed on pitch stick)</bit>
+        <bit index="1">Enable airspeed setpoint via sticks in altitude and position flight mode</bit>
+      </bitmask>
     </parameter>
     <parameter name="FW_P_LIM_MAX" default="45.0" type="FLOAT">
-      <short_desc>Positive pitch limit</short_desc>
-      <long_desc>The maximum positive pitch the controller will output.</long_desc>
+      <short_desc>Maximum pitch angle</short_desc>
+      <long_desc>The maximum pitch angle setpoint for autonomous modes including altitude and position control.</long_desc>
       <min>0.0</min>
       <max>60.0</max>
       <unit>deg</unit>
@@ -3016,8 +3031,8 @@ Set to 0 to disable heading hold</short_desc>
       <increment>0.5</increment>
     </parameter>
     <parameter name="FW_P_LIM_MIN" default="-45.0" type="FLOAT">
-      <short_desc>Negative pitch limit</short_desc>
-      <long_desc>The minimum negative pitch the controller will output.</long_desc>
+      <short_desc>Minimum pitch angle</short_desc>
+      <long_desc>The minimum pitch angle setpoint for autonomous modes including altitude and position control.</long_desc>
       <min>-60.0</min>
       <max>0.0</max>
       <unit>deg</unit>
@@ -3025,8 +3040,8 @@ Set to 0 to disable heading hold</short_desc>
       <increment>0.5</increment>
     </parameter>
     <parameter name="FW_R_LIM" default="50.0" type="FLOAT">
-      <short_desc>Controller roll limit</short_desc>
-      <long_desc>The maximum roll the controller will output.</long_desc>
+      <short_desc>Maximum roll angle</short_desc>
+      <long_desc>The maximum roll angle setpoint for autonomous modes including altitude and position control.</long_desc>
       <min>35.0</min>
       <max>65.0</max>
       <unit>deg</unit>
@@ -3131,6 +3146,81 @@ Set to 0 to disable heading hold</short_desc>
       <unit>s</unit>
       <decimal>2</decimal>
       <increment>0.05</increment>
+    </parameter>
+  </group>
+  <group name="FW NPFG Control">
+    <parameter name="FW_USE_NPFG" default="0" type="INT32" boolean="true">
+      <short_desc>Use NPFG as lateral-directional guidance law for fixed-wing vehicles</short_desc>
+      <long_desc>Replaces L1.</long_desc>
+    </parameter>
+    <parameter name="NPFG_DAMPING" default="0.7" type="FLOAT">
+      <short_desc>NPFG damping ratio</short_desc>
+      <long_desc>Damping ratio of the NPFG control law.</long_desc>
+      <min>0.10</min>
+      <max>1.00</max>
+      <decimal>2</decimal>
+      <increment>0.01</increment>
+    </parameter>
+    <parameter name="NPFG_EN_MIN_GSP" default="1" type="INT32" boolean="true">
+      <short_desc>Enable minimum forward ground speed maintaining excess wind handling logic</short_desc>
+    </parameter>
+    <parameter name="NPFG_GSP_MAX_TK" default="5.0" type="FLOAT">
+      <short_desc>Maximum, minimum forward ground speed for track keeping in excess wind</short_desc>
+      <long_desc>The maximum value of the minimum forward ground speed that may be commanded by the track keeping excess wind handling logic. Commanded in full at the normalized track error fraction of the track error boundary and reduced to zero on track.</long_desc>
+      <min>0.0</min>
+      <max>10.0</max>
+      <unit>m/s</unit>
+      <decimal>1</decimal>
+      <increment>0.5</increment>
+    </parameter>
+    <parameter name="NPFG_LB_PERIOD" default="1" type="INT32" boolean="true">
+      <short_desc>Enable automatic lower bound on the NPFG period</short_desc>
+      <long_desc>Avoids limit cycling from a too aggressively tuned period/damping combination. If set to false, also disables the upper bound NPFG_PERIOD_UB.</long_desc>
+    </parameter>
+    <parameter name="NPFG_PERIOD" default="10.0" type="FLOAT">
+      <short_desc>NPFG period</short_desc>
+      <long_desc>Period of the NPFG control law.</long_desc>
+      <min>1.0</min>
+      <max>100.0</max>
+      <unit>s</unit>
+      <decimal>1</decimal>
+      <increment>0.1</increment>
+    </parameter>
+    <parameter name="NPFG_PERIOD_SF" default="1.5" type="FLOAT">
+      <short_desc>Period safety factor</short_desc>
+      <long_desc>Multiplied by period for conservative minimum period bounding (when period lower bounding is enabled). 1.0 bounds at marginal stability.</long_desc>
+      <min>1.0</min>
+      <max>10.0</max>
+      <decimal>1</decimal>
+      <increment>0.1</increment>
+    </parameter>
+    <parameter name="NPFG_ROLL_TC" default="0.5" type="FLOAT">
+      <short_desc>Roll time constant</short_desc>
+      <long_desc>Time constant of roll controller command / response, modeled as first order delay. Used to determine lower period bound. Setting zero disables automatic period bounding.</long_desc>
+      <min>0.00</min>
+      <max>2.00</max>
+      <unit>s</unit>
+      <decimal>2</decimal>
+      <increment>0.05</increment>
+    </parameter>
+    <parameter name="NPFG_SW_DST_MLT" default="0.32" type="FLOAT">
+      <short_desc>NPFG switch distance multiplier</short_desc>
+      <long_desc>Multiplied by the track error boundary to determine when the aircraft switches to the next waypoint and/or path segment. Should be less than 1. 1/pi (0.32) sets the switch distance equivalent to that of the L1 controller.</long_desc>
+      <min>0.1</min>
+      <max>1.0</max>
+      <decimal>2</decimal>
+      <increment>0.01</increment>
+    </parameter>
+    <parameter name="NPFG_TRACK_KEEP" default="1" type="INT32" boolean="true">
+      <short_desc>Enable track keeping excess wind handling logic</short_desc>
+    </parameter>
+    <parameter name="NPFG_UB_PERIOD" default="1" type="INT32" boolean="true">
+      <short_desc>Enable automatic upper bound on the NPFG period</short_desc>
+      <long_desc>Adapts period to maintain track keeping in variable winds and path curvature.</long_desc>
+    </parameter>
+    <parameter name="NPFG_WIND_REG" default="1" type="INT32" boolean="true">
+      <short_desc>Enable wind excess regulation</short_desc>
+      <long_desc>Disabling this parameter further disables all other airspeed incrementation options.</long_desc>
     </parameter>
   </group>
   <group name="FW TECS">
@@ -3412,6 +3502,11 @@ but also ignore less noise</short_desc>
         <value code="1">Enable</value>
       </values>
     </parameter>
+    <parameter name="GPS_SAT_INFO" default="0" type="INT32" boolean="true">
+      <short_desc>Enable sat info (if available)</short_desc>
+      <long_desc>Enable publication of satellite info (ORB_ID(satellite_info)) if possible. Not available on MTK.</long_desc>
+      <reboot_required>true</reboot_required>
+    </parameter>
     <parameter name="GPS_UBX_DYNMODEL" default="7" type="INT32">
       <short_desc>u-blox GPS dynamic platform model</short_desc>
       <long_desc>u-blox receivers support different dynamic platform models to adjust the navigation engine to the expected application environment.</long_desc>
@@ -3428,22 +3523,30 @@ but also ignore less noise</short_desc>
     </parameter>
     <parameter name="GPS_UBX_MODE" default="0" type="INT32">
       <short_desc>u-blox GPS Mode</short_desc>
-      <long_desc>Select the u-blox configuration setup. Most setups will use the default, including RTK and dual GPS without heading. The Heading mode requires 2 F9P devices to be attached. The main GPS will act as rover and output heading information, whereas the secondary will act as moving base, sending RTCM on UART2 to the rover GPS. RTK is still possible with this setup.</long_desc>
+      <long_desc>Select the u-blox configuration setup. Most setups will use the default, including RTK and dual GPS without heading. The Heading mode requires 2 F9P devices to be attached. The main GPS will act as rover and output heading information, whereas the secondary will act as moving base. Modes 1 and 2 require each F9P UART1 to be connected to the Autopilot. In addition, UART2 on the F9P units are connected to each other. Modes 3 and 4 only require UART1 on each F9P connected to the Autopilot or Can Node. UART RX DMA is required. RTK is still possible with this setup.</long_desc>
       <min>0</min>
       <max>1</max>
       <reboot_required>true</reboot_required>
       <values>
         <value code="0">Default</value>
-        <value code="1">Heading</value>
+        <value code="1">Heading (Rover With Moving Base UART1 Connected To Autopilot, UART2 Connected To Moving Base)</value>
+        <value code="2">Moving Base (UART1 Connected To Autopilot, UART2 Connected To Rover)</value>
+        <value code="3">Heading (Rover With Moving Base UART1 Connected to Autopilot Or Can Node At 921600)</value>
+        <value code="4">Moving Base (Moving Base UART1 Connected to Autopilot Or Can Node At 921600)</value>
       </values>
     </parameter>
     <parameter name="GPS_YAW_OFFSET" default="0." type="FLOAT">
       <short_desc>Heading/Yaw offset for dual antenna GPS</short_desc>
-      <long_desc>Heading offset angle for dual antenna GPS setups that support heading estimation. (currently only for the Trimble MB-Two). Set this to 0 if the antennas are parallel to the forward-facing direction of the vehicle and the first antenna is in front. The offset angle increases clockwise. Set this to 90 if the first antenna is placed on the right side and the second on the left side of the vehicle.</long_desc>
+      <long_desc>Heading offset angle for dual antenna GPS setups that support heading estimation. Set this to 0 if the antennas are parallel to the forward-facing direction of the vehicle and the rover antenna is in front. The offset angle increases clockwise. Set this to 90 if the rover antenna is placed on the right side of the vehicle and the moving base antenna is on the left side.</long_desc>
       <min>0</min>
       <max>360</max>
       <unit>deg</unit>
       <decimal>0</decimal>
+      <reboot_required>true</reboot_required>
+    </parameter>
+    <parameter name="PPS_CAP_ENABLE" default="0" type="INT32" boolean="true">
+      <short_desc>PPS Capture Enable</short_desc>
+      <long_desc>Enables the PPS capture module. This switches mode of FMU channel 7 to be the PPS input channel.</long_desc>
       <reboot_required>true</reboot_required>
     </parameter>
   </group>
@@ -3569,19 +3672,64 @@ but also ignore less noise</short_desc>
       <unit>normalized_thrust/s</unit>
       <decimal>4</decimal>
     </parameter>
+    <parameter name="HTE_THR_RANGE" default="0.2" type="FLOAT">
+      <short_desc>Max deviation from MPC_THR_HOVER</short_desc>
+      <long_desc>Defines the range of the hover thrust estimate around MPC_THR_HOVER. A value of 0.2 with MPC_THR_HOVER at 0.5 results in a range of [0.3, 0.7]. Set to a large value if the vehicle operates in varying physical conditions that affect the required hover thrust strongly (e.g. differently sized payloads).</long_desc>
+      <min>0.01</min>
+      <max>0.4</max>
+      <unit>normalized_thrust</unit>
+      <decimal>2</decimal>
+    </parameter>
+    <parameter name="HTE_VXY_THR" default="10.0" type="FLOAT">
+      <short_desc>Horizontal velocity threshold for sensitivity reduction</short_desc>
+      <long_desc>Above this speed, the measurement noise is linearly increased to reduce the sensitivity of the estimator from biased measurement. Set to a low value on vehicles with large lifting surfaces.</long_desc>
+      <min>1.0</min>
+      <max>20.0</max>
+      <unit>m/s</unit>
+      <decimal>1</decimal>
+    </parameter>
+    <parameter name="HTE_VZ_THR" default="2.0" type="FLOAT">
+      <short_desc>Vertical velocity threshold for sensitivity reduction</short_desc>
+      <long_desc>Above this speed, the measurement noise is linearly increased to reduce the sensitivity of the estimator from biased measurement. Set to a low value on vehicles affected by air drag when climbing or descending.</long_desc>
+      <min>1.0</min>
+      <max>10.0</max>
+      <unit>m/s</unit>
+      <decimal>1</decimal>
+    </parameter>
+  </group>
+  <group name="Iridium SBD">
+    <parameter name="ISBD_READ_INT" default="0" type="INT32">
+      <short_desc>Satellite radio read interval. Only required to be nonzero if data is not sent using a ring call</short_desc>
+      <min>0</min>
+      <max>5000</max>
+      <unit>s</unit>
+    </parameter>
+    <parameter name="ISBD_SBD_TIMEOUT" default="60" type="INT32">
+      <short_desc>Iridium SBD session timeout</short_desc>
+      <min>0</min>
+      <max>300</max>
+      <unit>s</unit>
+    </parameter>
+    <parameter name="ISBD_STACK_TIME" default="0" type="INT32">
+      <short_desc>Time the Iridium driver will wait for additional mavlink messages to combine them into one SBD message</short_desc>
+      <long_desc>Value 0 turns the functionality off</long_desc>
+      <min>0</min>
+      <max>500</max>
+      <unit>ms</unit>
+    </parameter>
   </group>
   <group name="Land Detector">
     <parameter name="LNDFW_AIRSPD_MAX" default="6.00" type="FLOAT">
-      <short_desc>Airspeed max</short_desc>
-      <long_desc>Maximum airspeed allowed in the landed state (m/s)</long_desc>
-      <min>4</min>
+      <short_desc>Fixed-wing land detector: Max airspeed</short_desc>
+      <long_desc>Maximum airspeed allowed in the landed state</long_desc>
+      <min>2</min>
       <max>20</max>
       <unit>m/s</unit>
       <decimal>1</decimal>
     </parameter>
     <parameter name="LNDFW_VEL_XY_MAX" default="5.0" type="FLOAT">
-      <short_desc>Fixedwing max horizontal velocity</short_desc>
-      <long_desc>Maximum horizontal velocity allowed in the landed state (m/s)</long_desc>
+      <short_desc>Fixed-wing land detector: Max horizontal velocity threshold</short_desc>
+      <long_desc>Maximum horizontal velocity allowed in the landed state. A factor of 0.7 is applied in case of airspeed-less flying (either because no sensor is present or sensor data got invalid in flight).</long_desc>
       <min>0.5</min>
       <max>10</max>
       <unit>m/s</unit>
@@ -3589,14 +3737,14 @@ but also ignore less noise</short_desc>
     </parameter>
     <parameter name="LNDFW_VEL_Z_MAX" default="3.0" type="FLOAT">
       <short_desc>Fixedwing max climb rate</short_desc>
-      <long_desc>Maximum vertical velocity allowed in the landed state (m/s up and down)</long_desc>
+      <long_desc>Maximum vertical velocity allowed in the landed state (m/s up and down). A factor of 0.7 is applied in case of airspeed-less flying (either because no sensor is present or sensor data got invalid in flight).</long_desc>
       <min>0.1</min>
       <max>20</max>
       <unit>m/s</unit>
       <decimal>1</decimal>
     </parameter>
     <parameter name="LNDFW_XYACC_MAX" default="8.0" type="FLOAT">
-      <short_desc>Fixedwing max horizontal acceleration</short_desc>
+      <short_desc>Fixed-wing land detector: Max horizontal acceleration</short_desc>
       <long_desc>Maximum horizontal (x,y body axes) acceleration allowed in the landed state (m/s^2)</long_desc>
       <min>2</min>
       <max>15</max>
@@ -3638,6 +3786,43 @@ but also ignore less noise</short_desc>
       <short_desc>Total flight time in microseconds</short_desc>
       <long_desc>Total flight time of this autopilot. Lower 32 bits of the value. Flight time in microseconds = (LND_FLIGHT_T_HI &lt;&lt; 32) | LND_FLIGHT_T_LO.</long_desc>
       <min>0</min>
+    </parameter>
+  </group>
+  <group name="Landing Target Estimator">
+    <parameter name="LTEST_SENS_POS_X" default="0.0" type="FLOAT">
+      <short_desc>X Position of IRLOCK in body frame (forward)</short_desc>
+      <unit>m</unit>
+      <decimal>3</decimal>
+      <reboot_required>true</reboot_required>
+    </parameter>
+    <parameter name="LTEST_SENS_POS_Y" default="0.0" type="FLOAT">
+      <short_desc>Y Position of IRLOCK in body frame (right)</short_desc>
+      <unit>m</unit>
+      <decimal>3</decimal>
+      <reboot_required>true</reboot_required>
+    </parameter>
+    <parameter name="LTEST_SENS_POS_Z" default="0.0" type="FLOAT">
+      <short_desc>Z Position of IRLOCK in body frame (downward)</short_desc>
+      <unit>m</unit>
+      <decimal>3</decimal>
+      <reboot_required>true</reboot_required>
+    </parameter>
+    <parameter name="LTEST_SENS_ROT" default="2" type="INT32">
+      <short_desc>Rotation of IRLOCK sensor relative to airframe</short_desc>
+      <long_desc>Default orientation of Yaw 90°</long_desc>
+      <min>-1</min>
+      <max>40</max>
+      <reboot_required>true</reboot_required>
+      <values>
+        <value code="0">No rotation</value>
+        <value code="1">Yaw 45°</value>
+        <value code="2">Yaw 90°</value>
+        <value code="3">Yaw 135°</value>
+        <value code="4">Yaw 180°</value>
+        <value code="5">Yaw 225°</value>
+        <value code="6">Yaw 270°</value>
+        <value code="7">Yaw 315°</value>
+      </values>
     </parameter>
   </group>
   <group name="Landing target Estimator">
@@ -4175,6 +4360,13 @@ Used to calculate increased terrain random walk nosie due to movement</short_des
       <long_desc>If set to 1 incoming HIL GPS messages are parsed.</long_desc>
     </parameter>
   </group>
+  <group name="Manual Control">
+    <parameter name="MAN_ARM_GESTURE" default="1" type="INT32" boolean="true">
+      <short_desc>Enable arm/disarm stick gesture</short_desc>
+      <long_desc>This determines if moving the left stick to the lower right arms and to the lower left disarms the vehicle.</long_desc>
+      <reboot_required>true</reboot_required>
+    </parameter>
+  </group>
   <group name="Mission">
     <parameter name="COM_OBS_AVOID" default="0" type="INT32">
       <short_desc>Flag to enable obstacle avoidance</short_desc>
@@ -4387,6 +4579,20 @@ Used to calculate increased terrain random walk nosie due to movement</short_des
       <short_desc>Stabilize the mount (set to true for servo gimbal, false for passthrough).
 Does not affect MAVLINK_ROI input</short_desc>
     </parameter>
+    <parameter name="MNT_LND_P_MAX" default="90.0" type="FLOAT">
+      <short_desc>Pitch maximum when landed</short_desc>
+      <min>-90.0</min>
+      <max>90.0</max>
+      <unit>deg</unit>
+      <decimal>1</decimal>
+    </parameter>
+    <parameter name="MNT_LND_P_MIN" default="-90.0" type="FLOAT">
+      <short_desc>Pitch minimum when landed</short_desc>
+      <min>-90.0</min>
+      <max>90.0</max>
+      <unit>deg</unit>
+      <decimal>1</decimal>
+    </parameter>
     <parameter name="MNT_MAN_PITCH" default="0" type="INT32">
       <short_desc>Auxiliary channel to control pitch (in AUX input or manual mode)</short_desc>
       <min>0</min>
@@ -4439,27 +4645,30 @@ Does not affect MAVLINK_ROI input</short_desc>
     </parameter>
     <parameter name="MNT_MODE_IN" default="-1" type="INT32">
       <short_desc>Mount input mode</short_desc>
-      <long_desc>RC uses the AUX input channels (see MNT_MAN_* parameters), MAVLINK_ROI uses the MAV_CMD_DO_SET_ROI Mavlink message, and MAVLINK_DO_MOUNT the MAV_CMD_DO_MOUNT_CONFIGURE and MAV_CMD_DO_MOUNT_CONTROL messages to control a mount.</long_desc>
+      <long_desc>This is the protocol used between the ground station and the autopilot. Recommended is Auto, RC only or MAVLink gimbal protocol v2. The rest will be deprecated.</long_desc>
       <min>-1</min>
       <max>3</max>
       <reboot_required>true</reboot_required>
       <values>
         <value code="-1">DISABLED</value>
-        <value code="0">AUTO</value>
+        <value code="0">Auto (RC and MAVLink gimbal protocol v2)</value>
         <value code="1">RC</value>
         <value code="2">MAVLINK_ROI</value>
         <value code="3">MAVLINK_DO_MOUNT</value>
+        <value code="4">MAVlink gimbal protocol v2</value>
       </values>
     </parameter>
     <parameter name="MNT_MODE_OUT" default="0" type="INT32">
       <short_desc>Mount output mode</short_desc>
-      <long_desc>AUX uses the mixer output Control Group #2. MAVLINK uses the MAV_CMD_DO_MOUNT_CONFIGURE and MAV_CMD_DO_MOUNT_CONTROL MavLink messages to control a mount (set MNT_MAV_SYSID &amp; MNT_MAV_COMPID)</long_desc>
+      <long_desc>This is the protocol used between the autopilot and a connected gimbal. Recommended is the MAVLink gimbal protocol v2 if the gimbal supports it.</long_desc>
       <min>0</min>
       <max>1</max>
+      <reboot_required>true</reboot_required>
       <values>
         <value code="0">AUX</value>
         <value code="1">MAVLINK</value>
       </values>
+      <reboot_required>true</reboot_required>
     </parameter>
     <parameter name="MNT_OB_LOCK_MODE" default="0.0" type="FLOAT">
       <short_desc>Mixer value for selecting a locking mode
@@ -4479,36 +4688,42 @@ if required by the gimbal (only in AUX output mode)</short_desc>
       <short_desc>Offset for pitch channel output in degrees</short_desc>
       <min>-360.0</min>
       <max>360.0</max>
+      <unit>deg</unit>
       <decimal>1</decimal>
     </parameter>
     <parameter name="MNT_OFF_ROLL" default="0.0" type="FLOAT">
       <short_desc>Offset for roll channel output in degrees</short_desc>
       <min>-360.0</min>
       <max>360.0</max>
+      <unit>deg</unit>
       <decimal>1</decimal>
     </parameter>
     <parameter name="MNT_OFF_YAW" default="0.0" type="FLOAT">
       <short_desc>Offset for yaw channel output in degrees</short_desc>
       <min>-360.0</min>
       <max>360.0</max>
+      <unit>deg</unit>
       <decimal>1</decimal>
     </parameter>
-    <parameter name="MNT_RANGE_PITCH" default="360.0" type="FLOAT">
+    <parameter name="MNT_RANGE_PITCH" default="90.0" type="FLOAT">
       <short_desc>Range of pitch channel output in degrees (only in AUX output mode)</short_desc>
       <min>1.0</min>
       <max>720.0</max>
+      <unit>deg</unit>
       <decimal>1</decimal>
     </parameter>
-    <parameter name="MNT_RANGE_ROLL" default="360.0" type="FLOAT">
+    <parameter name="MNT_RANGE_ROLL" default="90.0" type="FLOAT">
       <short_desc>Range of roll channel output in degrees (only in AUX output mode)</short_desc>
       <min>1.0</min>
       <max>720.0</max>
+      <unit>deg</unit>
       <decimal>1</decimal>
     </parameter>
     <parameter name="MNT_RANGE_YAW" default="360.0" type="FLOAT">
       <short_desc>Range of yaw channel output in degrees (only in AUX output mode)</short_desc>
       <min>1.0</min>
       <max>720.0</max>
+      <unit>deg</unit>
       <decimal>1</decimal>
     </parameter>
   </group>
@@ -4753,6 +4968,20 @@ Setting this parameter to 0 disables the filter</short_desc>
       <min>0</min>
       <max>122</max>
       <unit>m</unit>
+      <decimal>1</decimal>
+    </parameter>
+    <parameter name="MPC_LAND_ALT3" default="1.0" type="FLOAT">
+      <short_desc>Altitude for 3. step of slow landing</short_desc>
+      <long_desc>Below this altitude descending velocity gets limited to "MPC_LAND_CRWL", if LIDAR available. No effect if LIDAR not available</long_desc>
+      <min>0</min>
+      <max>122</max>
+      <unit>m</unit>
+      <decimal>1</decimal>
+    </parameter>
+    <parameter name="MPC_LAND_CRWL" default="0.3" type="FLOAT">
+      <short_desc>Land crawl descend rate. Used below</short_desc>
+      <min>0.3</min>
+      <unit>m/s</unit>
       <decimal>1</decimal>
     </parameter>
     <parameter name="MPC_LAND_SPEED" default="0.7" type="FLOAT">
@@ -5006,26 +5235,54 @@ the setpoint will be capped to MPC_XY_VEL_MAX</short_desc>
       <max>2.0</max>
       <decimal>3</decimal>
     </parameter>
-    <parameter name="MPC_Z_VEL_MAX_DN" default="1.0" type="FLOAT">
-      <short_desc>Maximum vertical descent velocity</short_desc>
-      <long_desc>Maximum vertical velocity in AUTO mode and endpoint for stabilized modes (ALTCTRL, POSCTRL).</long_desc>
+    <parameter name="MPC_Z_VEL_MAX_DN" default="1." type="FLOAT">
+      <short_desc>Maximum descent velocity</short_desc>
+      <long_desc>Descent velocity in manual modes and offboard. For auto modes, see MPC_Z_V_AUTO_DN</long_desc>
       <min>0.5</min>
       <max>4.0</max>
       <unit>m/s</unit>
+      <decimal>1</decimal>
+      <increment>0.1</increment>
     </parameter>
-    <parameter name="MPC_Z_VEL_MAX_UP" default="3.0" type="FLOAT">
-      <short_desc>Maximum vertical ascent velocity</short_desc>
-      <long_desc>Maximum vertical velocity in AUTO mode and endpoint for stabilized modes (ALTCTRL, POSCTRL).</long_desc>
+    <parameter name="MPC_Z_VEL_MAX_UP" default="3." type="FLOAT">
+      <short_desc>Maximum ascent velocity</short_desc>
+      <long_desc>Ascent velocity in manual modes and offboard. For auto modes, see MPC_Z_V_AUTO_UP</long_desc>
       <min>0.5</min>
       <max>8.0</max>
       <unit>m/s</unit>
       <decimal>1</decimal>
+      <increment>0.1</increment>
     </parameter>
     <parameter name="MPC_Z_VEL_P_ACC" default="4.0" type="FLOAT">
       <short_desc>Proportional gain for vertical velocity error</short_desc>
       <long_desc>defined as correction acceleration in m/s^2 per m/s velocity error</long_desc>
       <min>2.0</min>
+      <max>15.0</max>
+      <decimal>2</decimal>
+    </parameter>
+    <parameter name="MPC_Z_V_AUTO_DN" default="1." type="FLOAT">
+      <short_desc>Automatic descent velocity</short_desc>
+      <long_desc>Descent velocity in auto modes. For manual modes and offboard, see MPC_Z_VEL_MAX_DN</long_desc>
+      <min>0.5</min>
+      <max>4.0</max>
+      <unit>m/s</unit>
+      <decimal>1</decimal>
+      <increment>0.1</increment>
+    </parameter>
+    <parameter name="MPC_Z_V_AUTO_UP" default="3." type="FLOAT">
+      <short_desc>Automatic ascent velocity</short_desc>
+      <long_desc>Ascent velocity in auto modes. For manual modes and offboard, see MPC_Z_VEL_MAX_UP</long_desc>
+      <min>0.5</min>
       <max>8.0</max>
+      <unit>m/s</unit>
+      <decimal>1</decimal>
+      <increment>0.1</increment>
+    </parameter>
+    <parameter name="SYS_VEHICLE_RESP" default="-0.4" type="FLOAT">
+      <short_desc>Responsiveness</short_desc>
+      <long_desc>Changes the overall responsiveness of the vehicle. The higher the value, the faster the vehicle will react. If set to a value greater than zero, other parameters are automatically set (such as the acceleration or jerk limits). If set to a negative value, the existing individual parameters are used.</long_desc>
+      <min>-1</min>
+      <max>1</max>
       <decimal>2</decimal>
     </parameter>
     <parameter name="WV_EN" default="0" type="INT32">
@@ -5239,7 +5496,7 @@ default 1.5 turns per second</short_desc>
   <group name="PWM Outputs">
     <parameter name="MOT_SLEW_MAX" default="0.0" type="FLOAT">
       <short_desc>Minimum motor rise time (slew rate limit)</short_desc>
-      <long_desc>Minimum time allowed for the motor input signal to pass through a range of 1000 PWM units. A value x means that the motor signal can only go from 1000 to 2000 PWM in maximum x seconds. Zero means that slew rate limiting is disabled.</long_desc>
+      <long_desc>Minimum time allowed for the motor input signal to pass through a range of 1000 PWM units. A value x means that the motor signal can only go from 1000 to 2000 PWM in minimum x seconds. Zero means that slew rate limiting is disabled.</long_desc>
       <min>0.0</min>
       <unit>s/(1000*PWM)</unit>
     </parameter>
@@ -9825,6 +10082,7 @@ is less than 50% of this value</short_desc>
       <values>
         <value code="0">Publish all magnetometers</value>
         <value code="1">Publish primary magnetometer</value>
+        <value code="2">Tailsitter</value>
       </values>
     </parameter>
     <parameter name="SENS_MAG_RATE" default="50.0" type="FLOAT">
@@ -9834,6 +10092,31 @@ is less than 50% of this value</short_desc>
       <max>200</max>
       <unit>Hz</unit>
       <reboot_required>true</reboot_required>
+    </parameter>
+  </group>
+  <group name="Simulator">
+    <parameter name="SIM_BARO_OFF_P" default="0.0" type="FLOAT">
+      <short_desc>simulated barometer pressure offset</short_desc>
+    </parameter>
+    <parameter name="SIM_BARO_OFF_T" default="0.0" type="FLOAT">
+      <short_desc>simulated barometer temperature offset</short_desc>
+    </parameter>
+    <parameter name="SIM_GPS_USED" default="10" type="INT32">
+      <short_desc>simulated GPS number of satellites used</short_desc>
+      <min>0</min>
+      <max>50</max>
+    </parameter>
+    <parameter name="SIM_MAG_OFFSET_X" default="0.0" type="FLOAT">
+      <short_desc>simulated magnetometer X offset</short_desc>
+      <unit>gauss</unit>
+    </parameter>
+    <parameter name="SIM_MAG_OFFSET_Y" default="0.0" type="FLOAT">
+      <short_desc>simulated magnetometer Y offset</short_desc>
+      <unit>gauss</unit>
+    </parameter>
+    <parameter name="SIM_MAG_OFFSET_Z" default="0.0" type="FLOAT">
+      <short_desc>simulated magnetometer Z offset</short_desc>
+      <unit>gauss</unit>
     </parameter>
   </group>
   <group name="System">
@@ -9892,7 +10175,21 @@ is less than 50% of this value</short_desc>
       <long_desc>Temperature calibration for each sensor will ignore data if the temperature is lower than the value set by SYS_CAL_TMIN.</long_desc>
       <unit>celcius</unit>
     </parameter>
-    <parameter name="SYS_FAC_CAL_MODE" default="0" type="INT32">
+    <parameter name="SYS_CTRL_ALLOC" default="0" type="INT32" boolean="true">
+      <short_desc>Enable Dynamic Control Allocation</short_desc>
+      <long_desc>If disabled, the existing mixing implementation is used. If enabled, dynamic control allocation with runtime configuration of the mixing and output functions is used. Note: this is work-in-progress and not all vehicle types are supported yet.</long_desc>
+      <reboot_required>true</reboot_required>
+    </parameter>
+    <parameter name="SYS_DM_BACKEND" default="0" type="INT32" boolean="true">
+      <short_desc>Dataman storage backend</short_desc>
+      <reboot_required>true</reboot_required>
+      <values>
+        <value code="-1">Disabled</value>
+        <value code="0">default (SD card)</value>
+        <value code="1">RAM (not persistent)</value>
+      </values>
+    </parameter>
+    <parameter name="SYS_FAC_CAL_MODE" default="0" type="INT32" boolean="true">
       <short_desc>Enable factory calibration mode</short_desc>
       <long_desc>If enabled, future sensor calibrations will be stored to /fs/mtd_caldata. Note: this is only supported on boards with a separate calibration storage /fs/mtd_caldata.</long_desc>
     </parameter>
@@ -10525,6 +10822,278 @@ is less than 50% of this value</short_desc>
       <reboot_required>true</reboot_required>
     </parameter>
   </group>
+  <group name="UAVCAN">
+    <parameter name="CANNODE_BITRATE" default="1000000" type="INT32">
+      <short_desc>UAVCAN CAN bus bitrate</short_desc>
+      <min>20000</min>
+      <max>1000000</max>
+    </parameter>
+    <parameter name="CANNODE_FLOW_ROT" default="0" type="INT32">
+      <short_desc>Cannode flow board rotation</short_desc>
+      <long_desc>This parameter defines the yaw rotation of the Cannode flow board relative to the vehicle body frame. Zero rotation is defined as X on flow board pointing towards front of vehicle.</long_desc>
+      <reboot_required>true</reboot_required>
+      <values>
+        <value code="0">No rotation</value>
+        <value code="1">Yaw 45°</value>
+        <value code="2">Yaw 90°</value>
+        <value code="3">Yaw 135°</value>
+        <value code="4">Yaw 180°</value>
+        <value code="5">Yaw 225°</value>
+        <value code="6">Yaw 270°</value>
+        <value code="7">Yaw 315°</value>
+      </values>
+    </parameter>
+    <parameter name="CANNODE_GPS_RTCM" default="0" type="INT32" boolean="true">
+      <short_desc>Enable RTCM pub/sub</short_desc>
+      <max>1</max>
+    </parameter>
+    <parameter name="CANNODE_NODE_ID" default="120" type="INT32">
+      <short_desc>UAVCAN Node ID</short_desc>
+      <long_desc>Read the specs at http://uavcan.org to learn more about Node ID.</long_desc>
+      <min>1</min>
+      <max>125</max>
+    </parameter>
+    <parameter name="CANNODE_TERM" default="0" type="INT32" boolean="true">
+      <short_desc>CAN built-in bus termination</short_desc>
+      <max>1</max>
+    </parameter>
+    <parameter name="UAVCAN_BITRATE" default="1000000" type="INT32">
+      <short_desc>UAVCAN CAN bus bitrate</short_desc>
+      <min>20000</min>
+      <max>1000000</max>
+      <unit>bit/s</unit>
+      <reboot_required>true</reboot_required>
+    </parameter>
+    <parameter name="UAVCAN_ENABLE" default="0" type="INT32">
+      <short_desc>UAVCAN mode</short_desc>
+      <long_desc>0 - UAVCAN disabled. 1 - Enables support for UAVCAN sensors without dynamic node ID allocation and firmware update. 2 - Enables support for UAVCAN sensors with dynamic node ID allocation and firmware update. 3 - Enables support for UAVCAN sensors and actuators with dynamic node ID allocation and firmware update. Also sets the motor control outputs to UAVCAN.</long_desc>
+      <min>0</min>
+      <max>3</max>
+      <reboot_required>true</reboot_required>
+      <values>
+        <value code="0">Disabled</value>
+        <value code="1">Sensors Manual Config</value>
+        <value code="2">Sensors Automatic Config</value>
+        <value code="3">Sensors and Actuators (ESCs) Automatic Config</value>
+      </values>
+    </parameter>
+    <parameter name="UAVCAN_ESC_IDLT" default="1" type="INT32" boolean="true">
+      <short_desc>UAVCAN ESC will spin at idle throttle when armed, even if the mixer outputs zero setpoints</short_desc>
+      <reboot_required>true</reboot_required>
+    </parameter>
+    <parameter name="UAVCAN_LGT_ANTCL" default="2" type="INT32">
+      <short_desc>UAVCAN ANTI_COLLISION light operating mode</short_desc>
+      <long_desc>This parameter defines the minimum condition under which the system will command the ANTI_COLLISION lights on 0 - Always off 1 - When autopilot is armed 2 - When autopilot is prearmed 3 - Always on</long_desc>
+      <min>0</min>
+      <max>3</max>
+      <reboot_required>true</reboot_required>
+      <values>
+        <value code="0">Always off</value>
+        <value code="1">When autopilot is armed</value>
+        <value code="2">When autopilot is prearmed</value>
+        <value code="3">Always on</value>
+      </values>
+    </parameter>
+    <parameter name="UAVCAN_LGT_LAND" default="0" type="INT32">
+      <short_desc>UAVCAN LIGHT_ID_LANDING light operating mode</short_desc>
+      <long_desc>This parameter defines the minimum condition under which the system will command the LIGHT_ID_LANDING lights on 0 - Always off 1 - When autopilot is armed 2 - When autopilot is prearmed 3 - Always on</long_desc>
+      <min>0</min>
+      <max>3</max>
+      <reboot_required>true</reboot_required>
+      <values>
+        <value code="0">Always off</value>
+        <value code="1">When autopilot is armed</value>
+        <value code="2">When autopilot is prearmed</value>
+        <value code="3">Always on</value>
+      </values>
+    </parameter>
+    <parameter name="UAVCAN_LGT_NAV" default="3" type="INT32">
+      <short_desc>UAVCAN RIGHT_OF_WAY light operating mode</short_desc>
+      <long_desc>This parameter defines the minimum condition under which the system will command the RIGHT_OF_WAY lights on 0 - Always off 1 - When autopilot is armed 2 - When autopilot is prearmed 3 - Always on</long_desc>
+      <min>0</min>
+      <max>3</max>
+      <reboot_required>true</reboot_required>
+      <values>
+        <value code="0">Always off</value>
+        <value code="1">When autopilot is armed</value>
+        <value code="2">When autopilot is prearmed</value>
+        <value code="3">Always on</value>
+      </values>
+    </parameter>
+    <parameter name="UAVCAN_LGT_STROB" default="1" type="INT32">
+      <short_desc>UAVCAN STROBE light operating mode</short_desc>
+      <long_desc>This parameter defines the minimum condition under which the system will command the STROBE lights on 0 - Always off 1 - When autopilot is armed 2 - When autopilot is prearmed 3 - Always on</long_desc>
+      <min>0</min>
+      <max>3</max>
+      <reboot_required>true</reboot_required>
+      <values>
+        <value code="0">Always off</value>
+        <value code="1">When autopilot is armed</value>
+        <value code="2">When autopilot is prearmed</value>
+        <value code="3">Always on</value>
+      </values>
+    </parameter>
+    <parameter name="UAVCAN_NODE_ID" default="1" type="INT32">
+      <short_desc>UAVCAN Node ID</short_desc>
+      <long_desc>Read the specs at http://uavcan.org to learn more about Node ID.</long_desc>
+      <min>1</min>
+      <max>125</max>
+      <reboot_required>true</reboot_required>
+    </parameter>
+    <parameter name="UAVCAN_RNG_MAX" default="200.0" type="FLOAT">
+      <short_desc>UAVCAN rangefinder maximum range</short_desc>
+      <long_desc>This parameter defines the maximum valid range for a rangefinder connected via UAVCAN.</long_desc>
+      <unit>m</unit>
+    </parameter>
+    <parameter name="UAVCAN_RNG_MIN" default="0.3" type="FLOAT">
+      <short_desc>UAVCAN rangefinder minimum range</short_desc>
+      <long_desc>This parameter defines the minimum valid range for a rangefinder connected via UAVCAN.</long_desc>
+      <unit>m</unit>
+    </parameter>
+    <parameter name="UAVCAN_SUB_ASPD" default="0" type="INT32" boolean="true">
+      <short_desc>subscription airspeed</short_desc>
+      <long_desc>Enable UAVCAN airspeed subscriptions. uavcan::equipment::air_data::IndicatedAirspeed uavcan::equipment::air_data::TrueAirspeed uavcan::equipment::air_data::StaticTemperature</long_desc>
+      <reboot_required>true</reboot_required>
+    </parameter>
+    <parameter name="UAVCAN_SUB_BARO" default="0" type="INT32" boolean="true">
+      <short_desc>subscription barometer</short_desc>
+      <long_desc>Enable UAVCAN barometer subscription. uavcan::equipment::air_data::StaticPressure uavcan::equipment::air_data::StaticTemperature</long_desc>
+      <reboot_required>true</reboot_required>
+    </parameter>
+    <parameter name="UAVCAN_SUB_BAT" default="0" type="INT32" boolean="true">
+      <short_desc>subscription battery</short_desc>
+      <long_desc>Enable UAVCAN battery subscription. uavcan::equipment::power::BatteryInfo ardupilot::equipment::power::BatteryInfoAux</long_desc>
+      <reboot_required>true</reboot_required>
+    </parameter>
+    <parameter name="UAVCAN_SUB_DPRES" default="0" type="INT32" boolean="true">
+      <short_desc>subscription differential pressure</short_desc>
+      <long_desc>Enable UAVCAN differential pressure subscription. uavcan::equipment::air_data::RawAirData</long_desc>
+      <reboot_required>true</reboot_required>
+    </parameter>
+    <parameter name="UAVCAN_SUB_FLOW" default="0" type="INT32" boolean="true">
+      <short_desc>subscription flow</short_desc>
+      <long_desc>Enable UAVCAN optical flow subscription.</long_desc>
+      <reboot_required>true</reboot_required>
+    </parameter>
+    <parameter name="UAVCAN_SUB_GPS" default="1" type="INT32" boolean="true">
+      <short_desc>subscription GPS</short_desc>
+      <long_desc>Enable UAVCAN GPS subscriptions. uavcan::equipment::gnss::Fix uavcan::equipment::gnss::Fix2 uavcan::equipment::gnss::Auxiliary</long_desc>
+      <reboot_required>true</reboot_required>
+    </parameter>
+    <parameter name="UAVCAN_SUB_HYGRO" default="0" type="INT32" boolean="true">
+      <short_desc>subscription hygrometer</short_desc>
+      <long_desc>Enable UAVCAN hygrometer subscriptions. dronecan::sensors::hygrometer::Hygrometer</long_desc>
+      <reboot_required>true</reboot_required>
+    </parameter>
+    <parameter name="UAVCAN_SUB_ICE" default="0" type="INT32" boolean="true">
+      <short_desc>subscription ICE</short_desc>
+      <long_desc>Enable UAVCAN internal combusion engine (ICE) subscription. uavcan::equipment::ice::reciprocating::Status</long_desc>
+      <reboot_required>true</reboot_required>
+    </parameter>
+    <parameter name="UAVCAN_SUB_IMU" default="0" type="INT32" boolean="true">
+      <short_desc>subscription IMU</short_desc>
+      <long_desc>Enable UAVCAN IMU subscription. uavcan::equipment::ahrs::RawIMU</long_desc>
+      <reboot_required>true</reboot_required>
+    </parameter>
+    <parameter name="UAVCAN_SUB_MAG" default="1" type="INT32" boolean="true">
+      <short_desc>subscription magnetometer</short_desc>
+      <long_desc>Enable UAVCAN GPS subscription. uavcan::equipment::ahrs::MagneticFieldStrength uavcan::equipment::ahrs::MagneticFieldStrength2</long_desc>
+      <reboot_required>true</reboot_required>
+    </parameter>
+    <parameter name="UAVCAN_SUB_RNG" default="0" type="INT32" boolean="true">
+      <short_desc>subscription range finder</short_desc>
+      <long_desc>Enable UAVCAN GPS subscription. uavcan::equipment::range_sensor::Measurement</long_desc>
+      <reboot_required>true</reboot_required>
+    </parameter>
+  </group>
+  <group name="UAVCAN v1">
+    <parameter name="UAVCAN_V1_BAUD" default="1000000" type="INT32">
+      <short_desc>UAVCAN/CAN v1 bus bitrate</short_desc>
+      <min>20000</min>
+      <max>1000000</max>
+      <unit>bit/s</unit>
+      <reboot_required>true</reboot_required>
+    </parameter>
+    <parameter name="UAVCAN_V1_ENABLE" default="0" type="INT32" boolean="true">
+      <short_desc>UAVCAN v1</short_desc>
+      <long_desc>0 - UAVCAN disabled. 1 - Enables UAVCANv1</long_desc>
+      <reboot_required>true</reboot_required>
+    </parameter>
+    <parameter name="UCAN1_ACTR_PUB" default="-1" type="INT32">
+      <short_desc>actuator_outputs uORB over UAVCAN v1 publication port ID</short_desc>
+      <min>-1</min>
+      <max>6143</max>
+    </parameter>
+    <parameter name="UCAN1_BMS_BP_SUB" default="-1" type="INT32">
+      <short_desc>DS-015 battery parameters subscription  port ID</short_desc>
+      <min>-1</min>
+      <max>6143</max>
+    </parameter>
+    <parameter name="UCAN1_BMS_BS_SUB" default="-1" type="INT32">
+      <short_desc>DS-015 battery status subscription port ID</short_desc>
+      <min>-1</min>
+      <max>6143</max>
+    </parameter>
+    <parameter name="UCAN1_BMS_ES_SUB" default="-1" type="INT32">
+      <short_desc>DS-015 battery energy source subscription port ID</short_desc>
+      <min>-1</min>
+      <max>6143</max>
+    </parameter>
+    <parameter name="UCAN1_ESC0_SUB" default="-1" type="INT32">
+      <short_desc>ESC 0 subscription port ID</short_desc>
+      <min>-1</min>
+      <max>6143</max>
+    </parameter>
+    <parameter name="UCAN1_ESC_PUB" default="-1" type="INT32">
+      <short_desc>UAVCAN v1 ESC publication port ID</short_desc>
+      <min>-1</min>
+      <max>6143</max>
+    </parameter>
+    <parameter name="UCAN1_GPS0_SUB" default="-1" type="INT32">
+      <short_desc>GPS 0 subscription port ID</short_desc>
+      <min>-1</min>
+      <max>6143</max>
+    </parameter>
+    <parameter name="UCAN1_GPS1_SUB" default="-1" type="INT32">
+      <short_desc>GPS 1 subscription port ID</short_desc>
+      <min>-1</min>
+      <max>6143</max>
+    </parameter>
+    <parameter name="UCAN1_GPS_PUB" default="-1" type="INT32">
+      <short_desc>UAVCAN v1 GPS publication port ID</short_desc>
+      <min>-1</min>
+      <max>6143</max>
+    </parameter>
+    <parameter name="UCAN1_LG_BMS_SUB" default="-1" type="INT32">
+      <short_desc>UAVCAN v1 leagcy battery port ID</short_desc>
+      <min>-1</min>
+      <max>6143</max>
+    </parameter>
+    <parameter name="UCAN1_SERVO_PUB" default="-1" type="INT32">
+      <short_desc>UAVCAN v1 Servo publication port ID</short_desc>
+      <min>-1</min>
+      <max>6143</max>
+    </parameter>
+    <parameter name="UCAN1_UORB_GPS" default="-1" type="INT32">
+      <short_desc>sensor_gps uORB over UAVCAN v1 subscription port ID</short_desc>
+      <min>-1</min>
+      <max>6143</max>
+    </parameter>
+    <parameter name="UCAN1_UORB_GPS_P" default="-1" type="INT32">
+      <short_desc>sensor_gps uORB over UAVCAN v1 publication port ID</short_desc>
+      <min>-1</min>
+      <max>6143</max>
+    </parameter>
+  </group>
+  <group name="UAVCANv1">
+    <parameter name="UAVCAN_V1_ID" default="1" type="INT32">
+      <short_desc>UAVCAN v1 Node ID</short_desc>
+      <long_desc>Read the specs at http://uavcan.org to learn more about Node ID.</long_desc>
+      <min>-1</min>
+      <max>125</max>
+      <reboot_required>true</reboot_required>
+    </parameter>
+  </group>
   <group name="UUV Attitude Control">
     <parameter name="UUV_DIRCT_PITCH" default="0.0" type="FLOAT">
       <short_desc>Direct pitch input</short_desc>
@@ -10652,16 +11221,9 @@ tailsitter, tiltrotor: main throttle</short_desc>
       <decimal>2</decimal>
       <increment>0.01</increment>
     </parameter>
-    <parameter name="VT_DWN_PITCH_MAX" default="5.0" type="FLOAT">
-      <short_desc>Maximum allowed angle the vehicle is allowed to pitch down to generate forward force
-when fixed-wing forward actuation is active (seeVT_FW_TRHUST_EN).
-If demanded down pitch exceeds this limmit, the fixed-wing forward actuators are used instead</short_desc>
-      <min>0.0</min>
-      <max>45.0</max>
-    </parameter>
-    <parameter name="VT_ELEV_MC_LOCK" default="1" type="INT32">
-      <short_desc>Lock elevons in multicopter mode</short_desc>
-      <long_desc>If set to 1 the elevons are locked in multicopter mode</long_desc>
+    <parameter name="VT_ELEV_MC_LOCK" default="1" type="INT32" boolean="true">
+      <short_desc>Lock control surfaces in hover</short_desc>
+      <long_desc>If set to 1 the control surfaces are locked at the disarmed value in multicopter mode.</long_desc>
     </parameter>
     <parameter name="VT_FWD_PITCH" default="-20.0" type="FLOAT">
       <short_desc>Initial Pitch for the Front Transition</short_desc>
@@ -10889,6 +11451,61 @@ to fixed wing mode. Zero or negative values will produce an instant throttle ris
       <unit>Hz</unit>
       <decimal>3</decimal>
       <increment>0.01</increment>
+    </parameter>
+  </group>
+  <group name="VTOL Takeoff">
+    <parameter name="VTO_LOITER_ALT" default="80" type="FLOAT">
+      <short_desc>VTOL Takeoff relative loiter altitude</short_desc>
+      <long_desc>Altitude relative to home at which vehicle will loiter after front transition.</long_desc>
+      <min>20</min>
+      <max>300</max>
+      <unit>m</unit>
+      <decimal>1</decimal>
+      <increment>1</increment>
+    </parameter>
+  </group>
+  <group name="Vehicle Model">
+    <parameter name="VM_INERTIA_XX" default="0.01" type="FLOAT">
+      <short_desc>Inertia matrix, XX component</short_desc>
+      <unit>kg m^2</unit>
+      <decimal>5</decimal>
+      <increment>0.00001</increment>
+    </parameter>
+    <parameter name="VM_INERTIA_XY" default="0." type="FLOAT">
+      <short_desc>Inertia matrix, XY component</short_desc>
+      <unit>kg m^2</unit>
+      <decimal>5</decimal>
+      <increment>0.00001</increment>
+    </parameter>
+    <parameter name="VM_INERTIA_XZ" default="0." type="FLOAT">
+      <short_desc>Inertia matrix, XZ component</short_desc>
+      <unit>kg m^2</unit>
+      <decimal>5</decimal>
+      <increment>0.00001</increment>
+    </parameter>
+    <parameter name="VM_INERTIA_YY" default="0.01" type="FLOAT">
+      <short_desc>Inertia matrix, YY component</short_desc>
+      <unit>kg m^2</unit>
+      <decimal>5</decimal>
+      <increment>0.00001</increment>
+    </parameter>
+    <parameter name="VM_INERTIA_YZ" default="0." type="FLOAT">
+      <short_desc>Inertia matrix, YZ component</short_desc>
+      <unit>kg m^2</unit>
+      <decimal>5</decimal>
+      <increment>0.00001</increment>
+    </parameter>
+    <parameter name="VM_INERTIA_ZZ" default="0.01" type="FLOAT">
+      <short_desc>Inertia matrix, ZZ component</short_desc>
+      <unit>kg m^2</unit>
+      <decimal>5</decimal>
+      <increment>0.00001</increment>
+    </parameter>
+    <parameter name="VM_MASS" default="1." type="FLOAT">
+      <short_desc>Mass</short_desc>
+      <unit>kg</unit>
+      <decimal>5</decimal>
+      <increment>0.00001</increment>
     </parameter>
   </group>
   <group name="Miscellaneous">

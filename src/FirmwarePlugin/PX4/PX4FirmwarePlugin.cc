@@ -11,7 +11,6 @@
 #include "PX4ParameterMetaData.h"
 #include "QGCApplication.h"
 #include "PX4AutoPilotPlugin.h"
-#include "PX4AdvancedFlightModesController.h"
 #include "PX4SimpleFlightModesController.h"
 #include "AirframeComponentController.h"
 #include "SensorsComponentController.h"
@@ -53,7 +52,6 @@ PX4FirmwarePlugin::PX4FirmwarePlugin()
     , _simpleFlightMode     (tr("Simple"))
     , _orbitFlightMode      (tr("Orbit"))
 {
-    qmlRegisterType<PX4AdvancedFlightModesController>   ("QGroundControl.Controllers", 1, 0, "PX4AdvancedFlightModesController");
     qmlRegisterType<PX4SimpleFlightModesController>     ("QGroundControl.Controllers", 1, 0, "PX4SimpleFlightModesController");
     qmlRegisterType<AirframeComponentController>        ("QGroundControl.Controllers", 1, 0, "AirframeComponentController");
     qmlRegisterType<SensorsComponentController>         ("QGroundControl.Controllers", 1, 0, "SensorsComponentController");
@@ -274,6 +272,7 @@ QList<MAV_CMD> PX4FirmwarePlugin::supportedMissionCommands(QGCMAVLink::VehicleCl
         MAV_CMD_DO_SET_CAM_TRIGG_DIST,
         MAV_CMD_DO_SET_SERVO,
         MAV_CMD_DO_CHANGE_SPEED,
+        MAV_CMD_DO_SET_HOME,
         MAV_CMD_DO_LAND_START,
         MAV_CMD_DO_SET_ROI_LOCATION, MAV_CMD_DO_SET_ROI_WPNEXT_OFFSET, MAV_CMD_DO_SET_ROI_NONE,
         MAV_CMD_DO_MOUNT_CONFIGURE,

@@ -276,7 +276,7 @@ QGCApplication::QGCApplication(int &argc, char* argv[], bool unitTesting)
     setOrganizationName(QGC_ORG_NAME);
     setOrganizationDomain(QGC_ORG_DOMAIN);
 
-    this->setApplicationVersion(QString(GIT_VERSION));
+    this->setApplicationVersion(QString(APP_VERSION_STR));
 
     // Set settings format
     QSettings::setDefaultFormat(QSettings::IniFormat);
@@ -758,7 +758,7 @@ void QGCApplication::showAppMessage(const QString& message, const QString& title
     if (rootQmlObject) {
         QVariant varReturn;
         QVariant varMessage = QVariant::fromValue(message);
-        QMetaObject::invokeMethod(_rootQmlObject(), "showMessageDialog", Q_RETURN_ARG(QVariant, varReturn), Q_ARG(QVariant, dialogTitle), Q_ARG(QVariant, varMessage));
+        QMetaObject::invokeMethod(_rootQmlObject(), "_showMessageDialog", Q_RETURN_ARG(QVariant, varReturn), Q_ARG(QVariant, dialogTitle), Q_ARG(QVariant, varMessage));
     } else if (runningUnitTests()) {
         // Unit tests can run without UI
         qDebug() << "QGCApplication::showAppMessage unittest title:message" << dialogTitle << message;
