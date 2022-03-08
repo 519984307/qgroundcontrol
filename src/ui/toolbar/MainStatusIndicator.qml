@@ -12,6 +12,7 @@ import QtQuick.Layouts  1.11
 
 import QGroundControl                       1.0
 import QGroundControl.Controls              1.0
+import QGroundControl.Controllers           1.0
 import QGroundControl.MultiVehicleManager   1.0
 import QGroundControl.ScreenTools           1.0
 import QGroundControl.Palette               1.0
@@ -306,8 +307,11 @@ RowLayout {
         text:                   "" + (_activeVehicle ? _activeVehicle.videoFPS.value : 0) + "FPS"
     }
 
-    // Start ROS Menu
+    RosSSHController{
+        id: sshController
+    }
 
+    // Start ROS Menu
     Item {
         Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * ScreenTools.largeFontPointRatio * 1.5
         height:                 1
@@ -332,11 +336,48 @@ RowLayout {
 
     StartROSMenu {
         id:                     rosMenu
+        controller:             sshController
         Layout.preferredHeight: _root.height
         verticalAlignment:      Text.AlignVCenter
         font.pointSize:         ScreenTools.defaultFontPointSize
         mouseAreaLeftMargin:    -(rosMenu.x - rosIcon.x)
         visible:                !_activeVehicle
+    }
+
+    // Stop ROS controls
+    Item {
+        Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * ScreenTools.largeFontPointRatio * 1.5
+        height:                 1
+        visible:                stopRosIcon.visible
+    }
+
+    QGCColoredImage {
+        id:         stopRosIcon
+        width:      ScreenTools.defaultFontPixelWidth * 2
+        height:     ScreenTools.defaultFontPixelHeight * 0.75
+        fillMode:   Image.PreserveAspectFit
+        mipmap:     true
+        color:      qgcPal.text
+        source:     "/qmlimages/Disconnect.svg"
+        visible:    stopRosLabel.visible
+        opacity:    stopRosLabel.opacity
+    }
+
+    Item {
+        Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth / 2
+        height:                 1
+        visible:                stopRosLabel.visible
+    }
+
+    StopROSLabel {
+        id:                     stopRosLabel
+        controller:             sshController
+        Layout.preferredHeight: _root.height
+        verticalAlignment:      Text.AlignVCenter
+        font.pointSize:         ScreenTools.defaultFontPointSize
+        mouseAreaLeftMargin:    -(stopRosLabel.x - stopRosIcon.x)
+        visible:                _activeVehicle && !_communicationLost
+        opacity:                _armed ? 0.3 : 1
     }
 
     Component {

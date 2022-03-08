@@ -98,6 +98,7 @@
         <file alias="QGroundControl/Controls/LandingStationIndicator.qml">src/QmlControls/LandingStationIndicator.qml</file>
 
         <file alias="QGroundControl/Controls/StartROSMenu.qml">src/QmlControls/StartROSMenu.qml</file>
+        <file alias="QGroundControl/Controls/StopROSLabel.qml">src/QmlControls/StopROSLabel.qml</file>
         <file alias="QGroundControl/Controls/FWLandingPatternMapVisual.qml">src/PlanView/FWLandingPatternMapVisual.qml</file>
         <file alias="QGroundControl/Controls/GeoFenceEditor.qml">src/PlanView/GeoFenceEditor.qml</file>
         <file alias="QGroundControl/Controls/GeoFenceMapVisuals.qml">src/PlanView/GeoFenceMapVisuals.qml</file>

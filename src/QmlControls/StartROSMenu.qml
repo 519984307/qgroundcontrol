@@ -18,11 +18,16 @@ QGCLabel {
 
 
     property var    currentVehicle:         QGroundControl.multiVehicleManager.activeVehicle
+    property var    controller:             null
     property real   mouseAreaLeftMargin:    0
+    property var    sshStatus:              -1
+    property var    waitingForResult:       false
 
-    StartROSMenuController {
-        id: controller
-        onStatusChanged: _root.text = mainText()
+    Connections {
+        target: controller
+        function onStatusChanged(value) {
+            _root.setSSHStatus(value);
+        }
     }
 
     Menu {
@@ -34,7 +39,7 @@ QGCLabel {
 
         MenuItem {
             enabled: true
-            onTriggered: controller.connectSSH(text)
+            onTriggered: {controller.startROS(text); waitingForResult = true; flightModesMenu.dismiss()}
         }
     }
 
@@ -47,16 +52,28 @@ QGCLabel {
 
     function reset_ssh_status()
     {
-        var state = controller.status
-        if(state!=-1 && state!=1) controller.reset_status();
+        if(sshStatus!=-1 && sshStatus!=1) {
+            setSSHStatus(-1);
+        }
     }
+
+    function setSSHStatus(value) {
+        sshStatus = value;
+        text = mainText()
+        // make sure we only react to results that we triggered ourselves
+        if (waitingForResult && value == 2) {
+            // SSH failed, reset connection (since we couldn't connect)
+            controller.resetConnection()
+        }
+        waitingForResult = false
+    }
+
     property var flightModesMenuItems: []
     property var ports: [5601, 5602, 5605, 5606, 5607]
     property var stream_names: ["Mark11", "Mark12", "Mark13", "Skeleton12", "Skeleton13"]
 
     function updateFlightModesMenu() {
         console.log(QGroundControl.settingsManager.videoSettings.udpPort.rawValue)
-        var state = controller.status;
         var i;
         // Remove old menu items
         for (i = 0; i < flightModesMenuItems.length; i++) {
@@ -64,7 +81,7 @@ QGCLabel {
         }
         flightModesMenuItems.length = 0
         // Add new items
-        if(state == 1) return;
+        if(sshStatus == 1) return;
         for (i = 0; i < ports.length; i++) {
             var menuItem = flightModeMenuItemComponent.createObject(null, { "text": stream_names[i]})
             flightModesMenuItems.push(menuItem)
@@ -74,23 +91,19 @@ QGCLabel {
 
     function mainText()
     {
-        var state = controller.status;
         updateFlightModesMenu();
-        if(state == -1) return "Start ROS"
-        if(state == 0) return "SSH successful!"
-        if(state == 1) return "Start ROS (Connecting ...)"
+        if(sshStatus == -1) return "Start ROS"
+        if(sshStatus == 0) return "SSH successful!"
+        if(sshStatus == 1) return "Start ROS (Connecting ...)"
+        if(sshStatus == 2) return "SSH failed"
         return "Start ROS (Connection failed! Make sure your Network, SSH and VPN setup is working.)"
-    }
-
-    function startSSH(glider_name) {
-        controller.connectSSH(glider_name)
     }
 
     Component.onCompleted: _root.updateFlightModesMenu()
 
     Connections {
         target:                 QGroundControl.multiVehicleManager
-        onActiveVehicleChanged: _root.updateFlightModesMenu()
+        onActiveVehicleChanged: {_root.updateFlightModesMenu(); _root.setSSHStatus(currentVehicle ? _root.sshStatus : -1)}
     }
 
     MouseArea {
