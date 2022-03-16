@@ -4233,6 +4233,12 @@ Used to calculate increased terrain random walk nosie due to movement</short_des
       <decimal>1</decimal>
       <increment>0.5</increment>
     </parameter>
+    <parameter name="MIS_TAKEOFF_MODE" default="0" type="INT32">
+      <short_desc>Choose if takeoff begins on landing station  (=0) or not (=1)</short_desc>
+      <min>0</min>
+      <max>1</max>
+      <increment>1</increment>
+    </parameter>
     <parameter name="MIS_TAKEOFF_REQ" default="0" type="INT32">
       <short_desc>Take-off waypoint required</short_desc>
       <long_desc>If set, the mission feasibility checker will check for a takeoff waypoint on the mission.</long_desc>
