@@ -1,12 +1,6 @@
 # QGroundControl Ground Control Station
 
-[![Releases](https://img.shields.io/github/release/mavlink/QGroundControl.svg)](https://github.com/mavlink/QGroundControl/releases)
-[![Travis Build Status](https://travis-ci.org/mavlink/qgroundcontrol.svg?branch=master)](https://travis-ci.org/mavlink/qgroundcontrol)
-[![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/crxcm4qayejuvh6c/branch/master?svg=true)](https://ci.appveyor.com/project/mavlink/qgroundcontrol)
-
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mavlink/qgroundcontrol?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-
+## Original Readme
 *QGroundControl* (QGC) is an intuitive and powerful ground control station (GCS) for UAVs.
 
 The primary goal of QGC is ease of use for both first time and professional users.
@@ -23,3 +17,10 @@ Key Links:
 * [Discussion/Support](https://docs.qgroundcontrol.com/en/Support/Support.html)
 * [Contributing](https://dev.qgroundcontrol.com/en/contribute/)
 * [License](https://github.com/mavlink/qgroundcontrol/blob/master/COPYING.md)
+---
+
+## Custom Features
+An overview of the features that we added to our custom QGroundControl, as well
+as instructions on how to set up QGC and use it to operate our gliders can be
+found in [this SharePoint document](https://thedeliverycompany.sharepoint.com/:w:/s/TechnicSoftwareDev/EYu5DDRgJclPliq-AxOum38BK5WA1hcAEwrdG4AYlsLQtQ?e=1rc9i5).
+
