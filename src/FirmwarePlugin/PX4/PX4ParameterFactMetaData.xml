@@ -6009,6 +6009,22 @@ default 1.5 turns per second</short_desc>
     </parameter>
   </group>
   <group name="Precision Land">
+    <parameter name="MPC_ANG_NEGATIVE" default="-30.0" type="FLOAT">
+      <short_desc>restrict negative pitch to this distance value when approaching the tag</short_desc>
+      <min>-40</min>
+      <max>0</max>
+      <unit>deg</unit>
+      <decimal>1</decimal>
+      <increment>0.1</increment>
+    </parameter>
+    <parameter name="MPC_ANG_POSITIVE" default="20.0" type="FLOAT">
+      <short_desc>restrict positive pitch to this distance value when approaching the tag</short_desc>
+      <min>0</min>
+      <max>40</max>
+      <unit>deg</unit>
+      <decimal>1</decimal>
+      <increment>0.1</increment>
+    </parameter>
     <parameter name="PLDL_BTOUT" default="5.0" type="FLOAT">
       <short_desc>Landing Target Timeout</short_desc>
       <long_desc>Time after which the landing target is considered lost without any new measurements.</long_desc>
