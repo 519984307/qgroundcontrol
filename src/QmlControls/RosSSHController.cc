@@ -122,14 +122,19 @@ RosSSHController::handleSSHResults(int result)
     {
         std::string setup_command = "ssh-copy-id "+_current_username+"@"+_current_ip;
         std::string osType = QSysInfo::productType().toStdString();
+        std::string extra_instruction = "";
         if(osType == "windows" || osType == "winrt")
         {
-            setup_command = "type %userprofile%\\.ssh\\id_rsa.pub | ssh "+_current_username+"@"+_current_ip+" \"cat >> .ssh/authorized_keys\"";
+            setup_command = "cat ~/.ssh/id_rsa.pub | ssh \""+_current_username+"@"+_current_ip+"\" \"mkdir -p ~/.ssh && touch ~/.ssh/authorized_keys && chmod -R go= ~/.ssh && cat >> ~/.ssh/authorized_keys\"";
+            extra_instruction = " (Run this in the Windows POWERSHELL, not the command prompt)";
         }
         std::string message = std::string("Make sure that your network setup is correct, and that you have run the SSH setup commands for this glider.\n\n") +
+                              "If you're not sure about your network setup, do the following steps:\n" +
+                              "1- Make sure your connected to the glider on the VPN\n" +
+                              "2- Add the glider's IP address in your Comm Links settings (in Application Settings)\n\n"
                               "If you didn't run the SSH setup, do the following steps CAREFULLY:\n" +
                               "1- If you have never used SSH on this machine, run \"ssh-keygen -b 4096\" (should be executed only once, choose \"Cancel\" if the command asks you to overwrite an existing SSH key)\n" +
-                              "2- Run \""+setup_command+"\" to copy your SSH identity to the glider, you will be prompted to enter the glider's password.\n\n" +
+                              "2- Run \""+setup_command+"\"" + extra_instruction + " to copy your SSH identity to the glider, you will be prompted to enter the glider's password.\n\n" +
                               "Stdout of command was:\n" + _newest_stdout;
 
         setStatus(2);
