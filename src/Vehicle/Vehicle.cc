@@ -4090,8 +4090,7 @@ void Vehicle::sendJoystickDataThreadSafe(float roll, float pitch, float yaw, flo
                 static_cast<int16_t>(newRollCommand),
                 static_cast<int16_t>(newThrustCommand),
                 static_cast<int16_t>(newYawCommand),
-                buttons,
-                0, 0, 0, 0);
+                buttons);
     sendMessageOnLinkThreadSafe(sharedLink.get(), message);
 }
 
