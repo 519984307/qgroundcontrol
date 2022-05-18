@@ -63,9 +63,9 @@ Rectangle {
         }
         QGCButton {
             Layout.alignment: Qt.AlignHCenter
-            text: "Deliver"
+            text: "Hook Hooked"
             Layout.preferredWidth: _buttonWidth
-            onClicked: landingStationController.delivery()
+            onClicked: landingStationController.hookHooked()
         }
 
         QGCButton {
