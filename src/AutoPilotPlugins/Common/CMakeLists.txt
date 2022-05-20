@@ -3,6 +3,7 @@ SOURCES
     ESP8266Component.qml
     ESP8266ComponentSummary.qml
     MotorComponent.qml
+    HookComponent.qml
     RadioComponent.qml
     SetupPage.qml
     SyslinkComponent.qml

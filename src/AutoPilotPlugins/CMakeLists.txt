@@ -28,6 +28,8 @@ add_library(AutoPilotPlugins
 	Common/ESP8266Component.cc
 	Common/ESP8266ComponentController.cc
 	Common/MotorComponent.cc
+	Common/HookComponent.cc
+	Common/HookComponentController.cc
 	Common/RadioComponentController.cc
 	Common/SyslinkComponent.cc
 	Common/SyslinkComponentController.cc

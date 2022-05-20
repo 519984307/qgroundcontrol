@@ -1042,6 +1042,8 @@ HEADERS+= \
     src/AutoPilotPlugins/Common/ESP8266Component.h \
     src/AutoPilotPlugins/Common/ESP8266ComponentController.h \
     src/AutoPilotPlugins/Common/MotorComponent.h \
+    src/AutoPilotPlugins/Common/HookComponent.h \
+    src/AutoPilotPlugins/Common/HookComponentController.h \
     src/AutoPilotPlugins/Common/RadioComponentController.h \
     src/AutoPilotPlugins/Common/SyslinkComponent.h \
     src/AutoPilotPlugins/Common/SyslinkComponentController.h \
@@ -1064,6 +1066,8 @@ SOURCES += \
     src/AutoPilotPlugins/Common/ESP8266Component.cc \
     src/AutoPilotPlugins/Common/ESP8266ComponentController.cc \
     src/AutoPilotPlugins/Common/MotorComponent.cc \
+    src/AutoPilotPlugins/Common/HookComponent.cc \
+    src/AutoPilotPlugins/Common/HookComponentController.cc \
     src/AutoPilotPlugins/Common/RadioComponentController.cc \
     src/AutoPilotPlugins/Common/SyslinkComponent.cc \
     src/AutoPilotPlugins/Common/SyslinkComponentController.cc \

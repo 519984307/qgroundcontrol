@@ -22,6 +22,7 @@
 #include "CameraComponent.h"
 #include "PowerComponent.h"
 #include "MotorComponent.h"
+#include "HookComponent.h"
 #include "PX4TuningComponent.h"
 #include "PX4FlightBehavior.h"
 #include "SyslinkComponent.h"
@@ -58,6 +59,7 @@ protected:
     CameraComponent*        _cameraComponent;
     PowerComponent*         _powerComponent;
     MotorComponent*         _motorComponent;
+    HookComponent*          _hookComponent;
     PX4TuningComponent*     _tuningComponent;
     PX4FlightBehavior*      _flightBehavior;
     SyslinkComponent*       _syslinkComponent;
