@@ -59,8 +59,7 @@ QGCLabel {
 
     function setLandingStationControlVisibility()
     {
-        if(currentVehicle && currentVehicle.landingStationConnected.value) {
-            // Only allow changing the visibility when we are connected
+        if(currentVehicle) {
             _flyViewSettings.landingStationControlsVisible.value = !_flyViewSettings.landingStationControlsVisible.value;
         }
     }

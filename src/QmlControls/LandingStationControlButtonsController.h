@@ -19,7 +19,7 @@ public:
     Q_INVOKABLE void setSpeed(int speed);
     Q_INVOKABLE void hookClose();
     Q_INVOKABLE void hookOpen();
-    Q_INVOKABLE void delivery();
+    Q_INVOKABLE void hookHooked();
     Q_INVOKABLE void beltStop();
     Q_INVOKABLE void beltUp();
     Q_INVOKABLE void beltDown();

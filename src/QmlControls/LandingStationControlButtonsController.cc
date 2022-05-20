@@ -47,12 +47,12 @@ LandingStationControlButtonsController::hookOpen(void)
 void
 LandingStationControlButtonsController::hookClose(void)
 {
-    _sendHookCommand(2);
+    _sendHookCommand(0);
 }
 void
-LandingStationControlButtonsController::delivery(void)
+LandingStationControlButtonsController::hookHooked(void)
 {
-    _sendDeliveryCommand(0);
+    _sendHookCommand(2);
 }
 
 void
