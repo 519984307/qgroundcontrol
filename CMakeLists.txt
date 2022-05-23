@@ -168,6 +168,8 @@ include_directories(
 	libs/mavlink/include/mavlink/v2.0/common
 
 	libs/shapelib
+
+	libs/libssh/include
 )
 
 add_subdirectory(libs)

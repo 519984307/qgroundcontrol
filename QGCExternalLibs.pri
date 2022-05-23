@@ -122,6 +122,9 @@ SOURCES += \
     libs/shapelib/shpopen.c \
     libs/shapelib/safileio.c
 
+# [REQUIRED] libssh library
+INCLUDEPATH += libs/libssh/include
+
 #
 # [REQUIRED] zlib library
 WindowsBuild {
