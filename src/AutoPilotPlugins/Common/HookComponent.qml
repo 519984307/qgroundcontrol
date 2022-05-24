@@ -37,7 +37,7 @@ SetupPage {
                 wrapMode:       Text.WordWrap
                 text:           qsTr("These controls can be used to move the hook and tune the closed position\n") +
                                 qsTr("\"Backwards\" and \"Forwards\" buttons move the hook. The number controls how far the hook moves with one button press\n") +
-                                qsTr("Once it is in the right position, use \"Set closed position\" to store this position as new closed position")
+                                qsTr("Once it is in the right position, use \"Set closed/open position\" to store this position as new closed/open position")
             }
 
             Row {
@@ -46,10 +46,6 @@ SetupPage {
                     text: "Backwards"
                     onClicked: {controller.hookStep(-parseInt(numSteps.text));}
                 }
-                // FactTextField {
-                //     fact: _flyViewSettings.landingStationSpeed
-                //     onEditingFinished: landingStationController.setSpeed(fact.value)
-                // }
                 QGCTextField {
                     id:                 numSteps
                     maximumLength:      5
@@ -61,11 +57,18 @@ SetupPage {
                     text: "Forwards"
                     onClicked: {controller.hookStep(parseInt(numSteps.text));}
                 }
+            }
+            Row {
+                spacing: ScreenTools.defaultFontPixelWidth
                 QGCButton {
                     text: "Set closed position"
-                    onClicked: {controller.hookReset()}
+                    onClicked: {controller.hookReset(0)}
                 }
-            } // Row
+                QGCButton {
+                    text: "Set open position"
+                    onClicked: {controller.hookReset(1)}
+                }
+            }
         } // Column
     } // Component
 } // SetupPage

@@ -20,9 +20,9 @@ HookComponentController::hookStep(int num_steps)
 }
 
 void
-HookComponentController::hookReset()
+HookComponentController::hookReset(int position)
 {
-    _sendHookResetCommand();
+    _sendHookResetCommand(position);
 }
 
 void
@@ -37,9 +37,9 @@ HookComponentController::_sendHookStepCommand(int num_steps)
     _sendNamedValueFloat("hook_stp", num_steps);
 }
 void
-HookComponentController::_sendHookResetCommand()
+HookComponentController::_sendHookResetCommand(int position)
 {
-    _sendNamedValueFloat("hook_rst", 0.0f);
+    _sendNamedValueFloat("hook_rst", position);
 }
 
 void
