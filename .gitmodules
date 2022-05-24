@@ -24,4 +24,5 @@
 	url = https://github.com/patrickelectric/qmdnsengine
 [submodule "libs/libssh"]
 	path = libs/libssh
-	url = git@github.com:substack/libssh.git
+	url = https://git.libssh.org/projects/libssh.git/
+	branch = stable-0.9

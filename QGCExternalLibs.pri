@@ -123,7 +123,13 @@ SOURCES += \
     libs/shapelib/safileio.c
 
 # [REQUIRED] libssh library
+HEADERS+= \
+    libs/libssh/include/libssh/libssh.h \
+    libs/libssh/include/libssh/libsshpp.hpp
+
 INCLUDEPATH += libs/libssh/include
+
+
 
 #
 # [REQUIRED] zlib library
