@@ -1,6 +1,6 @@
-//#define LIBSSH_STATIC 1
+#define LIBSSH_STATIC 1
 // #include <libssh/libsshpp.hpp>
-//#define SSH_NO_CPP_EXCEPTIONS
+#define SSH_NO_CPP_EXCEPTIONS
 #include <string>
 #include <libssh/libsshpp.hpp>
 #include "RosSSHThread.h"
@@ -12,16 +12,18 @@ void
 RosSSHThread::run() {
     int result = 2;
     // First, we create an SSH session
-    ssh_session my_ssh_session = ssh_new();
+    ssh::Session* my_ssh_session = new ssh::Session();
+    my_ssh_session->setOption(SSH_OPTIONS_HOST, _connection.c_str());
+    
 
     // TODO: Deal with this case
-    if (my_ssh_session == NULL)
-        emit resultReady(2);
-        return;
+    // if (my_ssh_session == NULL)
+    //     emit resultReady(2);
+    //     return;
 
-    ssh_options_set(my_ssh_session, SSH_OPTIONS_HOST, _connection.c_str());
+    // ssh_options_set(my_ssh_session, SSH_OPTIONS_HOST, _connection.c_str());
 
-    int rc = ssh_connect(my_ssh_session);
+    int rc = my_ssh_session->connect();
     if (rc != SSH_OK)
     {
         fprintf(stderr, "Error connecting to localhost: %s\n",
@@ -29,8 +31,8 @@ RosSSHThread::run() {
         emit resultReady(2);
         return;
     }
-
-    rc = ssh_userauth_autopubkey(my_ssh_session, NULL);
+    rc = my_ssh_session->userauthPublickeyAuto();
+    // rc = ssh_userauth_publickey_auto(my_ssh_session, NULL, NULL);
     if (rc == SSH_AUTH_ERROR)
     {
         fprintf(stderr, "Authentication failed: %s\n",
@@ -38,62 +40,62 @@ RosSSHThread::run() {
         emit resultReady(2);
         return;
     }
-    // Then we create a channel associated with the session
-    ssh_channel channel;
+    // // Then we create a channel associated with the session
+    // ssh_channel channel;
     char buffer[256];
     int nbytes;
-    channel = ssh_channel_new(my_ssh_session);
-    if (channel == NULL)
+    ssh::Channel* channel = new ssh::Channel(*my_ssh_session);
+    if (channel == NULL) {
         emit resultReady(2);
         return;
-    rc = ssh_channel_open_session(channel);
+    }
+    rc = channel->openSession();
     if (rc != SSH_OK)
     {
-        ssh_channel_free(channel);
+        delete channel;
         emit resultReady(2);
         return;
     }
     // We can use the channel to execute a remote command here
 
     if(_cmd != "") {
-        rc = ssh_channel_request_exec(channel, _cmd.c_str());
+        rc =channel->requestExec(_cmd.c_str());
         if (rc != SSH_OK)
         {
-            ssh_channel_close(channel);
-            ssh_channel_free(channel);
+            channel->close();
+            delete channel;
             emit resultReady(2);
             return;
         }
-        nbytes = ssh_channel_read(channel, buffer, sizeof(buffer), 0);
+
+        // TODO: Add a timeout here as a fourth argument
+        nbytes = channel->read(buffer, sizeof(buffer), true);
         while (nbytes > 0)
         {
             if (write(1, buffer, nbytes) != (unsigned int) nbytes)
             {
-                ssh_channel_close(channel);
-                ssh_channel_free(channel);
+                channel->close();
+                delete channel;
                 emit resultReady(2);
                 return;
             }
-            nbytes = ssh_channel_read(channel, buffer, sizeof(buffer), 0);
+            nbytes = channel->read(buffer, sizeof(buffer), true);
         }
         if (nbytes < 0)
         {
-            ssh_channel_close(channel);
-            ssh_channel_free(channel);
+            channel->close();
+            delete channel;
             emit resultReady(2);
             return;
         }
         
     }
-    // Close the channel
-    ssh_channel_send_eof(channel);
-    ssh_channel_close(channel);
-    ssh_channel_free(channel);
-    // Close the session
-
-    ssh_disconnect(my_ssh_session);
-
-    ssh_free(my_ssh_session);
+    // // Close the channel
+    channel->sendEof();
+    channel->close();
+    delete channel;
+    my_ssh_session->disconnect();
+    delete my_ssh_session;
 
     
     // QString program = tr("ssh");

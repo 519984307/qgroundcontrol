@@ -128,7 +128,7 @@ HEADERS+= \
     libs/libssh/include/libssh/libsshpp.hpp
 
 INCLUDEPATH += libs/libssh/include
-
+LIBS += -lssh
 
 
 #
