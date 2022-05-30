@@ -105,6 +105,7 @@
 #include "RosSSHThread.h"
 #include "RosSSHController.h"
 #include "LandingStationControlButtonsController.h"
+#include "HookComponentController.h"
 
 #if defined(QGC_ENABLE_PAIRING)
 #include "PairingManager.h"
@@ -519,6 +520,7 @@ void QGCApplication::_initCommon()
     qmlRegisterType<RosSSHThread>                   (kQGCControllers,                          1, 0, "RosSSHThread");
     qmlRegisterType<RosSSHController>               (kQGCControllers,                          1, 0, "RosSSHController");
     qmlRegisterType<LandingStationControlButtonsController>(kQGCControllers,                   1, 0, "LandingStationControlButtonsController");
+    qmlRegisterType<HookComponentController>        (kQGCControllers,                       1, 0, "HookComponentController");
 
 
     qmlRegisterType<TerrainProfile>                 ("QGroundControl.Controls",             1, 0, "TerrainProfile");
