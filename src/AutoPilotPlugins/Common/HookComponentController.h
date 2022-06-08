@@ -22,6 +22,8 @@ private:
     void _sendHookStepCommand(int num_steps);
     void _sendHookResetCommand(int position);
     void _sendNamedValueFloat(const char* name, float value);
+    SharedLinkInterfacePtr _getLink();
+    void _sendMavlinkMessage(mavlink_message_t& msg, SharedLinkInterfacePtr link_interface);
 };
 
 #endif
