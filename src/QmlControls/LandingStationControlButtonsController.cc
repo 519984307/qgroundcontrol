@@ -42,53 +42,58 @@ LandingStationControlButtonsController::setSpeed(int speed)
 void
 LandingStationControlButtonsController::hookOpen(void)
 {
-    _sendHookCommand(1);
+    _sendHookCommand(HOOK_COMMAND::HOOK_OPEN);
     _vehicleSetHookChanged(1);
 }
 void
 LandingStationControlButtonsController::hookClose(void)
 {
-    _sendHookCommand(0);
+    _sendHookCommand(HOOK_COMMAND::HOOK_CLOSE);
     _vehicleSetHookChanged(0);
 }
 void
 LandingStationControlButtonsController::hookSecured(void)
 {
-    _sendHookCommand(2);
+    _sendHookCommand(HOOK_COMMAND::HOOK_SECURED);
     _vehicleSetHookChanged(0);
+}
+
+void
+LandingStationControlButtonsController::deliverPackage()
+{
+    _sendDeliveryCommand();
 }
 
 void
 LandingStationControlButtonsController::beltStop(void)
 {
-    _sendBeltCommand(0);
+    _sendBeltCommand(LS_BELT_COMMAND::LS_BELT_CMD_STOP);
 }
 void
 LandingStationControlButtonsController::beltUp(void)
 {
-    _sendBeltCommand(2);
+    _sendBeltCommand(LS_BELT_COMMAND::LS_BELT_CMD_BOTH_UP);
 }
 void
 LandingStationControlButtonsController::beltDown(void)
 {
-    _sendBeltCommand(-2);
+    _sendBeltCommand(LS_BELT_COMMAND::LS_BELT_CMD_BOTH_DOWN);
 }
 void
 LandingStationControlButtonsController::beltRotateLeft(void)
 {
-    _sendBeltCommand(-1);
+    _sendBeltCommand(LS_BELT_COMMAND::LS_BELT_CMD_RIGHT_UP);
 }
 void
 LandingStationControlButtonsController::beltRotateRight(void)
 {
-    _sendBeltCommand(1);
+    _sendBeltCommand(LS_BELT_COMMAND::LS_BELT_CMD_LEFT_UP);
 }
 void
 LandingStationControlButtonsController::beltLevel(void)
 {
     _sendBeltLevelCommand();
 }
-
 
 void
 LandingStationControlButtonsController::_setActiveVehicle(Vehicle* vehicle)
@@ -99,29 +104,106 @@ LandingStationControlButtonsController::_setActiveVehicle(Vehicle* vehicle)
 }
 
 void
-LandingStationControlButtonsController::_sendTimeoutCommand(float value)
+LandingStationControlButtonsController::_sendTimeoutCommand(float time_out)
 {
-    _sendNamedValueFloat("lan_tmt", value);
+    SharedLinkInterfacePtr sharedLink = _getLink();
+    if(!sharedLink) {
+        return;
+    }
+
+    mavlink_message_t msg;
+    mavlink_msg_ls_time_out_pack_chan(
+        qgcApp()->toolbox()->mavlinkProtocol()->getSystemId(),
+        qgcApp()->toolbox()->mavlinkProtocol()->getComponentId(),
+        sharedLink->mavlinkChannel(),
+        &msg,
+        253,
+        0,
+        this->_since_start_timer.elapsed()*1000,
+        time_out);
+    _sendMavlinkMessage(msg, sharedLink);
 }
 void
-LandingStationControlButtonsController::_sendSpeedCommand(int value)
+LandingStationControlButtonsController::_sendSpeedCommand(int speed)
 {
-    _sendNamedValueFloat("lan_spd", static_cast<float>(value)/100);
+    SharedLinkInterfacePtr sharedLink = _getLink();
+    if(!sharedLink) {
+        return;
+    }
+
+    mavlink_message_t msg;
+    mavlink_msg_ls_speed_pack_chan(
+        qgcApp()->toolbox()->mavlinkProtocol()->getSystemId(),
+        qgcApp()->toolbox()->mavlinkProtocol()->getComponentId(),
+        sharedLink->mavlinkChannel(),
+        &msg,
+        253,
+        0,
+        this->_since_start_timer.elapsed()*1000,
+        speed);
+    _sendMavlinkMessage(msg, sharedLink);
 }
 void
-LandingStationControlButtonsController::_sendDeliveryCommand(int value)
+LandingStationControlButtonsController::_sendDeliveryCommand()
 {
-    _sendNamedValueFloat("delivery", value);
+    SharedLinkInterfacePtr sharedLink = _getLink();
+    if(!sharedLink) {
+        return;
+    }
+
+    mavlink_message_t msg;
+    mavlink_msg_parcel_delivery_pack_chan(
+        qgcApp()->toolbox()->mavlinkProtocol()->getSystemId(),
+        qgcApp()->toolbox()->mavlinkProtocol()->getComponentId(),
+        sharedLink->mavlinkChannel(),
+        &msg,
+        254,
+        0,
+        this->_since_start_timer.elapsed()*1000);
+    _sendMavlinkMessage(msg, sharedLink);
 }
 void
-LandingStationControlButtonsController::_sendHookCommand(int value)
+LandingStationControlButtonsController::_sendHookCommand(int command)
 {
-    _sendNamedValueFloat("hook_msg", value);
+    SharedLinkInterfacePtr sharedLink = _getLink();
+    if(!sharedLink) {
+        return;
+    }
+
+    mavlink_message_t msg;
+    mavlink_msg_hook_command_pack_chan(
+        qgcApp()->toolbox()->mavlinkProtocol()->getSystemId(),
+        qgcApp()->toolbox()->mavlinkProtocol()->getComponentId(),
+        sharedLink->mavlinkChannel(),
+        &msg,
+        254,
+        0,
+        this->_since_start_timer.elapsed()*1000,
+        command,
+        0);
+    _sendMavlinkMessage(msg, sharedLink);
 }
 void
-LandingStationControlButtonsController::_sendBeltCommand(int value)
+LandingStationControlButtonsController::_sendBeltCommand(int command)
 {
-    _sendNamedValueFloat("lan_act", value);
+    SharedLinkInterfacePtr sharedLink = _getLink();
+    if(!sharedLink) {
+        return;
+    }
+
+    mavlink_message_t msg;
+    mavlink_msg_ls_belt_command_pack_chan(
+        qgcApp()->toolbox()->mavlinkProtocol()->getSystemId(),
+        qgcApp()->toolbox()->mavlinkProtocol()->getComponentId(),
+        sharedLink->mavlinkChannel(),
+        &msg,
+        253,
+        0,
+        this->_since_start_timer.elapsed()*1000,
+        100,
+        command,
+        0.0f);
+    _sendMavlinkMessage(msg, sharedLink);
 }
 void
 LandingStationControlButtonsController::_sendBeltLevelCommand()
@@ -129,32 +211,24 @@ LandingStationControlButtonsController::_sendBeltLevelCommand()
     _sendNamedValueFloat("lan_lvl", 0.0f);
 }
 
-void
-LandingStationControlButtonsController::_sendNamedValueFloat(const char* name, float value)
+SharedLinkInterfacePtr
+LandingStationControlButtonsController::_getLink()
 {
     if (_vehicle) {
-        std::cout << "sending named value float with name " << name << " and value " << value << std::endl;
         WeakLinkInterfacePtr weakLink = _vehicle->vehicleLinkManager()->primaryLink();
         if (!weakLink.expired()) {
-            SharedLinkInterfacePtr sharedLink = weakLink.lock();
-
-            qCDebug(LandingStationControl) << "Sending NAMED_VALUE_FLOAT with name " << name << " and value " << value;
-            mavlink_message_t msg;
-            mavlink_msg_named_value_float_pack_chan(
-                        qgcApp()->toolbox()->mavlinkProtocol()->getSystemId(),
-                        qgcApp()->toolbox()->mavlinkProtocol()->getComponentId(),
-                        sharedLink->mavlinkChannel(),
-                        &msg,
-                        this->_since_start_timer.elapsed(),
-                        name,
-                        value);
-            _vehicle->sendMessageOnLinkThreadSafe(sharedLink.get(), msg);
+            return weakLink.lock();
         }
     }
-    else
-    {
-        std::cout << "not sending named value float since no vehicle connected" << std::endl;
-    }
+    qCDebug(LandingStationControl) << "Tried to send mavlink message but failed";
+    return nullptr;
+}
+
+//----------------------------------------------------------------------------------------
+void
+LandingStationControlButtonsController::_sendMavlinkMessage(mavlink_message_t& msg, SharedLinkInterfacePtr link_interface)
+{
+    _vehicle->sendMessageOnLinkThreadSafe(link_interface.get(), msg);
 }
 
 void

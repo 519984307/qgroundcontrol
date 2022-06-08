@@ -160,11 +160,11 @@ void UAS::receiveMessage(mavlink_message_t message)
         }
             break;
 
-        case MAVLINK_MSG_ID_NAMED_VALUE_FLOAT:
+        case MAVLINK_MSG_ID_LOG_CMP:
         {
-            mavlink_named_value_float_t named_value_float;
-            mavlink_msg_named_value_float_decode(&message, &named_value_float);
-            emit namedValueFloat(this, named_value_float.time_boot_ms, named_value_float.name, named_value_float.value);
+            mavlink_log_cmp_t log_cmp_message;
+            mavlink_msg_log_cmp_decode(&message, &log_cmp_message);
+            emit logCmp(this, log_cmp_message.time_usec, log_cmp_message.log_status);
         }
             break;
 

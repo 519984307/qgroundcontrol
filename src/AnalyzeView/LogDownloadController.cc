@@ -119,6 +119,7 @@ LogDownloadController::LogDownloadController(void)
     connect(manager, &MultiVehicleManager::activeVehicleChanged, this, &LogDownloadController::_setActiveVehicle);
     connect(&_timer, &QTimer::timeout, this, &LogDownloadController::_processDownload);
     _setActiveVehicle(manager->activeVehicle());
+    _since_start_timer.start(); // start timer for mavlink message timestamping
 }
 
 //----------------------------------------------------------------------------------------
@@ -142,7 +143,7 @@ LogDownloadController::_setActiveVehicle(Vehicle* vehicle)
         _logEntriesModel.clear();
         disconnect(_uas, &UASInterface::logEntry, this, &LogDownloadController::_logEntry);
         disconnect(_uas, &UASInterface::logData,  this, &LogDownloadController::_logData);
-        disconnect(_uas, &UASInterface::namedValueFloat, this, &LogDownloadController::_namedValueFloat);
+        disconnect(_uas, &UASInterface::logCmp, this, &LogDownloadController::_logCmp);
         _uas = nullptr;
     }
     _vehicle = vehicle;
@@ -150,7 +151,7 @@ LogDownloadController::_setActiveVehicle(Vehicle* vehicle)
         _uas = vehicle->uas();
         connect(_uas, &UASInterface::logEntry, this, &LogDownloadController::_logEntry);
         connect(_uas, &UASInterface::logData,  this, &LogDownloadController::_logData);
-        connect(_uas, &UASInterface::namedValueFloat, this, &LogDownloadController::_namedValueFloat);
+        connect(_uas, &UASInterface::logCmp, this, &LogDownloadController::_logCmp);
     }
 }
 
@@ -347,16 +348,16 @@ void LogDownloadController::_updateDataRate(void)
 }
 
 //----------------------------------------------------------------------------------------
-void LogDownloadController::_namedValueFloat(UASInterface* uas, uint32_t time_boot_ms, char* name, float value)
+void LogDownloadController::_logCmp(UASInterface* uas, uint64_t time_usec, uint8_t log_status)
 {
-    if(!_uas || uas != _uas || !_transferingLogs || (std::string(name) != "log_cmp")) {
-        //-- we are only listening to "log_cmp" messages
+    if(!_transferingLogs || !_downloadData) {
+        //-- don't react to unsolicited status messages when we're not even
+        //-- actively transfering logs
         return;
     }
 
     //-- float value is in format id.result (e.g. 5.3 -> id: 5, result 3)
-    int id = static_cast<int>(value);
-    int result = std::round(10*(value-id));
+    int id = _downloadData->ID;
 
     QGCLogEntry* entry = _getEntryByLogID(id);
     if(!entry) {
@@ -365,24 +366,24 @@ void LogDownloadController::_namedValueFloat(UASInterface* uas, uint32_t time_bo
         return;
     }
 
-    switch(result) {
-        case 0:
+    switch(log_status) {
+        case LOG_STATUS::LOG_TRANSFER_FINISHED:
             entry->setStatus("Transferred");
             break;
-        case 1:
+        case LOG_STATUS::LOG_TRANSFER_FAILED:
             entry->setStatus("Failed");
             break;
-        case 2:
+        case LOG_STATUS::LOG_UPLOADING:
             entry->setStatus("Uploading");
             break;
-        case 3:
+        case LOG_STATUS::LOG_EXISTS:
             entry->setStatus("Already exists");
         default:
             //-- Don't do anything if we don't recognize the result
             break;
     }
 
-    if (result != 2) //-- Don't move on if we are still uploading
+    if (log_status != LOG_STATUS::LOG_UPLOADING) //-- Don't move on if we are still uploading
     {
         entry->setSelected(false);
         emit selectionChanged();
@@ -711,7 +712,7 @@ LogDownloadController::startLogTransfer(void)
         }
 
         //-- send the request for a complete transfer and wait for log entries
-        _sendLogTransferRequest(-1);
+        _sendLogTransferRequest(UINT16_MAX);
         _setListing(true);
     }
 }
@@ -735,13 +736,29 @@ LogDownloadController::_setSelectedStatus(QString status)
 void
 LogDownloadController::_sendLogTransferRequest(int id)
 {
-    if (id == -1){
+    if (id >= UINT16_MAX){
+        id = UINT16_MAX; // mavlink field for id is only uint_16t
         qCDebug(LogDownloadLog) << "Request log transfer of all available logs";
-    } else if (id >= 0) {
+    } else {
         qCDebug(LogDownloadLog) << "Request log transfer of log with id: " << id;
     }
 
-    _sendNamedValueFloat("log_trs", id);
+    SharedLinkInterfacePtr sharedLink = _getLink();
+    if(!sharedLink) {
+        return;
+    }
+
+    mavlink_message_t msg;
+    mavlink_msg_log_trs_pack_chan(
+        qgcApp()->toolbox()->mavlinkProtocol()->getSystemId(),
+        qgcApp()->toolbox()->mavlinkProtocol()->getComponentId(),
+        sharedLink->mavlinkChannel(),
+        &msg,
+        254,
+        0,
+        this->_since_start_timer.elapsed()*1000,
+        id);
+    _sendMavlinkMessage(msg, sharedLink);
 }
 
 //----------------------------------------------------------------------------------------
@@ -749,30 +766,42 @@ void
 LogDownloadController::_sendLogTransferCancel(void)
 {
     qCDebug(LogDownloadLog) << "Cancelling log transfer";
-    _sendNamedValueFloat("log_ccl", 0);
+    SharedLinkInterfacePtr sharedLink = _getLink();
+    if(!sharedLink) {
+        return;
+    }
+
+    mavlink_message_t msg;
+    mavlink_msg_log_cnc_pack_chan(
+        qgcApp()->toolbox()->mavlinkProtocol()->getSystemId(),
+        qgcApp()->toolbox()->mavlinkProtocol()->getComponentId(),
+        sharedLink->mavlinkChannel(),
+        &msg,
+        254,
+        0,
+        this->_since_start_timer.elapsed()*1000);
+    _sendMavlinkMessage(msg, sharedLink);
 }
 
 //----------------------------------------------------------------------------------------
-void
-LogDownloadController::_sendNamedValueFloat(const char * name, float value)
+SharedLinkInterfacePtr
+LogDownloadController::_getLink()
 {
     if (_vehicle) {
         WeakLinkInterfacePtr weakLink = _vehicle->vehicleLinkManager()->primaryLink();
         if (!weakLink.expired()) {
-            SharedLinkInterfacePtr sharedLink = weakLink.lock();
-
-            mavlink_message_t msg;
-            mavlink_msg_named_value_float_pack_chan(
-                        qgcApp()->toolbox()->mavlinkProtocol()->getSystemId(),
-                        qgcApp()->toolbox()->mavlinkProtocol()->getComponentId(),
-                        sharedLink->mavlinkChannel(),
-                        &msg,
-                        0, // just send 0 as the timestamp because we don't really care atm.
-                        name,
-                        value);
-            _vehicle->sendMessageOnLinkThreadSafe(sharedLink.get(), msg);
+            return weakLink.lock();
         }
     }
+    qCDebug(LogDownloadLog) << "Tried to send mavlink message but failed";
+    return nullptr;
+}
+
+//----------------------------------------------------------------------------------------
+void
+LogDownloadController::_sendMavlinkMessage(mavlink_message_t& msg, SharedLinkInterfacePtr link_interface)
+{
+    _vehicle->sendMessageOnLinkThreadSafe(link_interface.get(), msg);
 }
 
 //----------------------------------------------------------------------------------------

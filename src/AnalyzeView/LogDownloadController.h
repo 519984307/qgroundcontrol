@@ -151,7 +151,7 @@ private slots:
     void _setActiveVehicle  (Vehicle* vehicle);
     void _logEntry          (UASInterface *uas, uint32_t time_utc, uint32_t size, uint16_t id, uint16_t num_logs, uint16_t last_log_num);
     void _logData           (UASInterface *uas, uint32_t ofs, uint16_t id, uint8_t count, const uint8_t *data);
-    void _namedValueFloat   (UASInterface* uas, uint32_t time_boot_ms, char* name, float value);
+    void _logCmp            (UASInterface* uas, uint64_t time_usec, uint8_t log_status);
     void _processDownload   ();
 
 private:
@@ -168,7 +168,8 @@ private:
     void _requestLogData    (uint16_t id, uint32_t offset, uint32_t count, int retryCount = 0);
     void _sendLogTransferRequest(int id);
     void _sendLogTransferCancel(void);
-    void _sendNamedValueFloat(const char * name, float value);
+    SharedLinkInterfacePtr _getLink();
+    void _sendMavlinkMessage(mavlink_message_t& msg, SharedLinkInterfacePtr link_interface);
     bool _prepareLogDownload();
     void _setSelectedStatus (QString status);
     QGCLogEntry* _getEntryByLogID(uint16_t id);
@@ -191,6 +192,7 @@ private:
     int                 _retries;
     int                 _apmOneBased;
     QString             _downloadPath;
+    QElapsedTimer       _since_start_timer;
 };
 
 #endif

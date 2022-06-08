@@ -19,7 +19,8 @@ public:
     Q_INVOKABLE void setSpeed(int speed);
     Q_INVOKABLE void hookClose();
     Q_INVOKABLE void hookOpen();
-    Q_INVOKABLE void hookSecured();
+    Q_INVOKABLE void hookHooked();
+    Q_INVOKABLE void deliverPackage();
     Q_INVOKABLE void beltStop();
     Q_INVOKABLE void beltUp();
     Q_INVOKABLE void beltDown();
@@ -39,6 +40,7 @@ private:
     int _speed_perc;
     Vehicle* _vehicle;
     QElapsedTimer _since_start_timer;
+    SharedLinkInterfacePtr _getLink();
     void _setActiveVehicle(Vehicle* vehicle);
     void _sendTimeoutCommand(float value);
     void _sendSpeedCommand(int value);
@@ -48,6 +50,7 @@ private:
     void _sendBeltLevelCommand();
     void _sendNamedValueFloat(const char* name, float value);
     void _vehicleSetHookChanged(uint8_t position);
+    void _sendMavlinkMessage(mavlink_message_t& msg, SharedLinkInterfacePtr link_interface);
 };
 
 #endif

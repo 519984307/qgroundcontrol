@@ -964,6 +964,7 @@ private slots:
     void _handletextMessageReceived         (UASMessage* message);
     void _imageProtocolImageReady           (void);
     void _prearmErrorTimeout                ();
+    void _lsConnectedTimeout                ();
     void _firstMissionLoadComplete          ();
     void _firstGeoFenceLoadComplete         ();
     void _firstRallyPointLoadComplete       ();
@@ -1005,7 +1006,8 @@ private:
     void _handleHighLatency2            (mavlink_message_t& message);
     void _handleAttitudeWorker          (double rollRadians, double pitchRadians, double yawRadians);
     void _handleAttitude                (mavlink_message_t& message);
-    void _handleNamedValueFloat         (mavlink_message_t& message);
+    void _handleLsPing                  (mavlink_message_t& message);
+    void _handleHookStatus              (mavlink_message_t& message);
     void _handleAttitudeQuaternion      (mavlink_message_t& message);
     void _handleStatusText              (mavlink_message_t& message);
     void _handleOrbitExecutionStatus    (const mavlink_message_t& message);
@@ -1116,6 +1118,8 @@ private:
     QString             _prearmError;
     QTimer              _prearmErrorTimer;
     static const int    _prearmErrorTimeoutMSecs = 35 * 1000;   ///< Take away prearm error after 35 seconds
+
+    QTimer              _lsConnectedTimer;
 
     bool                _initialPlanRequestComplete = false;
 

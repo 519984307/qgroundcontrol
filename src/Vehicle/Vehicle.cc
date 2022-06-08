@@ -238,6 +238,11 @@ Vehicle::Vehicle(LinkInterface*             link,
     _prearmErrorTimer.setInterval(_prearmErrorTimeoutMSecs);
     _prearmErrorTimer.setSingleShot(true);
 
+    // landing station connected timer
+    connect(&_lsConnectedTimer, &QTimer::timeout, this, &Vehicle::_lsConnectedTimeout);
+    _lsConnectedTimer.setInterval(3);
+    _lsConnectedTimer.setSingleShot(true);
+
     // Send MAV_CMD ack timer
     _mavCommandResponseCheckTimer.setSingleShot(false);
     _mavCommandResponseCheckTimer.setInterval(_mavCommandResponseCheckTimeoutMSecs);
@@ -278,6 +283,8 @@ Vehicle::Vehicle(LinkInterface*             link,
     // Start csv logger
     connect(&_csvLogTimer, &QTimer::timeout, this, &Vehicle::_writeCsvLine);
     _csvLogTimer.start(1000);
+
+    landingStationConnected()->setRawValue(tr("false"));
 }
 
 // Disconnected Vehicle for offline editing
@@ -785,8 +792,18 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
     case MAVLINK_MSG_ID_OBSTACLE_DISTANCE:
         _handleObstacleDistance(message);
         break;
-    case MAVLINK_MSG_ID_NAMED_VALUE_FLOAT:
-        _handleNamedValueFloat(message);
+    case MAVLINK_MSG_ID_LS_PING:
+        _handleLsPing(message);
+        break;
+    // case MAVLINK_MSG_ID_HOOK_STATUS:
+    //     _handleHookStatus(message);
+    //     break;
+
+    // commented out since we don't have a custom message for that yet and
+    // we are also not sending this information anymore on the ROS side
+    // case MAVLINK_MSG_ID_LS_DISTANCE:
+    //     _handleLsDistance(message);
+    //     break;
 
     case MAVLINK_MSG_ID_EVENT:
     case MAVLINK_MSG_ID_CURRENT_EVENT_SEQUENCE:
@@ -1145,47 +1162,57 @@ void Vehicle::_handleAttitudeQuaternion(mavlink_message_t& message)
     yawRate()->setRawValue(qRadiansToDegrees(rates[2]));
 }
 
-void Vehicle::_handleNamedValueFloat(mavlink_message_t& message)
+void Vehicle::_handleLsPing(mavlink_message_t& message)
 {
-    // only accept the message from the vehicle's flight controller
-    if (message.sysid != _id || message.compid != _compID) {
+    // only accept the message from the landing station
+    if (message.sysid != 253 || message.compid != 0) {
         return;
     }
 
-    mavlink_named_value_float_t content;
-    mavlink_msg_named_value_float_decode(&message, &content);
+    mavlink_ls_ping_t decoded_message;
+    mavlink_msg_ls_ping_decode(&message, &decoded_message);
 
-    // _handleAttitudeWorker(attitude.roll, attitude.pitch, attitude.yaw);
-    std::string name_str = content.name;
+    // check that the sequence number is odd, ROS always sends the request with
+    // an equal sequence number and the landing station should answer with an
+    // odd one
+    if(decoded_message.sequence_number%2 == 1) {
+        landingStationConnected()->setRawValue(tr("true"));
 
-    // handle the distance message
-    if(name_str == "dis_ls")
-    {
-        landingStationDistance()->setRawValue(content.value);
-        landingStationDistanceLastTime()->setRawValue((long long) QDateTime::currentSecsSinceEpoch());
-        return;
-    } else if (name_str == "lan_con") {
-        if(content.value == 1) {
-            landingStationConnected()->setRawValue(tr("true"));
-        } else {
-            landingStationConnected()->setRawValue(tr("false"));
-        }
-    } else if (name_str == "hok_sta") {
-        // since its a float, the integer part encodes the position and the
-        // float part encodes the status
-        // (position.status)
-        int position = static_cast<int>(content.value);
-        int status = std::round(10 * (content.value - position));
-        hookStatus()->setRawValue(status);
-        hookPosition()->setRawValue(position);
-    }
-
-    // Set the last time we have seen the distance message to 0 if the value is too old
-    if(QDateTime::currentSecsSinceEpoch() - landingStationDistanceLastTime()->rawValue().toInt() > 3)
-    {
-        landingStationDistanceLastTime()->setRawValue(0);
+    _   lsConnectedTimer.start();
     }
 }
+
+// Commented out since the corresponding mavlink message is not implemented yet
+
+// void Vehicle::_handleHookStatus(mavlink_message_t& message)
+// {
+//     // only accept the message from ROS
+//     if (message.sysid != 254 || message.compid != 0) {
+//         return;
+//     }
+
+//     mavlink_hook_status_t decoded_message;
+//     mavlink_msg_hook_status_decode(&message, &decoded_message);
+
+//     hookStatus()->setRawValue(decoded_message.status);
+//     hookPosition()->setRawValue(decoded_message.position);
+// }
+
+// Commented out since the corresponding mavlink message is not implemented yet
+
+// void Vehicle::_handleLsDistance(mavlink_message_t& message)
+// {
+//     // only accept the message from ROS
+//     if (message.sysid != 254 || message.compid != 0) {
+//         return;
+//     }
+
+//     mavlink_ls_distance_t decoded_message;
+//     mavlink_msg_ls_distance_decode(&message, &decoded_message);
+
+//     landingStationDistance()->setRawValue(decoded_message.distance);
+//     landingStationDistanceLastTime()->setRawValue((long long) QDateTime::currentSecsSinceEpoch());
+// }
 
 void Vehicle::_handleGpsRawInt(mavlink_message_t& message)
 {
@@ -3276,6 +3303,13 @@ void Vehicle::setPrearmError(const QString& prearmError)
 void Vehicle::_prearmErrorTimeout()
 {
     setPrearmError(QString());
+}
+
+void Vehicle::_lsConnectedTimeout()
+{
+    // Didn't get a ping answer from the landing station in time
+    // set to disconnected
+    landingStationConnected()->setRawValue(tr("false"));
 }
 
 void Vehicle::setFirmwareVersion(int majorVersion, int minorVersion, int patchVersion, FIRMWARE_VERSION_TYPE versionType)
