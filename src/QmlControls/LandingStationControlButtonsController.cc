@@ -80,6 +80,11 @@ LandingStationControlButtonsController::beltRotateRight(void)
 {
     _sendBeltCommand(1);
 }
+void
+LandingStationControlButtonsController::beltLevel(void)
+{
+    _sendBeltLevelCommand();
+}
 
 
 void
@@ -114,6 +119,11 @@ void
 LandingStationControlButtonsController::_sendBeltCommand(int value)
 {
     _sendNamedValueFloat("lan_act", value);
+}
+void
+LandingStationControlButtonsController::_sendBeltLevelCommand()
+{
+    _sendNamedValueFloat("lan_lvl", 0.0f);
 }
 
 void
