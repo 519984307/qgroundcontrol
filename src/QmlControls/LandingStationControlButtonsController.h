@@ -47,6 +47,7 @@ private:
     void _sendBeltCommand(int value);
     void _sendBeltLevelCommand();
     void _sendNamedValueFloat(const char* name, float value);
+    void _vehicleSetHookChanged(uint8_t position);
 };
 
 #endif

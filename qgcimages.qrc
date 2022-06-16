@@ -197,6 +197,8 @@
         <file alias="Yield.svg">src/ui/toolbar/Images/Yield.svg</file>
         <file alias="CircleX.svg">src/ui/toolbar/Images/CircleX.svg</file>
         <file alias="GreenCheckmark.svg">src/ui/toolbar/Images/GreenCheckmark.svg</file>
+        <file alias="HookOpen.svg">src/ui/toolbar/Images/HookOpen.svg</file>
+        <file alias="HookClosed.svg">src/ui/toolbar/Images/HookClosed.svg</file>
 
         <file alias="ZoomMinus.svg">src/FlightMap/Images/ZoomMinus.svg</file>
         <file alias="ZoomPlus.svg">src/FlightMap/Images/ZoomPlus.svg</file>

@@ -43,16 +43,19 @@ void
 LandingStationControlButtonsController::hookOpen(void)
 {
     _sendHookCommand(1);
+    _vehicleSetHookChanged(1);
 }
 void
 LandingStationControlButtonsController::hookClose(void)
 {
     _sendHookCommand(0);
+    _vehicleSetHookChanged(0);
 }
 void
 LandingStationControlButtonsController::hookSecured(void)
 {
     _sendHookCommand(2);
+    _vehicleSetHookChanged(0);
 }
 
 void
@@ -153,3 +156,13 @@ LandingStationControlButtonsController::_sendNamedValueFloat(const char* name, f
         std::cout << "not sending named value float since no vehicle connected" << std::endl;
     }
 }
+
+void
+LandingStationControlButtonsController::_vehicleSetHookChanged(uint8_t position) {
+    _vehicle->hookPosition()->setRawValue(position);
+    // set status to unknown since we don't know if we can reach the position
+    // when the hook does or does not reach the target, the status will be set
+    // accordingly from ROS
+    _vehicle->hookStatus()->setRawValue(2);
+}
+
