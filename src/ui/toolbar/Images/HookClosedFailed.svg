@@ -15,7 +15,7 @@
    version="1.1"
    id="svg8"
    inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
-   sodipodi:docname="HookOpen.svg">
+   sodipodi:docname="HookClosedFailed.svg">
   <defs
      id="defs2" />
   <sodipodi:namedview
@@ -56,12 +56,12 @@
      transform="translate(0,-280.06664)">
     <path
        style="fill:none;stroke:#000000;stroke-width:0.5291667;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 0.69622918,281.8086 H 8.9235227"
+       d="M 0.52918572,291.06281 H 8.7564792"
        id="path3719"
        inkscape:connector-curvature="0" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.5291667;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 13.469961,281.77519 3.340495,0.0334"
+       d="m 13.302918,291.0294 3.340495,0.0334"
        id="path3721"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
@@ -71,5 +71,16 @@
        id="path3725"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cccccc" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.58333397px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458335"
+       x="0.96885204"
+       y="289.71689"
+       id="text12"><tspan
+         sodipodi:role="line"
+         id="tspan10"
+         x="0.96885204"
+         y="289.71689"
+         style="stroke-width:0.26458335">X</tspan></text>
   </g>
 </svg>

@@ -197,8 +197,12 @@
         <file alias="Yield.svg">src/ui/toolbar/Images/Yield.svg</file>
         <file alias="CircleX.svg">src/ui/toolbar/Images/CircleX.svg</file>
         <file alias="GreenCheckmark.svg">src/ui/toolbar/Images/GreenCheckmark.svg</file>
-        <file alias="HookOpen.svg">src/ui/toolbar/Images/HookOpen.svg</file>
-        <file alias="HookClosed.svg">src/ui/toolbar/Images/HookClosed.svg</file>
+        <file alias="HookOpenOkay.svg">src/ui/toolbar/Images/HookOpenOkay.svg</file>
+        <file alias="HookOpenUnknown.svg">src/ui/toolbar/Images/HookOpenUnknown.svg</file>
+        <file alias="HookOpenFailed.svg">src/ui/toolbar/Images/HookOpenFailed.svg</file>
+        <file alias="HookClosedOkay.svg">src/ui/toolbar/Images/HookClosedOkay.svg</file>
+        <file alias="HookClosedUnknown.svg">src/ui/toolbar/Images/HookClosedUnknown.svg</file>
+        <file alias="HookClosedFailed.svg">src/ui/toolbar/Images/HookClosedFailed.svg</file>
 
         <file alias="ZoomMinus.svg">src/FlightMap/Images/ZoomMinus.svg</file>
         <file alias="ZoomPlus.svg">src/FlightMap/Images/ZoomPlus.svg</file>

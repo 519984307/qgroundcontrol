@@ -307,6 +307,26 @@ RowLayout {
         return Qt.rgba(1,1,1,1)
     }
 
+    function getHookIcon() {
+        var status = "Unknown"
+        var position = "Closed"
+        if (_activeVehicle) {
+            // check the hook status
+            if (_activeVehicle.hookStatus.value == 0) {
+                status = "Okay"
+            } else if (_activeVehicle.hookStatus.value == 1) {
+                status = "Failed"
+            }
+
+            // check the hook position
+            if (_activeVehicle.hookPosition.value == 1) {
+                // all other positions are considered closed
+                position = "Open"
+            }
+        }
+        return "/qmlimages/Hook" + position + status + ".svg"
+    }
+
     QGCColoredImage {
         id:         hookStatusIndicator
         width:      ScreenTools.defaultFontPixelWidth * 5
@@ -314,7 +334,7 @@ RowLayout {
         fillMode:   Image.PreserveAspectFit
         mipmap:     true
         color:      getHookColor()
-        source:     _activeVehicle ? (_activeVehicle.hookPosition.value == 1 ? "/qmlimages/HookOpen.svg" : "/qmlimages/HookClosed.svg") : "/qmlimages/HookClosed.svg"
+        source:     getHookIcon()
         visible:    _activeVehicle
     }
 
