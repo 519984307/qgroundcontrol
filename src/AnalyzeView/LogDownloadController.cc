@@ -752,7 +752,7 @@ LogDownloadController::_sendLogTransferRequest(int id)
         sharedLink->mavlinkChannel(),
         &msg,
         254,
-        0,
+        254,
         this->_since_start_timer.elapsed()*1000,
         id);
     _sendMavlinkMessage(msg, sharedLink);
@@ -775,7 +775,7 @@ LogDownloadController::_sendLogTransferCancel(void)
         sharedLink->mavlinkChannel(),
         &msg,
         254,
-        0,
+        254,
         this->_since_start_timer.elapsed()*1000);
     _sendMavlinkMessage(msg, sharedLink);
 }

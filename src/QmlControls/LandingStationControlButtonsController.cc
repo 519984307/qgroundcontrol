@@ -118,7 +118,7 @@ LandingStationControlButtonsController::_sendTimeoutCommand(float time_out)
         sharedLink->mavlinkChannel(),
         &msg,
         253,
-        0,
+        253,
         this->_since_start_timer.elapsed()*1000,
         time_out);
     _sendMavlinkMessage(msg, sharedLink);
@@ -138,7 +138,7 @@ LandingStationControlButtonsController::_sendSpeedCommand(int speed)
         sharedLink->mavlinkChannel(),
         &msg,
         253,
-        0,
+        253,
         this->_since_start_timer.elapsed()*1000,
         speed);
     _sendMavlinkMessage(msg, sharedLink);
@@ -158,7 +158,7 @@ LandingStationControlButtonsController::_sendDeliveryCommand()
         sharedLink->mavlinkChannel(),
         &msg,
         254,
-        0,
+        254,
         this->_since_start_timer.elapsed()*1000);
     _sendMavlinkMessage(msg, sharedLink);
 }
@@ -177,7 +177,7 @@ LandingStationControlButtonsController::_sendHookCommand(int command)
         sharedLink->mavlinkChannel(),
         &msg,
         254,
-        0,
+        254,
         this->_since_start_timer.elapsed()*1000,
         command,
         0);
@@ -198,7 +198,7 @@ LandingStationControlButtonsController::_sendBeltCommand(int command)
         sharedLink->mavlinkChannel(),
         &msg,
         253,
-        0,
+        253,
         this->_since_start_timer.elapsed()*1000,
         100,
         command,
