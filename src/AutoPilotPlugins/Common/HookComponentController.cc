@@ -40,6 +40,7 @@ void
 HookComponentController::_sendHookResetCommand(int position)
 {
     _sendNamedValueFloat("hook_rst", position);
+    _vehicle->hookPosition()->setRawValue(position);
 }
 
 void
