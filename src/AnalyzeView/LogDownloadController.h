@@ -151,7 +151,7 @@ private slots:
     void _setActiveVehicle  (Vehicle* vehicle);
     void _logEntry          (UASInterface *uas, uint32_t time_utc, uint32_t size, uint16_t id, uint16_t num_logs, uint16_t last_log_num);
     void _logData           (UASInterface *uas, uint32_t ofs, uint16_t id, uint8_t count, const uint8_t *data);
-    void _logCmp            (UASInterface* uas, uint64_t time_usec, uint8_t log_status);
+    void _logStatus         (UASInterface* uas, uint64_t time_usec, uint16_t log_id, uint8_t log_status);
     void _processDownload   ();
 
 private:

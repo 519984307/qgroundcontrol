@@ -640,7 +640,9 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
 
     if (message.sysid != _id && message.sysid != 0) {
         // We allow RADIO_STATUS messages which come from a link the vehicle is using to pass through and be handled
-        if (!(message.msgid == MAVLINK_MSG_ID_RADIO_STATUS && _vehicleLinkManager->containsLink(link))) {
+        // We additionally allow our custom jedsy messages to go through since they also come from the landing station and ROS sometimes
+        if (!(message.msgid == MAVLINK_MSG_ID_RADIO_STATUS && _vehicleLinkManager->containsLink(link)) ||
+            !(message.msgid >= 6000 && message.msgid <= 6009)) {
             return;
         }
     }

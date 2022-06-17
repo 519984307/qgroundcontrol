@@ -143,7 +143,7 @@ LogDownloadController::_setActiveVehicle(Vehicle* vehicle)
         _logEntriesModel.clear();
         disconnect(_uas, &UASInterface::logEntry, this, &LogDownloadController::_logEntry);
         disconnect(_uas, &UASInterface::logData,  this, &LogDownloadController::_logData);
-        disconnect(_uas, &UASInterface::logCmp, this, &LogDownloadController::_logCmp);
+        disconnect(_uas, &UASInterface::logStatus, this, &LogDownloadController::_logStatus);
         _uas = nullptr;
     }
     _vehicle = vehicle;
@@ -151,7 +151,7 @@ LogDownloadController::_setActiveVehicle(Vehicle* vehicle)
         _uas = vehicle->uas();
         connect(_uas, &UASInterface::logEntry, this, &LogDownloadController::_logEntry);
         connect(_uas, &UASInterface::logData,  this, &LogDownloadController::_logData);
-        connect(_uas, &UASInterface::logCmp, this, &LogDownloadController::_logCmp);
+        connect(_uas, &UASInterface::logStatus, this, &LogDownloadController::_logStatus);
     }
 }
 
@@ -348,21 +348,18 @@ void LogDownloadController::_updateDataRate(void)
 }
 
 //----------------------------------------------------------------------------------------
-void LogDownloadController::_logCmp(UASInterface* uas, uint64_t time_usec, uint8_t log_status)
+void LogDownloadController::_logStatus(UASInterface* uas, uint64_t time_usec, uint16_t log_id, uint8_t log_status)
 {
-    if(!_transferingLogs || !_downloadData) {
+    if(!_transferingLogs || !_downloadData || log_id != _downloadData->ID) {
         //-- don't react to unsolicited status messages when we're not even
         //-- actively transfering logs
         return;
     }
 
-    //-- float value is in format id.result (e.g. 5.3 -> id: 5, result 3)
-    int id = _downloadData->ID;
-
-    QGCLogEntry* entry = _getEntryByLogID(id);
+    QGCLogEntry* entry = _getEntryByLogID(log_id);
     if(!entry) {
         //-- id was not found in our log list, can't do anything with this msg
-        qWarning() << "No entry found with id" << id;
+        qWarning() << "No entry found with id" << log_id;
         return;
     }
 
@@ -749,7 +746,7 @@ LogDownloadController::_sendLogTransferRequest(int id)
     }
 
     mavlink_message_t msg;
-    mavlink_msg_log_trs_pack_chan(
+    mavlink_msg_log_transfer_pack_chan(
         qgcApp()->toolbox()->mavlinkProtocol()->getSystemId(),
         qgcApp()->toolbox()->mavlinkProtocol()->getComponentId(),
         sharedLink->mavlinkChannel(),
@@ -772,7 +769,7 @@ LogDownloadController::_sendLogTransferCancel(void)
     }
 
     mavlink_message_t msg;
-    mavlink_msg_log_cnc_pack_chan(
+    mavlink_msg_log_cancel_pack_chan(
         qgcApp()->toolbox()->mavlinkProtocol()->getSystemId(),
         qgcApp()->toolbox()->mavlinkProtocol()->getComponentId(),
         sharedLink->mavlinkChannel(),
