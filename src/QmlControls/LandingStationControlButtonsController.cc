@@ -50,7 +50,7 @@ LandingStationControlButtonsController::hookClose(void)
     _sendHookCommand(0);
 }
 void
-LandingStationControlButtonsController::hookHooked(void)
+LandingStationControlButtonsController::hookSecured(void)
 {
     _sendHookCommand(2);
 }
