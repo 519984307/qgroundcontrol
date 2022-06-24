@@ -238,9 +238,9 @@ Vehicle::Vehicle(LinkInterface*             link,
     _prearmErrorTimer.setInterval(_prearmErrorTimeoutMSecs);
     _prearmErrorTimer.setSingleShot(true);
 
-    // landing station connected timer
+    // landing station connected timer, set to disconnected after 3s
     connect(&_lsConnectedTimer, &QTimer::timeout, this, &Vehicle::_lsConnectedTimeout);
-    _lsConnectedTimer.setInterval(3);
+    _lsConnectedTimer.setInterval(3000);
     _lsConnectedTimer.setSingleShot(true);
 
     // Send MAV_CMD ack timer
@@ -364,6 +364,7 @@ Vehicle::Vehicle(MAV_AUTOPILOT              firmwareType,
 
     _offlineFirmwareTypeSettingChanged(_firmwareType);  // This adds correct terrain capability bit
     _firmwarePlugin->initializeVehicle(this);
+    landingStationConnected()->setRawValue(tr("false"));
 }
 
 void Vehicle::trackFirmwareVehicleTypeChanges(void)
@@ -641,7 +642,7 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
     if (message.sysid != _id && message.sysid != 0) {
         // We allow RADIO_STATUS messages which come from a link the vehicle is using to pass through and be handled
         // We additionally allow our custom jedsy messages to go through since they also come from the landing station and ROS sometimes
-        if (!(message.msgid == MAVLINK_MSG_ID_RADIO_STATUS && _vehicleLinkManager->containsLink(link)) ||
+        if (!(message.msgid == MAVLINK_MSG_ID_RADIO_STATUS && _vehicleLinkManager->containsLink(link)) &&
             !(message.msgid >= 6000 && message.msgid <= 6009)) {
             return;
         }
@@ -1167,7 +1168,7 @@ void Vehicle::_handleAttitudeQuaternion(mavlink_message_t& message)
 void Vehicle::_handleLsPing(mavlink_message_t& message)
 {
     // only accept the message from the landing station
-    if (message.sysid != 253 || message.compid != 0) {
+    if (message.sysid != 253 || message.compid != 253) {
         return;
     }
 
