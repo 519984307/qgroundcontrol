@@ -19,12 +19,13 @@ public:
     Q_INVOKABLE void setSpeed(int speed);
     Q_INVOKABLE void hookClose();
     Q_INVOKABLE void hookOpen();
-    Q_INVOKABLE void hookHooked();
+    Q_INVOKABLE void hookSecured();
     Q_INVOKABLE void beltStop();
     Q_INVOKABLE void beltUp();
     Q_INVOKABLE void beltDown();
     Q_INVOKABLE void beltRotateLeft();
     Q_INVOKABLE void beltRotateRight();
+    Q_INVOKABLE void beltLevel();
 
     Q_PROPERTY(int timeout READ getTimeout WRITE setTimeout NOTIFY timeoutChanged);
     Q_PROPERTY(int speed READ getSpeed WRITE setSpeed NOTIFY speedChanged);
@@ -44,6 +45,7 @@ private:
     void _sendHookCommand(int value);
     void _sendDeliveryCommand(int value);
     void _sendBeltCommand(int value);
+    void _sendBeltLevelCommand();
     void _sendNamedValueFloat(const char* name, float value);
 };
 

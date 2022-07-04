@@ -50,7 +50,7 @@ LandingStationControlButtonsController::hookClose(void)
     _sendHookCommand(0);
 }
 void
-LandingStationControlButtonsController::hookHooked(void)
+LandingStationControlButtonsController::hookSecured(void)
 {
     _sendHookCommand(2);
 }
@@ -79,6 +79,11 @@ void
 LandingStationControlButtonsController::beltRotateRight(void)
 {
     _sendBeltCommand(1);
+}
+void
+LandingStationControlButtonsController::beltLevel(void)
+{
+    _sendBeltLevelCommand();
 }
 
 
@@ -114,6 +119,11 @@ void
 LandingStationControlButtonsController::_sendBeltCommand(int value)
 {
     _sendNamedValueFloat("lan_act", value);
+}
+void
+LandingStationControlButtonsController::_sendBeltLevelCommand()
+{
+    _sendNamedValueFloat("lan_lvl", 0.0f);
 }
 
 void

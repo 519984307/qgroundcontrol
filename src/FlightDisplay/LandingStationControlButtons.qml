@@ -61,11 +61,9 @@ Rectangle {
             fact: _flyViewSettings.landingStationSpeed
             onEditingFinished: landingStationController.setSpeed(fact.value)
         }
-        QGCButton {
-            Layout.alignment: Qt.AlignHCenter
-            text: "Hook Hooked"
+        Item {
+            Layout.fillWidth: true
             Layout.preferredWidth: _buttonWidth
-            onClicked: landingStationController.hookHooked()
         }
 
         QGCButton {
@@ -106,9 +104,11 @@ Rectangle {
             onClicked: landingStationController.beltRotateRight()
         }
 
-        Item {
-            Layout.fillWidth: true
+        QGCButton {
+            Layout.alignment: Qt.AlignHCenter
+            text: "Hook Secure"
             Layout.preferredWidth: _buttonWidth
+            onClicked: landingStationController.hookSecured()
         }
         QGCButton {
             Layout.alignment: Qt.AlignHCenter
@@ -116,9 +116,11 @@ Rectangle {
             Layout.preferredWidth: _buttonWidth
             onClicked: landingStationController.beltDown()
         }
-        Item {
-            Layout.fillWidth: true
+        QGCButton {
+            Layout.alignment: Qt.AlignHCenter
+            text: "Level"
             Layout.preferredWidth: _buttonWidth
+            onClicked: landingStationController.beltLevel()
         }
 
         QGCLabel {
