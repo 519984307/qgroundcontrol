@@ -304,6 +304,8 @@ public:
     Q_PROPERTY(Fact* landingStationDistance READ landingStationDistance CONSTANT)
     Q_PROPERTY(Fact* landingStationDistanceLastTime READ landingStationDistanceLastTime CONSTANT)
     Q_PROPERTY(Fact* videoFPS           READ videoFPS           CONSTANT)
+    Q_PROPERTY(Fact* hookStatus         READ hookStatus         CONSTANT)
+    Q_PROPERTY(Fact* hookPosition       READ hookPosition       CONSTANT)
 
 
     Q_PROPERTY(FactGroup*           gps             READ gpsFactGroup               CONSTANT)
@@ -650,6 +652,8 @@ public:
     Fact* landingStationConnected           () { return &_landingStationConnectedFact; }
     Fact* landingStationDistance            () { return &_landingStationDistanceFact; }
     Fact* landingStationDistanceLastTime    () { return &_landingStationDistanceLastTimeFact; }
+    Fact* hookStatus                        () { return &_hookStatusFact; }
+    Fact* hookPosition                      () { return &_hookPositionFact; }
 
     Fact* videoFPS                          () { return &_videoFPSFact; }
 
@@ -1311,6 +1315,8 @@ private:
     Fact _landingStationConnectedFact;
     Fact _landingStationDistanceFact;
     Fact _landingStationDistanceLastTimeFact;
+    Fact _hookStatusFact;
+    Fact _hookPositionFact;
 
     Fact _videoFPSFact;
 
@@ -1367,6 +1373,8 @@ private:
     static const char* _landingStationConnectedFactName;
     static const char* _landingStationDistanceFactName;
     static const char* _landingStationDistanceLastTimeFactName;
+    static const char* _hookStatusFactName;
+    static const char* _hookPositionFactName;
 
     static const char* _videoFPSFactName;
 

@@ -144,6 +144,18 @@
     "default":          false
 },
 {
+    "name":             "hookStatus",
+    "shortDesc": "Status of hook, 0 is okay, 1 is not okay, 2 is unknown",
+    "type":             "uint8",
+    "default":          2
+},
+{
+    "name":             "hookPosition",
+    "shortDesc": "Position of hook, 0 is closed, 1 is open",
+    "type":             "uint8",
+    "default":          0
+},
+{
     "name":             "videoFPS",
     "shortDesc": "FPS of the current video stream",
     "type":             "uint16"

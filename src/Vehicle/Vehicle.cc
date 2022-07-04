@@ -97,6 +97,8 @@ const char* Vehicle::_throttlePctFactName =         "throttlePct";
 const char* Vehicle::_landingStationConnectedFactName = "landingStationConnected";
 const char* Vehicle::_landingStationDistanceFactName = "landingStationDistance";
 const char* Vehicle::_landingStationDistanceLastTimeFactName = "landingStationDistanceLastTime";
+const char* Vehicle::_hookStatusFactName =          "hookStatus";
+const char* Vehicle::_hookPositionFactName =        "hookPosition";
 
 
 const char* Vehicle::_videoFPSFactName =            "videoFPS";
@@ -161,8 +163,9 @@ Vehicle::Vehicle(LinkInterface*             link,
     , _hobbsFact                    (0, _hobbsFactName,             FactMetaData::valueTypeString)
     , _throttlePctFact              (0, _throttlePctFactName,       FactMetaData::valueTypeUint16)
     , _landingStationConnectedFact  (0, _landingStationConnectedFactName, FactMetaData::valueTypeBool)
-    , _landingStationDistanceFact  (0, _landingStationDistanceFactName, FactMetaData::valueTypeDouble)
-    , _landingStationDistanceLastTimeFact  (0, _landingStationDistanceLastTimeFactName, FactMetaData::valueTypeUint64)
+    , _landingStationDistanceFact   (0, _landingStationDistanceFactName, FactMetaData::valueTypeDouble)
+    , _hookStatusFact               (0, _hookStatusFactName,        FactMetaData::valueTypeUint8)
+    , _hookPositionFact             (0, _hookPositionFactName,      FactMetaData::valueTypeUint8)
 
     , _videoFPSFact                 (0, _videoFPSFactName,          FactMetaData::valueTypeUint16)
     , _gpsFactGroup                 (this)
@@ -210,6 +213,11 @@ Vehicle::Vehicle(LinkInterface*             link,
         _settingsManager->videoSettings()->videoSource()->setRawValue(VideoSettings::videoSourceUDPH264);
         _settingsManager->videoSettings()->lowLatencyMode()->setRawValue(true);
     }
+
+    // reset hook position and status since we don't really know where the hook
+    // is when we switch on the glider
+    hookStatus()->setRawValue(2);
+    hookPosition()->setRawValue(0);
 
     //-- Airspace Management
 #if defined(QGC_AIRMAP_ENABLED)
@@ -319,8 +327,10 @@ Vehicle::Vehicle(MAV_AUTOPILOT              firmwareType,
     , _hobbsFact                        (0, _hobbsFactName,             FactMetaData::valueTypeString)
     , _throttlePctFact                  (0, _throttlePctFactName,       FactMetaData::valueTypeUint16)
     , _landingStationConnectedFact      (0, _landingStationConnectedFactName, FactMetaData::valueTypeBool)
-    , _landingStationDistanceFact  (0, _landingStationDistanceFactName, FactMetaData::valueTypeDouble)
+    , _landingStationDistanceFact       (0, _landingStationDistanceFactName, FactMetaData::valueTypeDouble)
     , _landingStationDistanceLastTimeFact  (0, _landingStationDistanceLastTimeFactName, FactMetaData::valueTypeUint64)
+    , _hookStatusFact                   (0, _hookStatusFactName,        FactMetaData::valueTypeUint8)
+    , _hookPositionFact                 (0, _hookPositionFactName,      FactMetaData::valueTypeUint8)
 
     , _videoFPSFact                     (0, _videoFPSFactName,          FactMetaData::valueTypeUint16)
 
@@ -448,6 +458,8 @@ void Vehicle::_commonInit()
     _addFact(&_landingStationConnectedFact, _landingStationConnectedFactName);
     _addFact(&_landingStationDistanceFact, _landingStationDistanceFactName);
     _addFact(&_landingStationDistanceLastTimeFact, _landingStationDistanceLastTimeFactName);
+    _addFact(&_hookStatusFact,          _hookStatusFactName);
+    _addFact(&_hookPositionFact,        _hookPositionFactName);
 
     _addFact(&_videoFPSFact,            _videoFPSFactName);
 
@@ -1152,20 +1164,27 @@ void Vehicle::_handleNamedValueFloat(mavlink_message_t& message)
         landingStationDistance()->setRawValue(content.value);
         landingStationDistanceLastTime()->setRawValue((long long) QDateTime::currentSecsSinceEpoch());
         return;
+    } else if (name_str == "lan_con") {
+        if(content.value == 1) {
+            landingStationConnected()->setRawValue(tr("true"));
+        } else {
+            landingStationConnected()->setRawValue(tr("false"));
+        }
+    } else if (name_str == "hok_sta") {
+        // since its a float, the integer part encodes the position and the
+        // float part encodes the status
+        // (position.status)
+        int position = static_cast<int>(content.value);
+        int status = std::round(10 * (content.value - position));
+        hookStatus()->setRawValue(status);
+        hookPosition()->setRawValue(position);
     }
-
-    if(name_str != "lan_con") return;
 
     // Set the last time we have seen the distance message to 0 if the value is too old
     if(QDateTime::currentSecsSinceEpoch() - landingStationDistanceLastTime()->rawValue().toInt() > 3)
     {
         landingStationDistanceLastTime()->setRawValue(0);
     }
-    if(content.value == 1)
-    {
-        landingStationConnected()->setRawValue(tr("true"));
-    }
-    else landingStationConnected()->setRawValue(tr("false"));
 }
 
 void Vehicle::_handleGpsRawInt(mavlink_message_t& message)

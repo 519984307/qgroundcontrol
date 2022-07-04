@@ -273,7 +273,6 @@ RowLayout {
         visible:    landingStationIndicator.visible
     }
 
-
     Item {
         id:                     landingStationIndicatorItem
         Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth / 2
@@ -288,7 +287,55 @@ RowLayout {
         mouseAreaLeftMargin:    -(landingStationIndicator.x - landingStationIcon.x)
         visible:                _activeVehicle
         color:      _activeVehicle ? (landingStationIndicator.currentVehicle.landingStationConnected.value? Qt.rgba(1,1,1,1):Qt.rgba(1,0,0,1)): Qt.rgba(1,1,1,1)
+    }
 
+    // Hook status indicator
+    Item {
+        Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * ScreenTools.largeFontPointRatio * 1.5
+        height:                 1
+    }
+
+    function getHookColor() {
+        if (_activeVehicle && _activeVehicle.hookStatus.value == 0) {
+            // hook okay, retrun grean
+            return Qt.rgba(0,1,0,1)
+        } else if (_activeVehicle && _activeVehicle.hookStatus.value == 1) {
+            // hook not okay, return red
+            return Qt.rgba(1,0,0,1)
+        }
+        // no active vehicle or status unknown, return white
+        return Qt.rgba(1,1,1,1)
+    }
+
+    function getHookIcon() {
+        var status = "Unknown"
+        var position = "Closed"
+        if (_activeVehicle) {
+            // check the hook status
+            if (_activeVehicle.hookStatus.value == 0) {
+                status = "Okay"
+            } else if (_activeVehicle.hookStatus.value == 1) {
+                status = "Failed"
+            }
+
+            // check the hook position
+            if (_activeVehicle.hookPosition.value == 1) {
+                // all other positions are considered closed
+                position = "Open"
+            }
+        }
+        return "/qmlimages/Hook" + position + status + ".svg"
+    }
+
+    QGCColoredImage {
+        id:         hookStatusIndicator
+        width:      ScreenTools.defaultFontPixelWidth * 5
+        height:     ScreenTools.defaultFontPixelHeight * 2
+        fillMode:   Image.PreserveAspectFit
+        mipmap:     true
+        color:      getHookColor()
+        source:     getHookIcon()
+        visible:    _activeVehicle
     }
 
     // Video FPS indicator
