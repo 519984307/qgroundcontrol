@@ -643,7 +643,7 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
         // We allow RADIO_STATUS messages which come from a link the vehicle is using to pass through and be handled
         // We additionally allow our custom jedsy messages to go through since they also come from the landing station and ROS sometimes
         if (!(message.msgid == MAVLINK_MSG_ID_RADIO_STATUS && _vehicleLinkManager->containsLink(link)) &&
-            !(message.msgid >= 6000 && message.msgid <= 6009)) {
+            !(message.msgid >= MAVLINK_MSG_ID_LS_BELT_COMMAND && message.msgid <= MAVLINK_MSG_ID_JEDSY_DEBUG)) {
             return;
         }
     }
@@ -798,9 +798,9 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
     case MAVLINK_MSG_ID_LS_PING:
         _handleLsPing(message);
         break;
-    // case MAVLINK_MSG_ID_HOOK_STATUS:
-    //     _handleHookStatus(message);
-    //     break;
+    case MAVLINK_MSG_ID_HOOK_STATUS:
+        _handleHookStatus(message);
+        break;
 
     // commented out since we don't have a custom message for that yet and
     // we are also not sending this information anymore on the ROS side
@@ -1181,25 +1181,23 @@ void Vehicle::_handleLsPing(mavlink_message_t& message)
     if(decoded_message.sequence_number%2 == 1) {
         landingStationConnected()->setRawValue(tr("true"));
 
-    _   lsConnectedTimer.start();
+        _lsConnectedTimer.start();
     }
 }
 
-// Commented out since the corresponding mavlink message is not implemented yet
+void Vehicle::_handleHookStatus(mavlink_message_t& message)
+{
+    // only accept the message from ROS
+    if (message.sysid != 254 || message.compid != 254) {
+        return;
+    }
 
-// void Vehicle::_handleHookStatus(mavlink_message_t& message)
-// {
-//     // only accept the message from ROS
-//     if (message.sysid != 254 || message.compid != 0) {
-//         return;
-//     }
+    mavlink_hook_status_t decoded_message;
+    mavlink_msg_hook_status_decode(&message, &decoded_message);
 
-//     mavlink_hook_status_t decoded_message;
-//     mavlink_msg_hook_status_decode(&message, &decoded_message);
-
-//     hookStatus()->setRawValue(decoded_message.status);
-//     hookPosition()->setRawValue(decoded_message.position);
-// }
+    hookStatus()->setRawValue(decoded_message.status);
+    hookPosition()->setRawValue(decoded_message.position);
+}
 
 // Commented out since the corresponding mavlink message is not implemented yet
 

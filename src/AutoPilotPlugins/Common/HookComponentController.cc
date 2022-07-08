@@ -66,6 +66,7 @@ HookComponentController::_sendHookStepCommand(int num_steps)
         steps_to_send);
     _sendMavlinkMessage(msg, sharedLink);
 }
+
 void
 HookComponentController::_sendHookResetCommand(int position)
 {
@@ -76,8 +77,6 @@ HookComponentController::_sendHookResetCommand(int position)
 
     _vehicle->hookPosition()->setRawValue(position);
 
-    // to reset we send a hook command message with the right position and
-    // something not 0 for the steps
     mavlink_message_t msg;
     mavlink_msg_hook_command_pack_chan(
         qgcApp()->toolbox()->mavlinkProtocol()->getSystemId(),
@@ -87,8 +86,8 @@ HookComponentController::_sendHookResetCommand(int position)
         254,
         0,
         this->_since_start_timer.elapsed()*1000,
-        position,
-        1);
+        HOOK_COMMAND::HOOK_RESET,
+        position);
     _sendMavlinkMessage(msg, sharedLink);
 }
 

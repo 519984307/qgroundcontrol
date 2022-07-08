@@ -136,11 +136,11 @@ int UAS::getUASID() const
 
 void UAS::receiveMessage(mavlink_message_t message)
 {
-    // Always accept LOG_STATUS messages since they come directly from the Jetson and not from the pixhawk, otherwise:
+    // Always accept Jedsy messages since they come directly from the Jetson and not from the pixhawk, otherwise:
     // Only accept messages from this system (condition 1)
     // and only then if a) attitudeStamped is disabled OR b) attitudeStamped is enabled
     // and we already got one attitude packet
-    if (message.msgid == MAVLINK_MSG_ID_LOG_STATUS ||
+    if ((message.msgid >= MAVLINK_MSG_ID_LS_BELT_COMMAND && message.msgid <= MAVLINK_MSG_ID_JEDSY_DEBUG) ||
         (message.sysid == uasId && (!attitudeStamped || lastAttitude != 0 || message.msgid == MAVLINK_MSG_ID_ATTITUDE)))
     {
         switch (message.msgid)

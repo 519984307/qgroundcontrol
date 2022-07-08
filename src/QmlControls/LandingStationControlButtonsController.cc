@@ -52,9 +52,9 @@ LandingStationControlButtonsController::hookClose(void)
     _vehicleSetHookChanged(0);
 }
 void
-LandingStationControlButtonsController::hookSecured(void)
+LandingStationControlButtonsController::hookHooked(void)
 {
-    _sendHookCommand(HOOK_COMMAND::HOOK_SECURED);
+    _sendHookCommand(HOOK_COMMAND::HOOK_SECURE);
     _vehicleSetHookChanged(0);
 }
 
@@ -123,6 +123,7 @@ LandingStationControlButtonsController::_sendTimeoutCommand(float time_out)
         time_out);
     _sendMavlinkMessage(msg, sharedLink);
 }
+
 void
 LandingStationControlButtonsController::_sendSpeedCommand(int speed)
 {
@@ -143,6 +144,7 @@ LandingStationControlButtonsController::_sendSpeedCommand(int speed)
         speed);
     _sendMavlinkMessage(msg, sharedLink);
 }
+
 void
 LandingStationControlButtonsController::_sendDeliveryCommand()
 {
@@ -162,6 +164,7 @@ LandingStationControlButtonsController::_sendDeliveryCommand()
         this->_since_start_timer.elapsed()*1000);
     _sendMavlinkMessage(msg, sharedLink);
 }
+
 void
 LandingStationControlButtonsController::_sendHookCommand(int command)
 {
@@ -183,6 +186,7 @@ LandingStationControlButtonsController::_sendHookCommand(int command)
         0);
     _sendMavlinkMessage(msg, sharedLink);
 }
+
 void
 LandingStationControlButtonsController::_sendBeltCommand(int command)
 {
@@ -205,10 +209,25 @@ LandingStationControlButtonsController::_sendBeltCommand(int command)
         0.0f);
     _sendMavlinkMessage(msg, sharedLink);
 }
+
 void
 LandingStationControlButtonsController::_sendBeltLevelCommand()
 {
-    _sendNamedValueFloat("lan_lvl", 0.0f);
+    SharedLinkInterfacePtr sharedLink = _getLink();
+    if(!sharedLink) {
+        return;
+    }
+
+    mavlink_message_t msg;
+    mavlink_msg_ls_level_pack_chan(
+        qgcApp()->toolbox()->mavlinkProtocol()->getSystemId(),
+        qgcApp()->toolbox()->mavlinkProtocol()->getComponentId(),
+        sharedLink->mavlinkChannel(),
+        &msg,
+        254,
+        254,
+        this->_since_start_timer.elapsed()*1000);
+    _sendMavlinkMessage(msg, sharedLink);
 }
 
 SharedLinkInterfacePtr

@@ -45,7 +45,7 @@ private:
     void _sendTimeoutCommand(float value);
     void _sendSpeedCommand(int value);
     void _sendHookCommand(int value);
-    void _sendDeliveryCommand(int value);
+    void _sendDeliveryCommand();
     void _sendBeltCommand(int value);
     void _sendBeltLevelCommand();
     void _sendNamedValueFloat(const char* name, float value);
