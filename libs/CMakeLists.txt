@@ -1,6 +1,7 @@
 add_subdirectory(libevents)
 add_subdirectory(qtandroidserialport)
 add_subdirectory(shapelib)
+add_subdirectory(libssh)
 if (WIN32)
     add_subdirectory(sdl2)
     add_subdirectory(zlib)

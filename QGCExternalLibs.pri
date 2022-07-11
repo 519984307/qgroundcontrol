@@ -122,13 +122,7 @@ SOURCES += \
     libs/shapelib/shpopen.c \
     libs/shapelib/safileio.c
 
-# [REQUIRED] libssh library
-HEADERS+= \
-    libs/libssh/include/libssh/libssh.h \
-    libs/libssh/include/libssh/libsshpp.hpp
 
-INCLUDEPATH += libs/libssh/include
-LIBS += -lssh
 
 
 #
@@ -323,7 +317,8 @@ contains (DEFINES, DISABLE_AIRMAP) {
             rm "$${AIRMAP_PLATFORM_SDK_FILEPATH}"
         airmap_platform_sdk_install.depends =
         QMAKE_EXTRA_TARGETS += airmap_platform_sdk_install
-        PRE_TARGETDEPS += $$airmap_platform_sdk_install.target
+        # PRE_TARGETDEPS += $$airmap_platform_sdk_install.target
+        PRE_TARGETDEPS += $${AIRMAP_PLATFORM_SDK_PATH}/include/airmap
 
         LIBS += -L$${AIRMAP_PLATFORM_SDK_PATH}/linux/$${AIRMAP_QT_PATH} -lairmap-cpp
         DEFINES += QGC_AIRMAP_ENABLED
@@ -335,3 +330,25 @@ contains (DEFINES, DISABLE_AIRMAP) {
             $${AIRMAP_PLATFORM_SDK_PATH}/include
     }
 }
+
+# [REQUIRED] libssh library
+
+message("Attempting to install LIBSSH")
+LIBSSH_PLATFORM_SDK_PATH = $${OUT_PWD}/libs/libssh
+
+libssh_platform_sdk_install.target = $${LIBSSH_PLATFORM_SDK_PATH}
+
+libssh_platform_sdk_install.commands = \
+    echo "Doing LIBSSH stuff" && \
+    mkdir -p $${LIBSSH_PLATFORM_SDK_PATH} && cd $${LIBSSH_PLATFORM_SDK_PATH} && \
+    cmake $${SOURCE_DIR}/libs/libssh/ && \
+    make
+
+PRE_TARGETDEPS += $$libssh_platform_sdk_install.target
+QMAKE_EXTRA_TARGETS += libssh_platform_sdk_install
+
+INCLUDEPATH += libs/libssh/include/
+INCLUDEPATH += $${LIBSSH_PLATFORM_SDK_PATH}/include
+
+LIBS += $${LIBSSH_PLATFORM_SDK_PATH}/lib/libssh.so
+PRE_TARGETDEPS += $${LIBSSH_PLATFORM_SDK_PATH}/lib/libssh.so
