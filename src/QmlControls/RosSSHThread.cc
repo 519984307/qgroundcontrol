@@ -11,28 +11,30 @@ QGC_LOGGING_CATEGORY(RosSSHLogger, "RosSSHLogger")
 void
 RosSSHThread::run() {
     int result = 2;
+
     // First, we create an SSH session
     ssh::Session* my_ssh_session = new ssh::Session();
     my_ssh_session->setOption(SSH_OPTIONS_HOST, _connection.c_str());
     
+    qCDebug(RosSSHLogger)<<"Created SSH session\n";
 
-    // TODO: Deal with this case
-    // if (my_ssh_session == NULL)
-    //     emit resultReady(2);
-    //     return;
-
-    // ssh_options_set(my_ssh_session, SSH_OPTIONS_HOST, _connection.c_str());
+    if (my_ssh_session == NULL) {
+        qCDebug(RosSSHLogger)<<"Unexpected ERROR: SSH session NULL\n";
+        emit resultReady(2);
+        return;
+    }
 
     int rc = my_ssh_session->connect();
     if (rc != SSH_OK)
     {
-        fprintf(stderr, "Error connecting to localhost: %s\n",
+        fprintf(stderr, "Error connecting to host: %s\n",
                 ssh_get_error(my_ssh_session));
         emit resultReady(2);
         return;
     }
+    qCDebug(RosSSHLogger)<<"Connected the SSH session to the host\n";
     rc = my_ssh_session->userauthPublickeyAuto();
-    // rc = ssh_userauth_publickey_auto(my_ssh_session, NULL, NULL);
+
     if (rc == SSH_AUTH_ERROR)
     {
         fprintf(stderr, "Authentication failed: %s\n",
@@ -40,8 +42,9 @@ RosSSHThread::run() {
         emit resultReady(2);
         return;
     }
-    // // Then we create a channel associated with the session
-    // ssh_channel channel;
+    // Then we create a channel associated with the session
+    qCDebug(RosSSHLogger)<<"SSH authentication successful\n";
+
     char buffer[256];
     int nbytes;
     ssh::Channel* channel = new ssh::Channel(*my_ssh_session);
@@ -49,6 +52,7 @@ RosSSHThread::run() {
         emit resultReady(2);
         return;
     }
+    qCDebug(RosSSHLogger)<<"Created SSH channel\n";
     rc = channel->openSession();
     if (rc != SSH_OK)
     {
@@ -56,8 +60,9 @@ RosSSHThread::run() {
         emit resultReady(2);
         return;
     }
-    // We can use the channel to execute a remote command here
+    qCDebug(RosSSHLogger)<<"Opened Channel session\n";
 
+    // We can use the channel to execute a remote command here
     if(_cmd != "") {
         rc =channel->requestExec(_cmd.c_str());
         if (rc != SSH_OK)
@@ -67,9 +72,11 @@ RosSSHThread::run() {
             emit resultReady(2);
             return;
         }
+        qCDebug(RosSSHLogger)<<"Started command execution\n";
+        // Read command output with a timeout
+        int timeout_ms = 25000;
 
-        // TODO: Add a timeout here as a fourth argument
-        nbytes = channel->read(buffer, sizeof(buffer), true);
+        nbytes = channel->read(buffer, sizeof(buffer), true, timeout_ms);
         while (nbytes > 0)
         {
             if (write(1, buffer, nbytes) != (unsigned int) nbytes)
@@ -79,7 +86,7 @@ RosSSHThread::run() {
                 emit resultReady(2);
                 return;
             }
-            nbytes = channel->read(buffer, sizeof(buffer), true);
+            nbytes = channel->read(buffer, sizeof(buffer), true, timeout_ms);
         }
         if (nbytes < 0)
         {
@@ -90,38 +97,13 @@ RosSSHThread::run() {
         }
         
     }
-    // // Close the channel
+    // Close the channel
     channel->sendEof();
     channel->close();
     delete channel;
     my_ssh_session->disconnect();
     delete my_ssh_session;
 
-    
-    // QString program = tr("ssh");
-    // QStringList arguments;
-    // /*
-    //     arguments:
-    //         "-tt" this enforces the creation of a terminal, in case we want to read the STDOUT
-    //         "-o PasswordAuthentication=no" makes the ssh fail if a password is needed
-    //         (password needed means that the setup is not correct)
-    // */
-    // arguments << "-tt" << "-o" << "PasswordAuthentication=no" << _connection.c_str() << _cmd.c_str();
-
-    // qCDebug(RosSSHLogger)<<"Executing command " << program << arguments << "\n";
-    // QProcess *myProcess = new QProcess();
-
-    // myProcess->setProcessChannelMode(QProcess::MergedChannels);
-    // myProcess->start(program, arguments);
-    // myProcess->closeWriteChannel();
-
-    // myProcess->waitForFinished(_timeout_ms);
-    // int result = myProcess->state() == QProcess::Running ? 0 : (myProcess->exitCode() == 0 ? 0:2);
-
-    // save stdout for later in case someone wants to read it
-    // _stdout_str = myProcess->readAll().toStdString();
-    
-    // myProcess->kill();
     qCDebug(RosSSHLogger)<<"SSH done from SSH thread with code " << result << "\n";
     emit resultReady(0);
 }
