@@ -348,7 +348,6 @@ LinuxBuild {
 
 WindowsBuild {
     libssh_platform_sdk_install.commands = \
-    echo "Doing LIBSSH stuff" && \
     mkdir $${LIBSSH_PLATFORM_SDK_PATH} && cd $${LIBSSH_PLATFORM_SDK_PATH} && \
     cmake $${SOURCE_DIR}/libs/libssh/
 }
