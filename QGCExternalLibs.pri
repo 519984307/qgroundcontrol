@@ -338,11 +338,22 @@ LIBSSH_PLATFORM_SDK_PATH = $${OUT_PWD}/libs/libssh
 
 libssh_platform_sdk_install.target = $${LIBSSH_PLATFORM_SDK_PATH}
 
-libssh_platform_sdk_install.commands = \
+LinuxBuild {
+    libssh_platform_sdk_install.commands = \
     echo "Doing LIBSSH stuff" && \
     mkdir -p $${LIBSSH_PLATFORM_SDK_PATH} && cd $${LIBSSH_PLATFORM_SDK_PATH} && \
     cmake $${SOURCE_DIR}/libs/libssh/ && \
     make
+}
+
+WindowsBuild {
+    libssh_platform_sdk_install.commands = \
+    echo "Doing LIBSSH stuff" && \
+    mkdir $${LIBSSH_PLATFORM_SDK_PATH} && cd $${LIBSSH_PLATFORM_SDK_PATH} && \
+    cmake $${SOURCE_DIR}/libs/libssh/ && \
+    make
+}
+
 
 PRE_TARGETDEPS += $$libssh_platform_sdk_install.target
 QMAKE_EXTRA_TARGETS += libssh_platform_sdk_install
