@@ -333,31 +333,32 @@ contains (DEFINES, DISABLE_AIRMAP) {
 
 # [REQUIRED] libssh library
 
-message("Attempting to install LIBSSH")
-LIBSSH_PLATFORM_SDK_PATH = $${OUT_PWD}/libs/libssh
 
-libssh_platform_sdk_install.target = $${LIBSSH_PLATFORM_SDK_PATH}
 
 LinuxBuild {
+    message("Linux Build: Attempting to build LIBSSH using the submodule")
+    LIBSSH_PLATFORM_SDK_PATH = $${OUT_PWD}/libs/libssh
+
+    libssh_platform_sdk_install.target = $${LIBSSH_PLATFORM_SDK_PATH}
+
     libssh_platform_sdk_install.commands = \
     echo "Doing LIBSSH stuff" && \
     mkdir -p $${LIBSSH_PLATFORM_SDK_PATH} && cd $${LIBSSH_PLATFORM_SDK_PATH} && \
     cmake $${SOURCE_DIR}/libs/libssh/ && \
     make
+
+    PRE_TARGETDEPS += $$libssh_platform_sdk_install.target
+    QMAKE_EXTRA_TARGETS += libssh_platform_sdk_install
+
+    INCLUDEPATH += libs/libssh/include/
+    INCLUDEPATH += $${LIBSSH_PLATFORM_SDK_PATH}/include
+
+    LIBS += $${LIBSSH_PLATFORM_SDK_PATH}/lib/libssh.so
+    PRE_TARGETDEPS += $${LIBSSH_PLATFORM_SDK_PATH}
 }
 
 WindowsBuild {
-    libssh_platform_sdk_install.commands = \
-    mkdir \"$${LIBSSH_PLATFORM_SDK_PATH}\" & cd \"$${LIBSSH_PLATFORM_SDK_PATH}\" & \
-    cmake \"$${SOURCE_DIR}/libs/libssh/\"
+    message("Windows Build: Assuming a pre-installed LIBSSH")
+    LIBS += -lssh
 }
 
-
-PRE_TARGETDEPS += $$libssh_platform_sdk_install.target
-QMAKE_EXTRA_TARGETS += libssh_platform_sdk_install
-
-INCLUDEPATH += libs/libssh/include/
-INCLUDEPATH += $${LIBSSH_PLATFORM_SDK_PATH}/include
-
-LIBS += $${LIBSSH_PLATFORM_SDK_PATH}/lib/libssh.so
-PRE_TARGETDEPS += $${LIBSSH_PLATFORM_SDK_PATH}
