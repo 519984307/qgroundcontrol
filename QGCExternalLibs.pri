@@ -359,6 +359,8 @@ LinuxBuild {
 
 WindowsBuild {
     message("Windows Build: Assuming a pre-installed LIBSSH")
+    INCLUDEPATH += libs/libssh/include/
     LIBS += -lssh
+    LIBS += -libssh
 }
 
