@@ -27,11 +27,21 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install Libraries
-        uses: msys2/setup-msys2@v2
-        with:
-          update: true
-          install: zlib libssh
+      # - name: Install Libraries
+      #   uses: msys2/setup-msys2@v2
+      #   with:
+      #     update: true
+      #     install: zlib libssh
+
+      - name: Installing vcpkg (Windows)
+        run: |
+          cd ..
+          git clone https://github.com/Microsoft/vcpkg.git
+          cd vcpkg
+          git checkout --force 2020.01
+          .\bootstrap-vcpkg.bat
+          .\vcpkg.exe install zlib
+          .\vcpkg.exe install libssh
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v2
