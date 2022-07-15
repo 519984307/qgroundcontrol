@@ -80,32 +80,122 @@
     "default":     "jetsonnx"
 },
 {
-    "name":             "Mark11IP",
-    "shortDesc": "IP Address of the Mark 11 glider",
+    "name":             "Glider1Name",
+    "shortDesc": "Name of first glider",
     "type":             "string",
     "default":     ""
 },
 {
-    "name":             "Mark12IP",
-    "shortDesc": "IP Address of the Mark 12 glider",
+    "name":             "Glider1IP",
+    "shortDesc": "IP Address of first glider",
     "type":             "string",
     "default":     ""
 },
 {
-    "name":             "Mark13IP",
-    "shortDesc": "IP Address of the Mark 13 glider",
+    "name":             "Glider2Name",
+    "shortDesc": "Name of second glider",
     "type":             "string",
     "default":     ""
 },
 {
-    "name":             "Skeleton12IP",
-    "shortDesc": "IP Address of the Skeleton 12 glider",
+    "name":             "Glider2IP",
+    "shortDesc": "IP Address of second glider",
     "type":             "string",
     "default":     ""
 },
 {
-    "name":             "Skeleton13IP",
-    "shortDesc": "IP Address of the Skeleton 13 glider",
+    "name":             "Glider3Name",
+    "shortDesc": "Name of third glider",
+    "type":             "string",
+    "default":     ""
+},
+{
+    "name":             "Glider3IP",
+    "shortDesc": "IP Address of third glider",
+    "type":             "string",
+    "default":     ""
+},
+{
+    "name":             "Glider4Name",
+    "shortDesc": "Name of fourth glider",
+    "type":             "string",
+    "default":     ""
+},
+{
+    "name":             "Glider4IP",
+    "shortDesc": "IP Address of fourth glider",
+    "type":             "string",
+    "default":     ""
+},
+{
+    "name":             "Glider5Name",
+    "shortDesc": "Name of firth glider",
+    "type":             "string",
+    "default":     ""
+},
+{
+    "name":             "Glider5IP",
+    "shortDesc": "IP Address of firth glider",
+    "type":             "string",
+    "default":     ""
+},
+{
+    "name":             "Glider6Name",
+    "shortDesc": "Name of sixth glider",
+    "type":             "string",
+    "default":     ""
+},
+{
+    "name":             "Glider6IP",
+    "shortDesc": "IP Address of sixth glider",
+    "type":             "string",
+    "default":     ""
+},
+{
+    "name":             "Glider7Name",
+    "shortDesc": "Name of seventh glider",
+    "type":             "string",
+    "default":     ""
+},
+{
+    "name":             "Glider7IP",
+    "shortDesc": "IP Address of seventh glider",
+    "type":             "string",
+    "default":     ""
+},
+{
+    "name":             "Glider8Name",
+    "shortDesc": "Name of eighth glider",
+    "type":             "string",
+    "default":     ""
+},
+{
+    "name":             "Glider8IP",
+    "shortDesc": "IP Address of eighth glider",
+    "type":             "string",
+    "default":     ""
+},
+{
+    "name":             "Glider9Name",
+    "shortDesc": "Name of ninth glider",
+    "type":             "string",
+    "default":     ""
+},
+{
+    "name":             "Glider9IP",
+    "shortDesc": "IP Address of ninth glider",
+    "type":             "string",
+    "default":     ""
+},
+{
+    "name":             "Glider10Name",
+    "shortDesc": "Name of tenth glider",
+    "type":             "string",
+    "default":     ""
+},
+{
+    "name":             "Glider10IP",
+    "shortDesc": "IP Address of tenth glider",
     "type":             "string",
     "default":     ""
 },

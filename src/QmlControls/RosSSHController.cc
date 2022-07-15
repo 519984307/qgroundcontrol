@@ -29,25 +29,49 @@ RosSSHController::newConnection(QString gliderName) {
 
     // Get the IP from the settings
     std::string glider_name = gliderName.toStdString();
-    if(glider_name == "Mark11")
+    if(glider_name == _settingsManager->flyViewSettings()->Glider1Name()->rawValue().toString().toStdString())
     {
-        ip = _settingsManager->flyViewSettings()->Mark11IP()->rawValue().toString().toStdString();
+        ip = _settingsManager->flyViewSettings()->Glider1IP()->rawValue().toString().toStdString();
     }
-    else if(glider_name == "Mark12")
+    else if(glider_name == _settingsManager->flyViewSettings()->Glider2Name()->rawValue().toString().toStdString())
     {
-        ip = _settingsManager->flyViewSettings()->Mark12IP()->rawValue().toString().toStdString();
+        ip = _settingsManager->flyViewSettings()->Glider2IP()->rawValue().toString().toStdString();
     }
-    else if(glider_name == "Mark13")
+    else if(glider_name == _settingsManager->flyViewSettings()->Glider3Name()->rawValue().toString().toStdString())
     {
-        ip = _settingsManager->flyViewSettings()->Mark13IP()->rawValue().toString().toStdString();
+        ip = _settingsManager->flyViewSettings()->Glider3IP()->rawValue().toString().toStdString();
     }
-    else if(glider_name == "Skeleton12")
+    else if(glider_name == _settingsManager->flyViewSettings()->Glider4Name()->rawValue().toString().toStdString())
     {
-        ip = _settingsManager->flyViewSettings()->Skeleton12IP()->rawValue().toString().toStdString();
+        ip = _settingsManager->flyViewSettings()->Glider4IP()->rawValue().toString().toStdString();
     }
-    else if(glider_name == "Skeleton13")
+    else if(glider_name == _settingsManager->flyViewSettings()->Glider5Name()->rawValue().toString().toStdString())
     {
-        ip = _settingsManager->flyViewSettings()->Skeleton13IP()->rawValue().toString().toStdString();
+        ip = _settingsManager->flyViewSettings()->Glider5IP()->rawValue().toString().toStdString();
+    }
+    else if(glider_name == _settingsManager->flyViewSettings()->Glider6Name()->rawValue().toString().toStdString())
+    {
+        ip = _settingsManager->flyViewSettings()->Glider6IP()->rawValue().toString().toStdString();
+    }
+    else if(glider_name == _settingsManager->flyViewSettings()->Glider7Name()->rawValue().toString().toStdString())
+    {
+        ip = _settingsManager->flyViewSettings()->Glider7IP()->rawValue().toString().toStdString();
+    }
+    else if(glider_name == _settingsManager->flyViewSettings()->Glider8Name()->rawValue().toString().toStdString())
+    {
+        ip = _settingsManager->flyViewSettings()->Glider8IP()->rawValue().toString().toStdString();
+    }
+    else if(glider_name == _settingsManager->flyViewSettings()->Glider9Name()->rawValue().toString().toStdString())
+    {
+        ip = _settingsManager->flyViewSettings()->Glider9IP()->rawValue().toString().toStdString();
+    }
+    else if(glider_name == _settingsManager->flyViewSettings()->Glider10Name()->rawValue().toString().toStdString())
+    {
+        ip = _settingsManager->flyViewSettings()->Glider10IP()->rawValue().toString().toStdString();
+    }
+    else
+    {
+      qCWarning(RosSSHLogger) << "Unknown glider name: " << gliderName.toStdString().c_str();
     }
 
     setConnection(glider_name, username, ip);

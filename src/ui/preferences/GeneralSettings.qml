@@ -427,108 +427,250 @@ Rectangle {
                                 }
 
                                 QGCLabel {
-                                    text:       qsTr("Mark 11 IP address")
+                                    text:       qsTr("Glider Name")
                                     visible:    true
                                 }
-                                FactTextField {
-                                    id:                     mark11ip
-                                    Layout.preferredWidth:  _comboFieldWidth
-                                    visible:                true
-                                    fact:                   _flyViewSettings.Mark11IP
+                                QGCLabel {
+                                    text:       qsTr("Glider IP")
+                                    visible:    true
                                 }
-                                QGCButton {
+                                Item {
                                     visible: parent.advancedControls
-                                    text: qsTr("Reboot")
-                                    onClicked: rebootJetson("Mark11")
+                                    Layout.fillWidth: true
                                 }
-                                QGCButton {
+                                Item {
                                     visible: parent.advancedControls
-                                    text: qsTr("Shutdown")
-                                    onClicked: shutdownJetson("Mark11")
+                                    Layout.fillWidth: true
                                 }
 
-                                QGCLabel {
-                                    text:       qsTr("Mark 12 IP address")
-                                    visible:    true
-                                }
                                 FactTextField {
-                                    id:                     mark12ip
+                                    id:                     glider_1_name
                                     Layout.preferredWidth:  _comboFieldWidth
                                     visible:                true
-                                    fact:                   _flyViewSettings.Mark12IP
+                                    fact:                   _flyViewSettings.Glider1Name
+                                }
+                                FactTextField {
+                                    id:                     glider_1_ip
+                                    Layout.preferredWidth:  _comboFieldWidth
+                                    visible:                true
+                                    fact:                   _flyViewSettings.Glider1IP
                                 }
                                 QGCButton {
                                     visible: parent.advancedControls
                                     text: qsTr("Reboot")
-                                    onClicked: rebootJetson("Mark12")
+                                    onClicked: rebootJetson(_flyViewSettings.Glider1Name.value)
                                 }
                                 QGCButton {
                                     visible: parent.advancedControls
                                     text: qsTr("Shutdown")
-                                    onClicked: shutdownJetson("Mark12")
+                                    onClicked: shutdownJetson(_flyViewSettings.Glider1Name.value)
                                 }
 
-                                QGCLabel {
-                                    text:       qsTr("Mark 13 IP address")
-                                    visible:    true
-                                }
                                 FactTextField {
-                                    id:                     mark13ip
+                                    id:                     glider_2_name
                                     Layout.preferredWidth:  _comboFieldWidth
                                     visible:                true
-                                    fact:                   _flyViewSettings.Mark13IP
+                                    fact:                   _flyViewSettings.Glider2Name
+                                }
+                                FactTextField {
+                                    id:                     glider_2_ip
+                                    Layout.preferredWidth:  _comboFieldWidth
+                                    visible:                true
+                                    fact:                   _flyViewSettings.Glider2IP
                                 }
                                 QGCButton {
                                     visible: parent.advancedControls
                                     text: qsTr("Reboot")
-                                    onClicked: rebootJetson("Mark13")
+                                    onClicked: rebootJetson(_flyViewSettings.Glider2Name.value)
                                 }
                                 QGCButton {
                                     visible: parent.advancedControls
                                     text: qsTr("Shutdown")
-                                    onClicked: shutdownJetson("Mark13")
+                                    onClicked: shutdownJetson(_flyViewSettings.Glider2Name.value)
                                 }
 
-                                QGCLabel {
-                                    text:       qsTr("Skeleton 12 IP address")
-                                    visible:    true
-                                }
                                 FactTextField {
-                                    id:                     skeleton12ip
+                                    id:                     glider_3_name
                                     Layout.preferredWidth:  _comboFieldWidth
                                     visible:                true
-                                    fact:                   _flyViewSettings.Skeleton12IP
+                                    fact:                   _flyViewSettings.Glider3Name
+                                }
+                                FactTextField {
+                                    id:                     glider_3_ip
+                                    Layout.preferredWidth:  _comboFieldWidth
+                                    visible:                true
+                                    fact:                   _flyViewSettings.Glider3IP
                                 }
                                 QGCButton {
                                     visible: parent.advancedControls
                                     text: qsTr("Reboot")
-                                    onClicked: rebootJetson("Skeleton12")
+                                    onClicked: rebootJetson(_flyViewSettings.Glider3Name.value)
                                 }
                                 QGCButton {
                                     visible: parent.advancedControls
                                     text: qsTr("Shutdown")
-                                    onClicked: shutdownJetson("Skeleton12")
+                                    onClicked: shutdownJetson(_flyViewSettings.Glider3Name.value)
                                 }
 
-                                QGCLabel {
-                                    text:       qsTr("Skeleton 13 IP address")
-                                    visible:    true
-                                }
                                 FactTextField {
-                                    id:                     skeleton13ip
+                                    id:                     glider_4_name
                                     Layout.preferredWidth:  _comboFieldWidth
                                     visible:                true
-                                    fact:                   _flyViewSettings.Skeleton13IP
+                                    fact:                   _flyViewSettings.Glider4Name
+                                }
+                                FactTextField {
+                                    id:                     glider_4_ip
+                                    Layout.preferredWidth:  _comboFieldWidth
+                                    visible:                true
+                                    fact:                   _flyViewSettings.Glider4IP
                                 }
                                 QGCButton {
                                     visible: parent.advancedControls
                                     text: qsTr("Reboot")
-                                    onClicked: rebootJetson("Skeleton13")
+                                    onClicked: rebootJetson(_flyViewSettings.Glider4Name.value)
                                 }
                                 QGCButton {
                                     visible: parent.advancedControls
                                     text: qsTr("Shutdown")
-                                    onClicked: shutdownJetson("Skeleton13")
+                                    onClicked: shutdownJetson(_flyViewSettings.Glider4Name.value)
+                                }
+
+                                FactTextField {
+                                    id:                     glider_5_name
+                                    Layout.preferredWidth:  _comboFieldWidth
+                                    visible:                true
+                                    fact:                   _flyViewSettings.Glider5Name
+                                }
+                                FactTextField {
+                                    id:                     glider_5_ip
+                                    Layout.preferredWidth:  _comboFieldWidth
+                                    visible:                true
+                                    fact:                   _flyViewSettings.Glider5IP
+                                }
+                                QGCButton {
+                                    visible: parent.advancedControls
+                                    text: qsTr("Reboot")
+                                    onClicked: rebootJetson(_flyViewSettings.Glider5Name.value)
+                                }
+                                QGCButton {
+                                    visible: parent.advancedControls
+                                    text: qsTr("Shutdown")
+                                    onClicked: shutdownJetson(_flyViewSettings.Glider5Name.value)
+                                }
+
+                                FactTextField {
+                                    id:                     glider_6_name
+                                    Layout.preferredWidth:  _comboFieldWidth
+                                    visible:                true
+                                    fact:                   _flyViewSettings.Glider6Name
+                                }
+                                FactTextField {
+                                    id:                     glider_6_ip
+                                    Layout.preferredWidth:  _comboFieldWidth
+                                    visible:                true
+                                    fact:                   _flyViewSettings.Glider6IP
+                                }
+                                QGCButton {
+                                    visible: parent.advancedControls
+                                    text: qsTr("Reboot")
+                                    onClicked: rebootJetson(_flyViewSettings.Glider6Name.value)
+                                }
+                                QGCButton {
+                                    visible: parent.advancedControls
+                                    text: qsTr("Shutdown")
+                                    onClicked: shutdownJetson(_flyViewSettings.Glider6Name.value)
+                                }
+
+                                FactTextField {
+                                    id:                     glider_7_name
+                                    Layout.preferredWidth:  _comboFieldWidth
+                                    visible:                true
+                                    fact:                   _flyViewSettings.Glider7Name
+                                }
+                                FactTextField {
+                                    id:                     glider_7_ip
+                                    Layout.preferredWidth:  _comboFieldWidth
+                                    visible:                true
+                                    fact:                   _flyViewSettings.Glider7IP
+                                }
+                                QGCButton {
+                                    visible: parent.advancedControls
+                                    text: qsTr("Reboot")
+                                    onClicked: rebootJetson(_flyViewSettings.Glider7Name.value)
+                                }
+                                QGCButton {
+                                    visible: parent.advancedControls
+                                    text: qsTr("Shutdown")
+                                    onClicked: shutdownJetson(_flyViewSettings.Glider7Name.value)
+                                }
+
+                                FactTextField {
+                                    id:                     glider_8_name
+                                    Layout.preferredWidth:  _comboFieldWidth
+                                    visible:                true
+                                    fact:                   _flyViewSettings.Glider8Name
+                                }
+                                FactTextField {
+                                    id:                     glider_8_ip
+                                    Layout.preferredWidth:  _comboFieldWidth
+                                    visible:                true
+                                    fact:                   _flyViewSettings.Glider8IP
+                                }
+                                QGCButton {
+                                    visible: parent.advancedControls
+                                    text: qsTr("Reboot")
+                                    onClicked: rebootJetson(_flyViewSettings.Glider8Name.value)
+                                }
+                                QGCButton {
+                                    visible: parent.advancedControls
+                                    text: qsTr("Shutdown")
+                                    onClicked: shutdownJetson(_flyViewSettings.Glider8Name.value)
+                                }
+
+                                FactTextField {
+                                    id:                     glider_9_name
+                                    Layout.preferredWidth:  _comboFieldWidth
+                                    visible:                true
+                                    fact:                   _flyViewSettings.Glider9Name
+                                }
+                                FactTextField {
+                                    id:                     glider_9_ip
+                                    Layout.preferredWidth:  _comboFieldWidth
+                                    visible:                true
+                                    fact:                   _flyViewSettings.Glider9IP
+                                }
+                                QGCButton {
+                                    visible: parent.advancedControls
+                                    text: qsTr("Reboot")
+                                    onClicked: rebootJetson(_flyViewSettings.Glider9Name.value)
+                                }
+                                QGCButton {
+                                    visible: parent.advancedControls
+                                    text: qsTr("Shutdown")
+                                    onClicked: shutdownJetson(_flyViewSettings.Glider9Name.value)
+                                }
+
+                                FactTextField {
+                                    id:                     glider_10_name
+                                    Layout.preferredWidth:  _comboFieldWidth
+                                    visible:                true
+                                    fact:                   _flyViewSettings.Glider10Name
+                                }
+                                FactTextField {
+                                    id:                     glider_10_ip
+                                    Layout.preferredWidth:  _comboFieldWidth
+                                    visible:                true
+                                    fact:                   _flyViewSettings.Glider10IP
+                                }
+                                QGCButton {
+                                    visible: parent.advancedControls
+                                    text: qsTr("Reboot")
+                                    onClicked: rebootJetson(_flyViewSettings.Glider10Name.value)
+                                }
+                                QGCButton {
+                                    visible: parent.advancedControls
+                                    text: qsTr("Shutdown")
+                                    onClicked: shutdownJetson(_flyViewSettings.Glider10Name.value)
                                 }
                             }
                         }

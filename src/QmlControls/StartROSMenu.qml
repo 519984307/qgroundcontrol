@@ -18,6 +18,7 @@ QGCLabel {
 
 
     property var    currentVehicle:         QGroundControl.multiVehicleManager.activeVehicle
+    property var    flightViewSettings:     QGroundControl.settingsManager.flyViewSettings
     property var    controller:             null
     property real   mouseAreaLeftMargin:    0
     property var    sshStatus:              -1
@@ -69,11 +70,8 @@ QGCLabel {
     }
 
     property var flightModesMenuItems: []
-    property var ports: [5601, 5602, 5605, 5606, 5607]
-    property var stream_names: ["Mark11", "Mark12", "Mark13", "Skeleton12", "Skeleton13"]
 
     function updateFlightModesMenu() {
-        console.log(QGroundControl.settingsManager.videoSettings.udpPort.rawValue)
         var i;
         // Remove old menu items
         for (i = 0; i < flightModesMenuItems.length; i++) {
@@ -82,8 +80,54 @@ QGCLabel {
         flightModesMenuItems.length = 0
         // Add new items
         if(sshStatus == 1) return;
-        for (i = 0; i < ports.length; i++) {
-            var menuItem = flightModeMenuItemComponent.createObject(null, { "text": stream_names[i]})
+
+        if (flightViewSettings.Glider1Name.value != "") {
+            var menuItem = flightModeMenuItemComponent.createObject(null, { "text": flightViewSettings.Glider1Name.value})
+            flightModesMenuItems.push(menuItem)
+            flightModesMenu.insertItem(i, menuItem)
+        }
+        if (flightViewSettings.Glider2Name.value != "") {
+            var menuItem = flightModeMenuItemComponent.createObject(null, { "text": flightViewSettings.Glider2Name.value})
+            flightModesMenuItems.push(menuItem)
+            flightModesMenu.insertItem(i, menuItem)
+        }
+        if (flightViewSettings.Glider3Name.value != "") {
+            var menuItem = flightModeMenuItemComponent.createObject(null, { "text": flightViewSettings.Glider3Name.value})
+            flightModesMenuItems.push(menuItem)
+            flightModesMenu.insertItem(i, menuItem)
+        }
+        if (flightViewSettings.Glider4Name.value != "") {
+            var menuItem = flightModeMenuItemComponent.createObject(null, { "text": flightViewSettings.Glider4Name.value})
+            flightModesMenuItems.push(menuItem)
+            flightModesMenu.insertItem(i, menuItem)
+        }
+        if (flightViewSettings.Glider5Name.value != "") {
+            var menuItem = flightModeMenuItemComponent.createObject(null, { "text": flightViewSettings.Glider5Name.value})
+            flightModesMenuItems.push(menuItem)
+            flightModesMenu.insertItem(i, menuItem)
+        }
+        if (flightViewSettings.Glider6Name.value != "") {
+            var menuItem = flightModeMenuItemComponent.createObject(null, { "text": flightViewSettings.Glider6Name.value})
+            flightModesMenuItems.push(menuItem)
+            flightModesMenu.insertItem(i, menuItem)
+        }
+        if (flightViewSettings.Glider7Name.value != "") {
+            var menuItem = flightModeMenuItemComponent.createObject(null, { "text": flightViewSettings.Glider7Name.value})
+            flightModesMenuItems.push(menuItem)
+            flightModesMenu.insertItem(i, menuItem)
+        }
+        if (flightViewSettings.Glider8Name.value != "") {
+            var menuItem = flightModeMenuItemComponent.createObject(null, { "text": flightViewSettings.Glider8Name.value})
+            flightModesMenuItems.push(menuItem)
+            flightModesMenu.insertItem(i, menuItem)
+        }
+        if (flightViewSettings.Glider9Name.value != "") {
+            var menuItem = flightModeMenuItemComponent.createObject(null, { "text": flightViewSettings.Glider9Name.value})
+            flightModesMenuItems.push(menuItem)
+            flightModesMenu.insertItem(i, menuItem)
+        }
+        if (flightViewSettings.Glider10Name.value != "") {
+            var menuItem = flightModeMenuItemComponent.createObject(null, { "text": flightViewSettings.Glider10Name.value})
             flightModesMenuItems.push(menuItem)
             flightModesMenu.insertItem(i, menuItem)
         }
