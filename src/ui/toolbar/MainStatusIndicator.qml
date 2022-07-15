@@ -227,6 +227,7 @@ RowLayout {
     Item {
         Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * ScreenTools.largeFontPointRatio * 1.5
         height:                 1
+        visible:                videoSourceIcon.visible
     }
 
     QGCColoredImage {
@@ -260,6 +261,7 @@ RowLayout {
     Item {
         Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * ScreenTools.largeFontPointRatio * 1.5
         height:                 1
+        visible:                landingStationIcon.visible
     }
 
     QGCColoredImage {
@@ -270,13 +272,14 @@ RowLayout {
         mipmap:     true
         color:      _activeVehicle ? (landingStationIndicator.currentVehicle.landingStationConnected.value? Qt.rgba(0,1,0,1):Qt.rgba(1,0,0,1)): Qt.rgba(1,1,1,1)
         source:     _activeVehicle ? (landingStationIndicator.currentVehicle.landingStationConnected.value ? "/qmlimages/GreenCheckmark.svg" : "/qmlimages/CircleX.svg") : ""
-        visible:    landingStationIndicator.visible
+        visible:    _activeVehicle
     }
 
     Item {
         id:                     landingStationIndicatorItem
         Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth / 2
         height:                 1
+        visible:                landingStationIndicator.visible
     }
 
     LandingStationIndicator {
@@ -286,13 +289,14 @@ RowLayout {
         font.pointSize:         ScreenTools.defaultFontPointSize
         mouseAreaLeftMargin:    -(landingStationIndicator.x - landingStationIcon.x)
         visible:                _activeVehicle
-        color:      _activeVehicle ? (landingStationIndicator.currentVehicle.landingStationConnected.value? Qt.rgba(1,1,1,1):Qt.rgba(1,0,0,1)): Qt.rgba(1,1,1,1)
+        color:                  _activeVehicle ? (landingStationIndicator.currentVehicle.landingStationConnected.value? Qt.rgba(1,1,1,1):Qt.rgba(1,0,0,1)): Qt.rgba(1,1,1,1)
     }
 
     // Hook status indicator
     Item {
         Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * ScreenTools.largeFontPointRatio * 1.5
         height:                 1
+        visible:                hookStatusIndicator.visible
     }
 
     function getHookColor() {
@@ -343,6 +347,7 @@ RowLayout {
         id:                     videoFPSItem
         Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth
         height:                 1
+        visible:                videoFPS.visible
     }
 
     QGCLabel {
@@ -352,6 +357,76 @@ RowLayout {
         font.pointSize:         ScreenTools.defaultFontPointSize
         visible:                _activeVehicle
         text:                   "" + (_activeVehicle ? _activeVehicle.videoFPS.value : 0) + "FPS"
+    }
+
+    // Jetson temperature display
+    function getTemperatureColor() {
+        if (_activeVehicle && _activeVehicle.jetsonTemperature.value > 0 && _activeVehicle.jetsonTemperature.value <= 60) {
+            // not too warm, return green
+            return Qt.rgba(0,1,0,1)
+        } else if (_activeVehicle && _activeVehicle.jetsonTemperature.value > 60 && _activeVehicle.jetsonTemperature.value <= 75) {
+            // getting warmer, return orange
+            return Qt.rgba(1,0.65,0,1)
+        } else if (_activeVehicle && _activeVehicle.jetsonTemperature.value > 75) {
+            // on fire, return red
+            return Qt.rgba(1,0,0,1)
+        }
+        // no active vehicle or temperature unknown, return white
+        return Qt.rgba(1,1,1,1)
+    }
+
+    Item {
+        Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * ScreenTools.largeFontPointRatio * 1.5
+        height:                 1
+        visible:                jetsonTemperature.visible
+    }
+
+    QGCLabel {
+        id:                     jetsonTemperature
+        Layout.preferredHeight: _root.height
+        verticalAlignment:      Text.AlignVCenter
+        text:                   "Jetson: " + (_activeVehicle ? _activeVehicle.jetsonTemperature.value : 0) + "°C"
+        font.pointSize:         ScreenTools.defaultFontPointSize
+        visible:                _activeVehicle
+        color:                  getTemperatureColor()
+    }
+
+    // detection quality indicator
+    function getQualityColor() {
+        var innovationMax = _activeVehicle ? _activeVehicle.innovationMax : 0.5
+        var percentageMin = 100 * (1 - innovationMax)
+        var percentageMiddle = (100 + percentageMin)/2
+
+        if (_activeVehicle && _activeVehicle.tagDetectionQuality.value < percentageMin) {
+            // everything below percentageMin % is really not good,
+            // (innovation > PLD_INNOV_MX which is considered vision lost),
+            // return red
+            return Qt.rgba(1,0,0,1)
+        } else if (_activeVehicle && _activeVehicle.tagDetectionQuality.value >= percentageMin && _activeVehicle.tagDetectionQuality.value < percentageMiddle) {
+            // kinda okay (PLD_INNOV_MX/2 < innovation <= PLD_INNOV_MX), return orange
+            return Qt.rgba(1,0.65,0,1)
+        } else if (_activeVehicle && _activeVehicle.tagDetectionQuality.value >= percentageMiddle && _activeVehicle.tagDetectionQuality.value <= 100) {
+            // good detections (low innovation), return green
+            return Qt.rgba(0,1,0,1)
+        }
+        // no active vehicle
+        return Qt.rgba(1,1,1,1)
+    }
+
+    Item {
+        Layout.preferredWidth:  ScreenTools.defaultFontPixelWidth * ScreenTools.largeFontPointRatio * 1.5
+        height:                 1
+        visible:                tagDetectionQuality.visible
+    }
+
+    QGCLabel {
+        id:                     tagDetectionQuality
+        Layout.preferredHeight: _root.height
+        verticalAlignment:      Text.AlignVCenter
+        text:                   "Vision: " + (_activeVehicle && _activeVehicle.tagDetectionQuality.value <= 100 ? _activeVehicle.tagDetectionQuality.value : 0) + "%"
+        font.pointSize:         ScreenTools.defaultFontPointSize
+        visible:                _activeVehicle
+        color:                  getQualityColor()
     }
 
     RosSSHController{

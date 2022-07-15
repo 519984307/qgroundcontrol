@@ -33,9 +33,9 @@ QGCLabel {
         var dist_info = "";
         const d = new Date();
         let time = d.getTime()/1000;
-        console.log(currentVehicle.landingStationDistanceLastTime.value);
-        console.log(currentVehicle.landingStationDistance.value);
-        console.log(time);
+        // console.log(currentVehicle.landingStationDistanceLastTime.value);
+        // console.log(currentVehicle.landingStationDistance.value);
+        // console.log(time);
 
         if(time - currentVehicle.landingStationDistanceLastTime.value < 3)
         {

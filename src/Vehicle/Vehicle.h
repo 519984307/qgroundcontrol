@@ -210,6 +210,7 @@ public:
     Q_PROPERTY(int                  sensorsHealthBits           READ sensorsHealthBits                                              NOTIFY sensorsHealthBitsChanged)
     Q_PROPERTY(int                  sensorsUnhealthyBits        READ sensorsUnhealthyBits                                           NOTIFY sensorsUnhealthyBitsChanged) ///< Combination of enabled and health
     Q_PROPERTY(QString              missionFlightMode           READ missionFlightMode                                              CONSTANT)
+    Q_PROPERTY(QString              preclandFlightMode          READ preclandFlightMode                                             CONSTANT)
     Q_PROPERTY(QString              pauseFlightMode             READ pauseFlightMode                                                CONSTANT)
     Q_PROPERTY(QString              rtlFlightMode               READ rtlFlightMode                                                  CONSTANT)
     Q_PROPERTY(QString              smartRTLFlightMode          READ smartRTLFlightMode                                             CONSTANT)
@@ -254,6 +255,7 @@ public:
     Q_PROPERTY(bool                 requiresGpsFix              READ requiresGpsFix                                                 NOTIFY requiresGpsFixChanged)
     Q_PROPERTY(double               loadProgress                READ loadProgress                                                   NOTIFY loadProgressChanged)
     Q_PROPERTY(bool                 initialConnectComplete      READ isInitialConnectComplete                                       NOTIFY initialConnectComplete)
+    Q_PROPERTY(float                innovationMax               READ innovationMax                                                  CONSTANT)
 
     // The following properties relate to Orbit status
     Q_PROPERTY(bool             orbitActive     READ orbitActive        NOTIFY orbitActiveChanged)
@@ -306,6 +308,8 @@ public:
     Q_PROPERTY(Fact* videoFPS           READ videoFPS           CONSTANT)
     Q_PROPERTY(Fact* hookStatus         READ hookStatus         CONSTANT)
     Q_PROPERTY(Fact* hookPosition       READ hookPosition       CONSTANT)
+    Q_PROPERTY(Fact* jetsonTemperature  READ jetsonTemperature  CONSTANT)
+    Q_PROPERTY(Fact* tagDetectionQuality READ tagDetectionQuality CONSTANT)
 
 
     Q_PROPERTY(FactGroup*           gps             READ gpsFactGroup               CONSTANT)
@@ -572,6 +576,7 @@ public:
     int             sensorsHealthBits           () const { return static_cast<int>(_onboardControlSensorsHealth); }
     int             sensorsUnhealthyBits        () const { return static_cast<int>(_onboardControlSensorsUnhealthy); }
     QString         missionFlightMode           () const;
+    QString         preclandFlightMode          () const;
     QString         pauseFlightMode             () const;
     QString         rtlFlightMode               () const;
     QString         smartRTLFlightMode          () const;
@@ -599,6 +604,7 @@ public:
     QObject*        sysStatusSensorInfo         () { return &_sysStatusSensorInfo; }
     bool            requiresGpsFix              () const { return static_cast<bool>(_onboardControlSensorsPresent & SysStatusSensorGPS); }
     bool            hilMode                     () const { return _base_mode & MAV_MODE_FLAG_HIL_ENABLED; }
+    float           innovationMax               () const { return _innovation_max; }
 
     /// Get the maximum MAVLink protocol version supported
     /// @return the maximum version
@@ -654,6 +660,8 @@ public:
     Fact* landingStationDistanceLastTime    () { return &_landingStationDistanceLastTimeFact; }
     Fact* hookStatus                        () { return &_hookStatusFact; }
     Fact* hookPosition                      () { return &_hookPositionFact; }
+    Fact* jetsonTemperature                 () { return &_jetsonTemperatureFact; }
+    Fact* tagDetectionQuality               () { return &_tagDetectionQualityFact; }
 
     Fact* videoFPS                          () { return &_videoFPSFact; }
 
@@ -1006,6 +1014,7 @@ private:
     void _handleAttitudeWorker          (double rollRadians, double pitchRadians, double yawRadians);
     void _handleAttitude                (mavlink_message_t& message);
     void _handleNamedValueFloat         (mavlink_message_t& message);
+    void _handleOnboardComputerStatus   (mavlink_message_t& message);
     void _handleAttitudeQuaternion      (mavlink_message_t& message);
     void _handleStatusText              (mavlink_message_t& message);
     void _handleOrbitExecutionStatus    (const mavlink_message_t& message);
@@ -1286,6 +1295,8 @@ private:
 
     float _altitudeTuningOffset = qQNaN(); // altitude offset, so the plotted value is around 0
 
+    float _innovation_max = 0.5f;
+
     // FactGroup facts
 
     Fact _rollFact;
@@ -1317,6 +1328,8 @@ private:
     Fact _landingStationDistanceLastTimeFact;
     Fact _hookStatusFact;
     Fact _hookPositionFact;
+    Fact _jetsonTemperatureFact;
+    Fact _tagDetectionQualityFact;
 
     Fact _videoFPSFact;
 
@@ -1375,6 +1388,8 @@ private:
     static const char* _landingStationDistanceLastTimeFactName;
     static const char* _hookStatusFactName;
     static const char* _hookPositionFactName;
+    static const char* _jetsonTemperatureFactName;
+    static const char* _tagDetectionQualityFactName;
 
     static const char* _videoFPSFactName;
 

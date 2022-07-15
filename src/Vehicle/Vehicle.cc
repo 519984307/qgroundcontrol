@@ -99,6 +99,8 @@ const char* Vehicle::_landingStationDistanceFactName = "landingStationDistance";
 const char* Vehicle::_landingStationDistanceLastTimeFactName = "landingStationDistanceLastTime";
 const char* Vehicle::_hookStatusFactName =          "hookStatus";
 const char* Vehicle::_hookPositionFactName =        "hookPosition";
+const char* Vehicle::_jetsonTemperatureFactName =   "jetsonTemperature";
+const char* Vehicle::_tagDetectionQualityFactName = "tagDetectionQuality";
 
 
 const char* Vehicle::_videoFPSFactName =            "videoFPS";
@@ -166,6 +168,8 @@ Vehicle::Vehicle(LinkInterface*             link,
     , _landingStationDistanceFact   (0, _landingStationDistanceFactName, FactMetaData::valueTypeDouble)
     , _hookStatusFact               (0, _hookStatusFactName,        FactMetaData::valueTypeUint8)
     , _hookPositionFact             (0, _hookPositionFactName,      FactMetaData::valueTypeUint8)
+    , _jetsonTemperatureFact        (0, _jetsonTemperatureFactName, FactMetaData::valueTypeUint8)
+    , _tagDetectionQualityFact      (0, _tagDetectionQualityFactName, FactMetaData::valueTypeUint8)
 
     , _videoFPSFact                 (0, _videoFPSFactName,          FactMetaData::valueTypeUint16)
     , _gpsFactGroup                 (this)
@@ -218,6 +222,8 @@ Vehicle::Vehicle(LinkInterface*             link,
     // is when we switch on the glider
     hookStatus()->setRawValue(2);
     hookPosition()->setRawValue(0);
+    jetsonTemperature()->setRawValue(0);
+    tagDetectionQuality()->setRawValue(0);
 
     //-- Airspace Management
 #if defined(QGC_AIRMAP_ENABLED)
@@ -331,6 +337,9 @@ Vehicle::Vehicle(MAV_AUTOPILOT              firmwareType,
     , _landingStationDistanceLastTimeFact  (0, _landingStationDistanceLastTimeFactName, FactMetaData::valueTypeUint64)
     , _hookStatusFact                   (0, _hookStatusFactName,        FactMetaData::valueTypeUint8)
     , _hookPositionFact                 (0, _hookPositionFactName,      FactMetaData::valueTypeUint8)
+    , _jetsonTemperatureFact            (0, _jetsonTemperatureFactName, FactMetaData::valueTypeUint8)
+    , _tagDetectionQualityFact          (0, _tagDetectionQualityFactName, FactMetaData::valueTypeUint8)
+
 
     , _videoFPSFact                     (0, _videoFPSFactName,          FactMetaData::valueTypeUint16)
 
@@ -460,6 +469,8 @@ void Vehicle::_commonInit()
     _addFact(&_landingStationDistanceLastTimeFact, _landingStationDistanceLastTimeFactName);
     _addFact(&_hookStatusFact,          _hookStatusFactName);
     _addFact(&_hookPositionFact,        _hookPositionFactName);
+    _addFact(&_jetsonTemperatureFact,   _jetsonTemperatureFactName);
+    _addFact(&_tagDetectionQualityFact, _tagDetectionQualityFactName);
 
     _addFact(&_videoFPSFact,            _videoFPSFactName);
 
@@ -633,7 +644,8 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
 
     if (message.sysid != _id && message.sysid != 0) {
         // We allow RADIO_STATUS messages which come from a link the vehicle is using to pass through and be handled
-        if (!(message.msgid == MAVLINK_MSG_ID_RADIO_STATUS && _vehicleLinkManager->containsLink(link))) {
+        // also allow onboard_computer_status messages since they are coming directly from the jetson
+        if (!(message.msgid == MAVLINK_MSG_ID_RADIO_STATUS && _vehicleLinkManager->containsLink(link)) && !(message.msgid == MAVLINK_MSG_ID_ONBOARD_COMPUTER_STATUS)) {
             return;
         }
     }
@@ -787,6 +799,10 @@ void Vehicle::_mavlinkMessageReceived(LinkInterface* link, mavlink_message_t mes
         break;
     case MAVLINK_MSG_ID_NAMED_VALUE_FLOAT:
         _handleNamedValueFloat(message);
+        break;
+    case MAVLINK_MSG_ID_ONBOARD_COMPUTER_STATUS:
+        _handleOnboardComputerStatus(message);
+        break;
 
     case MAVLINK_MSG_ID_EVENT:
     case MAVLINK_MSG_ID_CURRENT_EVENT_SEQUENCE:
@@ -1184,6 +1200,26 @@ void Vehicle::_handleNamedValueFloat(mavlink_message_t& message)
     if(QDateTime::currentSecsSinceEpoch() - landingStationDistanceLastTime()->rawValue().toInt() > 3)
     {
         landingStationDistanceLastTime()->setRawValue(0);
+    }
+}
+
+void Vehicle::_handleOnboardComputerStatus(mavlink_message_t& message)
+{
+    // only accept the message from the jetson
+    if (message.sysid != 254) {
+        return;
+    }
+
+    mavlink_onboard_computer_status_t decoded_message;
+    mavlink_msg_onboard_computer_status_decode(&message, &decoded_message);
+
+    jetsonTemperature()->setRawValue(decoded_message.temperature_core[0]);
+    tagDetectionQuality()->setRawValue(decoded_message.cpu_cores[7]);
+
+    // update the max innovation parameter, this is used to put the detection quality into perspective
+    QString maxInnovationParam("PLD_INNOV_MX");
+    if (_parameterManager->parameterExists(FactSystem::defaultComponentId, maxInnovationParam)) {
+      _innovation_max = _parameterManager->getParameter(FactSystem::defaultComponentId, maxInnovationParam)->rawValue().toFloat();
     }
 }
 
@@ -3547,6 +3583,11 @@ void Vehicle::setFirmwarePluginInstanceData(QObject* firmwarePluginInstanceData)
 QString Vehicle::missionFlightMode() const
 {
     return _firmwarePlugin->missionFlightMode();
+}
+
+QString Vehicle::preclandFlightMode() const
+{
+    return _firmwarePlugin->preclandFlightMode();
 }
 
 QString Vehicle::pauseFlightMode() const
