@@ -364,10 +364,10 @@ RowLayout {
         if (_activeVehicle && _activeVehicle.jetsonTemperature.value > 0 && _activeVehicle.jetsonTemperature.value <= 60) {
             // not too warm, return green
             return Qt.rgba(0,1,0,1)
-        } else if (_activeVehicle && _activeVehicle.jetsonTemperature.value > 60 && _activeVehicle.jetsonTemperature.value <= 75) {
+        } else if (_activeVehicle && _activeVehicle.jetsonTemperature.value > 60 && _activeVehicle.jetsonTemperature.value <= 85) {
             // getting warmer, return orange
             return Qt.rgba(1,0.65,0,1)
-        } else if (_activeVehicle && _activeVehicle.jetsonTemperature.value > 75) {
+        } else if (_activeVehicle && _activeVehicle.jetsonTemperature.value > 85) {
             // on fire, return red
             return Qt.rgba(1,0,0,1)
         }
