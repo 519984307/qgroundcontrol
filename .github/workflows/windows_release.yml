@@ -95,6 +95,10 @@ jobs:
           cd vcpkg
           git checkout --force 2022.06.16.1
           .\bootstrap-vcpkg.bat
+
+      - name: Installing libraries using vcpkg
+        run: |
+          cd ..\vcpkg
           .\vcpkg.exe install zlib
           .\vcpkg.exe install libssh
           .\vcpkg.exe list
