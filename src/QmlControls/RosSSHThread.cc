@@ -1,5 +1,4 @@
-// #define LIBSSH_STATIC 1
-// #include <libssh/libsshpp.hpp>
+#define LIBSSH_STATIC 1
 #define SSH_NO_CPP_EXCEPTIONS
 #include <string>
 #include <libssh/libsshpp.hpp>
