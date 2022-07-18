@@ -363,9 +363,13 @@ WindowsBuild {
     LIBS += -libssh
     LIBS += libssh
     # INCLUDEPATH += D:\a\qgroundcontrol\vcpkg\installed\x64-windows\include
-    INCLUDEPATH += D:\a\qgroundcontrol\vcpkg\packages\libssh_x64-windows\include
-    DEPENDPATH += D:\a\qgroundcontrol\vcpkg\packages\libssh_x64-windows\include
-    LIBS += -LD:\a\qgroundcontrol\vcpkg\installed\x64-windows\lib -lssh.dll
-    LIBS += D:\a\qgroundcontrol\vcpkg\packages\libssh_x64-windows\bin -lssh.dll
+    #INCLUDEPATH += D:\a\qgroundcontrol\vcpkg\packages\libssh_x64-windows\include
+    # DEPENDPATH += D:\a\qgroundcontrol\vcpkg\packages\libssh_x64-windows\include
+    #LIBS += -LD:\a\qgroundcontrol\vcpkg\installed\x64-windows\lib -lssh.dll
+    # LIBS += D:\a\qgroundcontrol\vcpkg\packages\libssh_x64-windows\bin -lssh.dll
+    INCLUDEPATH += D:\a\qgroundcontrol\vcpkg\installed\x64-windows\include
+    DEPENDPATH += D:\a\qgroundcontrol\vcpkg\installed\x64-windows\include
+
+    LIBS += -LD:\a\qgroundcontrol\vcpkg\installed\x64-windows\bin -lssh.dll
 }
 
