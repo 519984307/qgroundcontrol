@@ -102,7 +102,13 @@ jobs:
           .\vcpkg.exe install zlib:x64-windows
           .\vcpkg.exe install libssh:x64-windows
           .\vcpkg.exe list
-          .\vcpkg integrate install
+          .\vcpkg.exe integrate install
+
+      - name: Debug commands
+        run: |
+          echo %LIBPATH%
+          cd ..\vcpkg
+          Get-ChildItem -Filter *ssh* -Recurse $pwd
 
       - name: Build
         working-directory: ${{ runner.temp }}\shadow_build_dir
