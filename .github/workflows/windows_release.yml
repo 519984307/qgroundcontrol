@@ -102,6 +102,7 @@ jobs:
           .\vcpkg.exe install zlib:x64-windows
           .\vcpkg.exe install libssh:x64-windows
           .\vcpkg.exe list
+          .\vcpkg integrate install
 
       - name: Build
         working-directory: ${{ runner.temp }}\shadow_build_dir
