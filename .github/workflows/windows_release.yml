@@ -108,7 +108,7 @@ jobs:
         run: |
           echo %LIBPATH%
           cd ..\vcpkg
-          Get-ChildItem -Filter *ssh* -Recurse $pwd
+          dir /s D:\a\qgroundcontrol\vcpkg\*ssh*
 
       - name: Build
         working-directory: ${{ runner.temp }}\shadow_build_dir
