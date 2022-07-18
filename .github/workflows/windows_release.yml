@@ -99,8 +99,8 @@ jobs:
       - name: Installing libraries using vcpkg
         run: |
           cd ..\vcpkg
-          .\vcpkg.exe install zlib
-          .\vcpkg.exe install libssh
+          .\vcpkg.exe install zlib:x64-windows
+          .\vcpkg.exe install libssh:x64-windows
           .\vcpkg.exe list
 
       - name: Build
