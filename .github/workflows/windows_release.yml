@@ -84,9 +84,12 @@ jobs:
 
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1
+        with:
+          msbuild-architecture: x64
       
       - name: Installing vcpkg (Windows)
         run: |
+          vswhere.exe -legacy -prerelease -format json
           cd ..
           git clone https://github.com/Microsoft/vcpkg.git
           cd vcpkg
