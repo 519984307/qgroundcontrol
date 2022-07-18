@@ -359,9 +359,9 @@ LinuxBuild {
 
 WindowsBuild {
     message("Windows Build: Assuming a pre-installed LIBSSH")
-    LIBS += -lssh
-    LIBS += -libssh
-    LIBS += libssh
+    #LIBS += -lssh
+    #LIBS += -libssh
+    #LIBS += libssh
     # INCLUDEPATH += D:\a\qgroundcontrol\vcpkg\installed\x64-windows\include
     #INCLUDEPATH += D:\a\qgroundcontrol\vcpkg\packages\libssh_x64-windows\include
     # DEPENDPATH += D:\a\qgroundcontrol\vcpkg\packages\libssh_x64-windows\include
