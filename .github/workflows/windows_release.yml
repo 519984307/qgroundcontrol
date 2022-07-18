@@ -93,7 +93,7 @@ jobs:
           cd ..
           git clone https://github.com/Microsoft/vcpkg.git
           cd vcpkg
-          git checkout --force 2020.01
+          git checkout --force 2022.06.16.1
           .\bootstrap-vcpkg.bat
           .\vcpkg.exe install zlib
           .\vcpkg.exe install libssh
