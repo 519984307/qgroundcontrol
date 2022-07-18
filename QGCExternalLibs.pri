@@ -371,5 +371,6 @@ WindowsBuild {
     DEPENDPATH += D:\a\qgroundcontrol\vcpkg\installed\x64-windows\include
 
     LIBS += -LD:\a\qgroundcontrol\vcpkg\installed\x64-windows\bin -lssh.dll
+    LIBS += -LD:\a\qgroundcontrol\vcpkg\installed\x64-windows\lib -lssh.dll
 }
 
