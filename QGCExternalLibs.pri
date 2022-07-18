@@ -362,5 +362,7 @@ WindowsBuild {
     LIBS += -lssh
     LIBS += -libssh
     LIBS += libssh
+    INCLUDEPATH += D:\a\qgroundcontrol\vcpkg\installed\x64-windows\include
+    LIBS += -LD:\a\qgroundcontrol\vcpkg\installed\x64-windows\lib -lssh.dll
 }
 
