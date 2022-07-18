@@ -361,5 +361,6 @@ WindowsBuild {
     message("Windows Build: Assuming a pre-installed LIBSSH")
     LIBS += -lssh
     LIBS += -libssh
+    LIBS += libssh
 }
 
