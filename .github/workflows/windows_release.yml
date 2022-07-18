@@ -97,6 +97,7 @@ jobs:
           .\bootstrap-vcpkg.bat
           .\vcpkg.exe install zlib
           .\vcpkg.exe install libssh
+          .\vcpkg.exe list
 
       - name: Build
         working-directory: ${{ runner.temp }}\shadow_build_dir
