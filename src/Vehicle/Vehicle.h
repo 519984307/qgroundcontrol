@@ -210,7 +210,6 @@ public:
     Q_PROPERTY(int                  sensorsHealthBits           READ sensorsHealthBits                                              NOTIFY sensorsHealthBitsChanged)
     Q_PROPERTY(int                  sensorsUnhealthyBits        READ sensorsUnhealthyBits                                           NOTIFY sensorsUnhealthyBitsChanged) ///< Combination of enabled and health
     Q_PROPERTY(QString              missionFlightMode           READ missionFlightMode                                              CONSTANT)
-    Q_PROPERTY(QString              preclandFlightMode          READ preclandFlightMode                                             CONSTANT)
     Q_PROPERTY(QString              pauseFlightMode             READ pauseFlightMode                                                CONSTANT)
     Q_PROPERTY(QString              rtlFlightMode               READ rtlFlightMode                                                  CONSTANT)
     Q_PROPERTY(QString              smartRTLFlightMode          READ smartRTLFlightMode                                             CONSTANT)
@@ -576,7 +575,6 @@ public:
     int             sensorsHealthBits           () const { return static_cast<int>(_onboardControlSensorsHealth); }
     int             sensorsUnhealthyBits        () const { return static_cast<int>(_onboardControlSensorsUnhealthy); }
     QString         missionFlightMode           () const;
-    QString         preclandFlightMode          () const;
     QString         pauseFlightMode             () const;
     QString         rtlFlightMode               () const;
     QString         smartRTLFlightMode          () const;

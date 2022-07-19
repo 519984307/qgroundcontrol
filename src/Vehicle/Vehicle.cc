@@ -3585,11 +3585,6 @@ QString Vehicle::missionFlightMode() const
     return _firmwarePlugin->missionFlightMode();
 }
 
-QString Vehicle::preclandFlightMode() const
-{
-    return _firmwarePlugin->preclandFlightMode();
-}
-
 QString Vehicle::pauseFlightMode() const
 {
     return _firmwarePlugin->pauseFlightMode();
