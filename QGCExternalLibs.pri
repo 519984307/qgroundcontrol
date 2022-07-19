@@ -344,7 +344,7 @@ LinuxBuild {
     libssh_platform_sdk_install.commands = \
     echo "Doing LIBSSH stuff" && \
     mkdir -p $${LIBSSH_PLATFORM_SDK_PATH} && cd $${LIBSSH_PLATFORM_SDK_PATH} && \
-    cmake $${SOURCE_DIR}/libs/libssh/ && \
+    cmake $${SOURCE_DIR}/libs/libssh/ -DWITH_EXAMPLES=OFF -DBUILD_SHARED_LIBS=OFF -DWITH_STATIC_LIB=ON && \
     make
 
     PRE_TARGETDEPS += $$libssh_platform_sdk_install.target
@@ -353,7 +353,8 @@ LinuxBuild {
     INCLUDEPATH += libs/libssh/include/
     INCLUDEPATH += $${LIBSSH_PLATFORM_SDK_PATH}/include
 
-    LIBS += $${LIBSSH_PLATFORM_SDK_PATH}/lib/libssh.so
+    LIBS += $${LIBSSH_PLATFORM_SDK_PATH}/src/libssh.a
+    LIBS += -lgssapi_krb5 -lcrypto -lz
     PRE_TARGETDEPS += $${LIBSSH_PLATFORM_SDK_PATH}
 }
 
