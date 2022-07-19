@@ -362,6 +362,6 @@ WindowsBuild {
     message("Windows Build: Assuming a pre-installed LIBSSH")
     DEFINES += _WINSOCKAPI_
     INCLUDEPATH += D:\a\qgroundcontrol\vcpkg\installed\x64-windows\include
-    LIBS += D:\a\qgroundcontrol\vcpkg\installed\x64-windows\lib\ssh.lib
+    LIBS += -Xlinker -Bstatic D:\a\qgroundcontrol\vcpkg\installed\x64-windows\lib\ssh.lib -Xlinker -Bdynamic
 }
 
