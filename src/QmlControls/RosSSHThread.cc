@@ -9,8 +9,6 @@ QGC_LOGGING_CATEGORY(RosSSHLogger, "RosSSHLogger")
 
 void
 RosSSHThread::run() {
-    int result = 2;
-
     // First, we create an SSH session
     ssh::Session* my_ssh_session = new ssh::Session();
     my_ssh_session->setOption(SSH_OPTIONS_HOST, _connection.c_str());
@@ -96,6 +94,10 @@ RosSSHThread::run() {
         }
         
     }
+    // else we just wait for some time then close the SSH session
+    else {
+        sleep(15);
+    }
     // Close the channel
     channel->sendEof();
     channel->close();
@@ -103,7 +105,7 @@ RosSSHThread::run() {
     my_ssh_session->disconnect();
     delete my_ssh_session;
 
-    qCDebug(RosSSHLogger)<<"SSH done from SSH thread with code " << result << "\n";
+    qCDebug(RosSSHLogger)<<"SSH done from SSH thread with code 0";
     emit resultReady(0);
 }
 
