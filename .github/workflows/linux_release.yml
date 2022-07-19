@@ -38,7 +38,7 @@ jobs:
           setup-python: true
 
       - name: Install QGC source dependencies
-        run:  sudo apt-get install -y libsdl2-dev libgssapi-krb5-2:amd64 libssh-dev
+        run:  sudo apt-get install -y libsdl2-dev libgssapi-krb5-2:amd64 libssh-dev krb5-multidev libkrb5-dev
 
       - name: Install Gstreamer
         run:  sudo apt-get install -y libgstreamer-plugins-base1.0-dev libgstreamer1.0-0:amd64 libgstreamer1.0-dev
