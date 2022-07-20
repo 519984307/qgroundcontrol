@@ -101,6 +101,7 @@ jobs:
           cd ..\vcpkg
           .\vcpkg.exe install zlib:x64-windows
           .\vcpkg.exe install libssh:x64-windows
+          .\vcpkg.exe install pthread:x64-windows
           .\vcpkg.exe list
           .\vcpkg.exe integrate install
 
@@ -109,6 +110,7 @@ jobs:
           echo %LIBPATH%
           cd ..\vcpkg
           dir /s D:\a\qgroundcontrol\vcpkg\*ssh*
+          dir /s D:\a\qgroundcontrol\vcpkg\*pthread*
 
       - name: Build
         working-directory: ${{ runner.temp }}\shadow_build_dir
